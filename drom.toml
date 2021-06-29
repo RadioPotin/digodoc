@@ -25,6 +25,7 @@ version = "0.1.0"
 
 [project]
 description = """\n
+
 The Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro
 """
 
@@ -64,14 +65,7 @@ share-dirs = ["share"]
 
 # project-wide fields (depends on project skeleton)
 [fields]
-makefile-trailer="""
-test-html:
-\tDIGODOC_CONFIG=$$(pwd)/config ./digodoc --test
-"""
-dot-gitignore-trailer="""
-/_digodoc
-/examples
-"""
+# ...
 
 [[package]]
 dir = "src/digodoc"
@@ -92,4 +86,8 @@ dir = "src/ez_html"
 [[package]]
 dir = "src/htmlize"
 # edit 'src/htmlize/package.toml' for package-specific options
+
+[[package]]
+dir = "src/frontend"
+# edit 'src/frontend/package.toml' for package-specific options
 

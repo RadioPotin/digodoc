@@ -15,7 +15,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh digodoc digodoc_lib meta_file ez_html htmlize
+	./scripts/copy-bin.sh digodoc digodoc_lib meta_file ez_html htmlize frontend
 	./scripts/after.sh build
 
 build-deps:

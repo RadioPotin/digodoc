@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-97dacf207785138e3b78b16d65e9cf44:.
+956f5966093e32439844bb3c4b15098b:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -12,12 +12,12 @@
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-c2dee0b87cc3e8b15710e236f927bbdb:.github/workflows/workflow.yml
+525235dfeb3338440426dc3acfa097b7:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-db0cdb9cfc7ec8f26b6344386ca9d132:.gitignore
+b31de2e5f81bfffeefcff8087eaa714f:.gitignore
 # end context for .gitignore
 
 # begin context for .ocamlformat
@@ -37,7 +37,7 @@ db0cdb9cfc7ec8f26b6344386ca9d132:.gitignore
 
 # begin context for CHANGES.md
 # file CHANGES.md
-4ac435471b09a813e8e3d83530febddc:CHANGES.md
+40035723f82f0be7fe645d22240220d9:CHANGES.md
 # end context for CHANGES.md
 
 # begin context for LICENSE.md
@@ -47,22 +47,22 @@ d091b81b6155e5fd5d6556fc8bba0094:LICENSE.md
 
 # begin context for Makefile
 # file Makefile
-e19197cb80be3103c7206862bf80342f:Makefile
+700fd86d2348d4b2019b5032ca84002a:Makefile
 # end context for Makefile
 
 # begin context for README.md
 # file README.md
-9a9129d5fa32fe17fecaabb201ed8962:README.md
+884be09571618f837b140e55bc6a2e8f:README.md
 # end context for README.md
 
 # begin context for digodoc.opam
 # file digodoc.opam
-5a6fd5088796b7f4ea0e35b94ffe0ca3:digodoc.opam
+1440dafa3fa24a5520f21513f3b26f7d:digodoc.opam
 # end context for digodoc.opam
 
 # begin context for digodoc_lib.opam
 # file digodoc_lib.opam
-6ee79f56e17edaca07f5338664bbed84:digodoc_lib.opam
+f76915a3931a5df61b1da5b47e072d7c:digodoc_lib.opam
 # end context for digodoc_lib.opam
 
 # begin context for docs/.nojekyll
@@ -87,7 +87,7 @@ e19197cb80be3103c7206862bf80342f:Makefile
 
 # begin context for docs/index.html
 # file docs/index.html
-cef3a30137e76cb3bd7f6d5559c390e6:docs/index.html
+cac235710a4b4b3649e1387a1d8c8a43:docs/index.html
 # end context for docs/index.html
 
 # begin context for docs/sphinx/index.html
@@ -107,7 +107,7 @@ dcd2ae395f9bbc486289c33f6f528c97:dot_gitignore
 
 # begin context for drom.toml
 # file drom.toml
-812d3969601fb714ec30aa5ffc13371f:drom.toml
+4c12091a6d3c308b2650595aaaa33dda:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -117,22 +117,27 @@ df544cfaf9078d1bba2f90ed1b5adf5f:dune
 
 # begin context for dune-project
 # file dune-project
-94d6af9ec23e708f2e6e8479755a9ec6:dune-project
+67882465b92158f7563976e429e261e0:dune-project
 # end context for dune-project
 
 # begin context for ez_html.opam
 # file ez_html.opam
-f345f6ec3e5d6fcb17227d97233af7cb:ez_html.opam
+c32dc82891be357071ee82eb536027c6:ez_html.opam
 # end context for ez_html.opam
+
+# begin context for frontend.opam
+# file frontend.opam
+8f46021d77d72232173f103c67c65176:frontend.opam
+# end context for frontend.opam
 
 # begin context for htmlize.opam
 # file htmlize.opam
-2ff63d883e90e76a6650307b678d7e2d:htmlize.opam
+28005ef1587adab391158b49121969ae:htmlize.opam
 # end context for htmlize.opam
 
 # begin context for meta_file.opam
 # file meta_file.opam
-d19e7a622f04aafee498af0ac024ccac:meta_file.opam
+a5e495a775514b9e77ea4ad2353dadf4:meta_file.opam
 # end context for meta_file.opam
 
 # begin context for scripts/after.sh
@@ -157,7 +162,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
-62f8e80d2ff76bed8ae90cde677457eb:sphinx/about.rst
+1ab1dcbb3ec36b23236d6d0e6b9fa81d:sphinx/about.rst
 # end context for sphinx/about.rst
 
 # begin context for sphinx/conf.py
@@ -217,7 +222,7 @@ d0b3d2dc9011821b4305f3e45a9bfcf5:src/digodoc_lib/dune
 
 # begin context for src/digodoc_lib/index.mld
 # file src/digodoc_lib/index.mld
-359745cc02022287255ff52dd10f140a:src/digodoc_lib/index.mld
+46e0cea11bce0460d20bb4abcbd9f00b:src/digodoc_lib/index.mld
 # end context for src/digodoc_lib/index.mld
 
 # begin context for src/digodoc_lib/main.ml
@@ -227,7 +232,7 @@ d0b3d2dc9011821b4305f3e45a9bfcf5:src/digodoc_lib/dune
 
 # begin context for src/digodoc_lib/package.toml
 # file src/digodoc_lib/package.toml
-a73167b84c7d267ee7c64538461bea5e:src/digodoc_lib/package.toml
+a76fb5cbbe6c609284b07e19e4e5ee72:src/digodoc_lib/package.toml
 # end context for src/digodoc_lib/package.toml
 
 # begin context for src/digodoc_lib/version.mlt
@@ -242,7 +247,7 @@ a73167b84c7d267ee7c64538461bea5e:src/digodoc_lib/package.toml
 
 # begin context for src/ez_html/index.mld
 # file src/ez_html/index.mld
-f6f9f13c572031aeaf771e6e7453e511:src/ez_html/index.mld
+ae0774fbcf953c87c5cbc3bf28d7254c:src/ez_html/index.mld
 # end context for src/ez_html/index.mld
 
 # begin context for src/ez_html/package.toml
@@ -250,14 +255,34 @@ f6f9f13c572031aeaf771e6e7453e511:src/ez_html/index.mld
 e1bd27ee36ce397a21ed05e6312d7f0d:src/ez_html/package.toml
 # end context for src/ez_html/package.toml
 
+# begin context for src/frontend/dune
+# file src/frontend/dune
+a372ab55deb99cd2767c1bd7585f8c13:src/frontend/dune
+# end context for src/frontend/dune
+
+# begin context for src/frontend/main.ml
+# file src/frontend/main.ml
+3358c8af43348f0350ede973a65548d8:src/frontend/main.ml
+# end context for src/frontend/main.ml
+
+# begin context for src/frontend/package.toml
+# file src/frontend/package.toml
+a65d506bdbdb94ec43a959766afdf44e:src/frontend/package.toml
+# end context for src/frontend/package.toml
+
+# begin context for src/frontend/version.mlt
+# file src/frontend/version.mlt
+e5152b4b8b0489050db1e38339e55a7e:src/frontend/version.mlt
+# end context for src/frontend/version.mlt
+
 # begin context for src/htmlize/dune
 # file src/htmlize/dune
-b24b36a16ef6a534de9e6957ab8bbdf5:src/htmlize/dune
+12a44d7fa1cc267659a39cd3f11299c4:src/htmlize/dune
 # end context for src/htmlize/dune
 
 # begin context for src/htmlize/index.mld
 # file src/htmlize/index.mld
-d083009cb760f54ec7584a5d45243f48:src/htmlize/index.mld
+973813a9104ced8e7baa3019fff3334c:src/htmlize/index.mld
 # end context for src/htmlize/index.mld
 
 # begin context for src/htmlize/main.ml
@@ -267,7 +292,7 @@ b7bf043b394931c798f91fa638eb24d2:src/htmlize/main.ml
 
 # begin context for src/htmlize/package.toml
 # file src/htmlize/package.toml
-ac3c08df90039d64eeae1e9369bb4d9c:src/htmlize/package.toml
+fa76a1e854d90342137c7cec19aa7303:src/htmlize/package.toml
 # end context for src/htmlize/package.toml
 
 # begin context for src/htmlize/version.mlt
@@ -282,7 +307,7 @@ e5152b4b8b0489050db1e38339e55a7e:src/htmlize/version.mlt
 
 # begin context for src/meta_file/index.mld
 # file src/meta_file/index.mld
-8a492b152c983734cb47d5e41975d58a:src/meta_file/index.mld
+03155c8f6d976e7596a9f6cedaaa9548:src/meta_file/index.mld
 # end context for src/meta_file/index.mld
 
 # begin context for src/meta_file/main.ml
