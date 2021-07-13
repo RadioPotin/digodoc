@@ -10,7 +10,7 @@ SPHINX_TARGET:=_drom/docs/sphinx
 ODOC_TARGET:=_drom/docs/doc/.
 
 
-all: build
+all: build website
 
 build:
 	./scripts/before.sh build
@@ -70,6 +70,10 @@ test:
 	./scripts/before.sh test
 	opam exec -- dune build @runtest
 	./scripts/after.sh test
+
+website: html/info.json
+	dune build ./src/frontend/main.bc.js --profile release
+	cp _build/default/src/frontend/main.bc.js html/frontend.js
 
 clean:
 	rm -rf _build

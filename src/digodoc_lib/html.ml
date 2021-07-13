@@ -11,8 +11,9 @@
 
 open Ez_html.V1
 open EzFile.OP
+open Globals
 
-let digodoc_html_dir = Globals.digodoc_dir // "html"
+let digodoc_html_dir = digodoc_dir // "html"
 
 (* generate page _digodoc/html/${filename} *)
 let generate_page ~filename ~title f =
@@ -29,8 +30,13 @@ let generate_page ~filename ~title f =
         path_list) in
   let root = if s = "" then s else s ^ "/" in
   
-  let script = if !Globals.dynamic_index then "search_api.js" else "search.js" in
 
+  let script = match !frontend with 
+    | JS -> "search.js"
+    | JS_API -> "search_api.js"
+    | JS_OCAML -> "frontend.js"
+  in 
+  
   (* removed 'async' from the script line because unrecognized by ez_ml parser *)
   let bb = Buffer.create 10000 in
   Printf.bprintf bb {|<!DOCTYPE html>
@@ -171,10 +177,10 @@ let add_header_footer () =
   Printf.eprintf "Adding header and footer...\n%!";
   let html_dir = digodoc_html_dir in
   let head_childs = [("link", {|<link rel="icon" href="${root-html}_odoc-theme/favicon.png">|});
-                     ("script", {|<script defer="defer" 
+                     (* TOREMOVE : ("script", {|<script defer="defer" 
                         type="application/javascript" 
                         src="${root-html}headerFooter.js">
-                        </script>|})] in
+                        </script>|})*)] in
   
 
   EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"*.html"

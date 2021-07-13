@@ -35,30 +35,66 @@ let clear_index_page () =
       title##.style##.display := js "none")
   done
 
-
 let update_index_page () =
-  let added = Requests.sendRequest () in
+  let%lwt added = Requests.sendRequest () in
   if added then begin
     state.last_id <- state.last_id + 50;
     Dom.appendChild (get_main_div ()) load_div
   end;
-  Requests.getEntriesNumber ();
-  Headfoot.footerHandler ()
+  let%lwt () = Requests.getEntriesNumber () in
+  Headfoot.footerHandler ();
+  Lwt.return_unit
 
-
-let set_start_letter ch = 
+let set_start_letter ch =
+  logs "PES";
   state.starts_with <- ch;
   state.last_id <- 0;
-  state.pattern <- "~";
-  let search_elt = unopt @@ document##getElementById (js "search") in
-  let search = unopt @@ Html.CoerceTo.input search_elt in
-  search##.value := js "";
   clear_index_page ();
   update_index_page ()
 
+let set_onclick_handlers () =
+  let onclick_handler ch _ =
+    Lwt.async (fun () -> set_start_letter ch);
+    _false
+  in 
+    let a = getElementById "all-letters" in 
+    a##.onclick := Html.handler (onclick_handler ".");
+    for index = 48 to 57 do
+      let ch = fromCharCode index in
+      let id = "letter-" ^ ch in
+      match Opt.to_option @@ document##getElementById (js id) with
+      | Some a -> a##.onclick := Html.handler (onclick_handler ch)
+      | None -> ()  
+    done;
+    for index = 97 to 122 do
+      let ch = fromCharCode index in
+      let id = "letter-" ^ ch in
+      match Opt.to_option @@ document##getElementById (js id) with
+      | Some a -> a##.onclick := Html.handler (onclick_handler ch)
+      | None -> () 
+    done
 
-let onload _ =
-  Requests.api_host ();
+let set_search_handler () = 
+  let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in
+  search##.onkeyup := Html.handler (fun _ ->
+    let re = search##.value in
+    if in_root_directory && not (filename = "about.html") 
+    then begin
+      clear_index_page ();
+      let input = re##trim in
+      begin  
+        if input##.length > 0
+        then state.pattern <- to_string input
+        else state.pattern <- "~";
+      end;
+      state.last_id <- 0;
+      Lwt.async update_index_page
+    end;
+    _false)
+
+let onload_main () = 
+  let%lwt () = Requests.api_host () in 
+  Headfoot.activate_bar ();
   Headfoot.footerHandler ();
   if in_root_directory && not (filename = "about.html") 
   then begin
@@ -73,30 +109,22 @@ let onload _ =
       Opt.iter title_opt (fun title -> 
         title##.style##.display := js "none")
     done;
-    ignore @@ Requests.sendRequest ();
-    Requests.getEntriesNumber ();
-    state.last_id <- state.last_id + 50;
-    Dom.appendChild (get_main_div ()) load_div;
-    let selected_elt = unopt @@ document##querySelector (js "#load_div") in
-    Observer.observer##observe selected_elt
+    Lwt.async (fun () -> 
+      let%lwt _ = Requests.sendRequest () in
+      let%lwt () = Requests.getEntriesNumber () in
+      state.last_id <- state.last_id + 50;
+      Dom.appendChild (get_main_div ()) load_div;
+      let selected_elt = unopt @@ document##querySelector (js "#load_div") in
+      Observer.observer##observe selected_elt;
+      Lwt.return_unit);
   end;
-  let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in
-  search##.onkeyup := Html.handler (fun _ ->
-      let re = search##.value in
-      if in_root_directory && not (filename = "about.html") 
-      then begin
-        clear_index_page ();
-        let input = re##trim in
-        begin  
-          if input##.length > 0
-          then state.pattern <- to_string input
-          else state.pattern <- "~";
-        end;
-        state.last_id <- 0;
-        update_index_page ()
-      end;
-      _false
-    );
+  Lwt.return_unit
+    
+
+let onload _ =
+  set_search_handler ();
+  set_onclick_handlers ();
+  Lwt.async onload_main;
   _false
 
 (* TODO: different onload in function to the type of page : index, doc, source *)

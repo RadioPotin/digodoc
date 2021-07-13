@@ -17,7 +17,7 @@ let activate_bar () =
     let item_bar = getElementById item in
     item_bar##.className := js "active"
   in
-    if in_root_directory then begin
+    if not in_root_directory then begin
         (* TODO : search input dispo through all the pages *)
         let search = getElementById "search" in
         search##.style##.display := js "none"

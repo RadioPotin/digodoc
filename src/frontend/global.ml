@@ -40,6 +40,8 @@ let state = {
 
 (********** Utils **********)
 
+let logs s = Firebug.console##warn (Js.string s)
+
 let unoptdef (valeur : 'a optdef) : 'a  =
   Optdef.get valeur (fun () -> assert false)
 
@@ -83,5 +85,4 @@ let load_div : Html.element t =
   div##setAttribute (js "id") (js "load_div");
   div
 
-let in_root_directory : bool =
-  reversed_path.(1) = "html"
+let in_root_directory : bool = Array.length reversed_path > 1

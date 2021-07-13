@@ -458,9 +458,9 @@ let print_index bb index entity_name =
       <nav>
 |} !n entity_name;
 
-  Printf.bprintf bb {|<a href="#" onclick="set_start_letter('.');return false;">ALL</a>|};
+  Printf.bprintf bb {|<a id="all-letters" href="#" >ALL</a>|};
   StringMap.iter (fun i _ ->
-      Printf.bprintf bb {|<a href="#" onclick="set_start_letter('%s');return false;">%s</a>
+      Printf.bprintf bb {|<a id="letter-%s" href="#" >%s</a>
 |} i i) !map;
 
   Printf.bprintf bb {|
@@ -475,7 +475,7 @@ let print_index bb index entity_name =
       </h3>
       <ol id="packages-%s" class="packages">
 |} i i i i i;
-      if not !Globals.dynamic_index then begin
+      if !Globals.frontend = Globals.JS then begin
         List.iter (fun ( _entry, line ) ->
             Printf.bprintf bb "%s\n" line;
           ) ( List.sort compare !r ) 

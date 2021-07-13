@@ -15,4 +15,6 @@ let htmlize_sources_dir = "_digodoc/sources"
 
 let db_update_index = ref false
 
-let dynamic_index = ref false
+type frontentd_type = JS | JS_API | JS_OCAML
+
+let frontend = ref JS 

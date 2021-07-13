@@ -5,24 +5,21 @@
  (name ui_lib)
  (wrapped false)
  (modules headfoot observer requests global insertion object)
- (preprocess (pps js_of_ocaml-ppx ppx_deriving_jsoo))
- (libraries search-api.data_common search-api.api_services vue-jsoo ez_api.ixhr))
+ (preprocess (pps js_of_ocaml-ppx ppx_deriving_jsoo lwt_ppx))
+ (libraries js_of_ocaml-lwt search-api.data_common search-api.api_services ez_api ez_api.ixhr_lwt))
 
 (executable
  (name main)
  (modules main)
- (preprocess (pps js_of_ocaml-ppx))
+ (preprocess (pps js_of_ocaml-ppx lwt_ppx))
  (libraries ui_lib)
  (modes js)
  (js_of_ocaml
   (flags (:standard --no-sourcemap))))
 
 
-
-
-
 (install
- (files (main.bc.js as www/js/frontend.js))
+ (files (main.bc.js as frontend.js))
  (section share)
  (package frontend))
 
