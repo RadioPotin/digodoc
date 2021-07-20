@@ -45,7 +45,7 @@ ez_subst = "0.1"
 ez_html = ">=0.1"
 lambdasoup = "0.7.2"
 crunch = ""
-omd = ""
+omd = ">=2.0.0"
 
 # package tools dependencies
 [tools]
