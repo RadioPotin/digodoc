@@ -30,9 +30,42 @@ let () =
       title = None
     }
     in
-    let result = Htmlize.Patchtml.handle_link sent in
+    let result = Htmlize.Patchtml.handle_link ~is_raw:false sent in
     let ok = result = expected in
     if not ok then Format.printf "expected: %s but got %s@." expected.destination sent.destination;
 
     assert ok
-  ) test_cases
+  ) test_cases;
+
+  let img_test_cases = [|
+    (".", "raw/.");
+    ("./", "raw/.");
+    ("../.", "../../raw/.");
+    ("./image.png", "../image.png/raw/image.png");
+    ("../image.png", "../../image.png/raw/image.png");
+    ("..////image.png", "../../image.png/raw/image.png");
+    ("..////.../image.png", "../../.../image.png/raw/image.png");
+    ("../dir/../dir/image.png", "../../dir/../dir/image.png/raw/image.png");
+  |]
+  in
+
+  Array.iter (fun (sent, expected)->
+    let open Omd  in
+    let sent = {
+      label =  Text ([("plop","salut")], "cc");
+      destination = sent;
+      title = None
+    }
+    in
+    let expected = {
+      label = Text ([("plop","salut")], "cc");
+      destination = expected;
+      title = None
+    }
+    in
+    let result = Htmlize.Patchtml.handle_link ~is_raw:true sent in
+    let ok = result = expected in
+    if not ok then Format.printf "expected: %s but got %s@." expected.destination sent.destination;
+
+    assert ok
+  ) img_test_cases

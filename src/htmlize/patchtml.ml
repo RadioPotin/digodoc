@@ -41,7 +41,7 @@ let is_anchor link =
  * Then prepend the corresponding number of .. to the basename
  * Then append index.html to fix link
  * *)
-let handle_link link =
+let handle_link ~is_raw link =
 
   (* Escape through this branch if the link points to an http(s) address,
    * or is an anchor, or link is empty
@@ -50,6 +50,12 @@ let handle_link link =
     link
 
   else
+    let target =
+      if is_raw then
+        ["raw";Filename.basename link.destination]
+      else
+        ["index.html"]
+    in
     (* Turn the link into a list in order to process it *)
     let li = String.split_on_char '/' link.destination in
 
@@ -96,17 +102,14 @@ let handle_link link =
      * *)
     {
       link with destination =
-                  String.concat "/" (new_link @ ["index.html"]);
+                  String.concat "/" (new_link @ target);
     }
 
-
 let rec handle_inline = function
-  | Concat (attr, attr_inline_list) ->
-    Concat (attr, List.map handle_inline attr_inline_list)
+  | Concat (attr, attr_inline_list) -> Concat (attr, List.map handle_inline attr_inline_list)
   | Text (attr, s) -> Text (attr, s)
   | Emph (attr, attr_inline) -> Emph (attr, handle_inline attr_inline)
-  | Strong (attr, attr_inline) ->
-    Strong (attr, handle_inline attr_inline)
+  | Strong (attr, attr_inline) -> Strong (attr, handle_inline attr_inline)
   | Code (attr, s) -> Code (attr, s)
   | Hard_break attr -> Hard_break (attr)
   | Soft_break attr -> Soft_break (attr)
@@ -114,21 +117,20 @@ let rec handle_inline = function
     if attr_link.destination = "" then
       attr_link.label
     else
-      Link (attr, handle_link attr_link)
+      Link (attr, handle_link ~is_raw:false attr_link)
   | Image (attr, attr_link) ->
     if attr_link.destination = "" then
       attr_link.label
     else
-      Image (attr, handle_link attr_link)
+      Image (attr, handle_link ~is_raw:true attr_link)
   | Html (attr, s) -> Html (attr, s)
 
 let rec handle_block = function
-  | Paragraph (attr, inline)->
-    Paragraph (attr, handle_inline inline)
+  | Paragraph (attr, inline)-> Paragraph (attr, handle_inline inline)
   | List (attr, list_type, list_spacing, attr_block_list_list) ->
     List (attr, list_type, list_spacing,
       List.map (List.map handle_block) attr_block_list_list)
-  | Blockquote (attr, attr_block_list) -> Blockquote (attr, attr_block_list)
+  | Blockquote (attr, attr_block_list) -> Blockquote (attr, List.map handle_block attr_block_list)
   | Thematic_break attr -> Thematic_break attr
   | Heading (attr, i, attr_inline) ->
     Heading (attr, i, (handle_inline attr_inline))
@@ -138,3 +140,6 @@ let rec handle_block = function
 
 let handle_file doc  =
   List.map handle_block doc
+
+let render_img img =
+  Format.sprintf "<img src=\"raw/%s\"/>" img
