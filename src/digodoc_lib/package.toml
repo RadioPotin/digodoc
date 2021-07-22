@@ -42,7 +42,7 @@ ez_opam_file = ">=0.1"
 meta_file = "version"
 htmlize = "version"
 lwt= ">=5.4.0"
-omd = ">=2.0.0"
+omd = ">=2.0.0~alpha2"
 cohttp-lwt-unix = ">=2.5.4"
 cohttp-lwt= ">=2.5.4"
 

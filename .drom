@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-123c7ef475b1fbdcaf011a0f846cfe6f:.
+c3eb60f15811c5533361a18f2cda86b0:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -37,7 +37,7 @@ a8d1bcd6f62c6b813b77d3ff8959d8d2:.ocamlformat-ignore
 
 # begin context for CHANGES.md
 # file CHANGES.md
-873ca123aaa4f12aedad55595c52d1ea:CHANGES.md
+d56aaadd8e0fec3ee5e644de78212d04:CHANGES.md
 # end context for CHANGES.md
 
 # begin context for LICENSE.md
@@ -62,7 +62,7 @@ e19197cb80be3103c7206862bf80342f:Makefile
 
 # begin context for digodoc_lib.opam
 # file digodoc_lib.opam
-9a7a2235b2cf444eaa7ea91595e88c89:digodoc_lib.opam
+891fd9598bd5c613776d122868b8d492:digodoc_lib.opam
 # end context for digodoc_lib.opam
 
 # begin context for docs/.nojekyll
@@ -112,7 +112,7 @@ df544cfaf9078d1bba2f90ed1b5adf5f:dune
 
 # begin context for dune-project
 # file dune-project
-e0feded49dd4a679a0dd82d5bb21eb17:dune-project
+de4b904136eb0eb911bdca8f3f644688:dune-project
 # end context for dune-project
 
 # begin context for ez_html.opam
@@ -122,7 +122,7 @@ f345f6ec3e5d6fcb17227d97233af7cb:ez_html.opam
 
 # begin context for htmlize.opam
 # file htmlize.opam
-62f80efc77418166ec65d7f89ca0735b:htmlize.opam
+41dd768c5e6d8c95e1aa3467cd41dbdd:htmlize.opam
 # end context for htmlize.opam
 
 # begin context for meta_file.opam
@@ -232,7 +232,7 @@ a73167b84c7d267ee7c64538461bea5e:src/digodoc_lib/package.toml
 
 # begin context for src/ez_html/dune
 # file src/ez_html/dune
-8b4343935c05c9a0301dd12bf2e21d8c:src/ez_html/dune
+2f64757a8934c6e550f88a7638d272a2:src/ez_html/dune
 # end context for src/ez_html/dune
 
 # begin context for src/ez_html/index.mld
