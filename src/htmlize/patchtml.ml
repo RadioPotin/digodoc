@@ -46,18 +46,18 @@ let handle_link ~is_raw link =
   (* Escape through this branch if the link points to an http(s) address,
    * or is an anchor, or link is empty
    * *)
-  if is_url link.destination || is_anchor link.destination then
+  if is_url link || is_anchor link then
     link
 
   else
     let target =
       if is_raw then
-        ["raw";Filename.basename link.destination]
+        ["raw";Filename.basename link]
       else
         ["index.html"]
     in
     (* Turn the link into a list in order to process it *)
-    let li = String.split_on_char '/' link.destination in
+    let li = String.split_on_char '/' link in
 
     (* Filter out the empty strings resulting from forms like:
      * path/to/directory/ = [path;to;directory;""]
@@ -100,10 +100,50 @@ let handle_link ~is_raw link =
      * 2. the correct basename, whether it be foo/ or foo/bar/bang
      * 3. index.html appended to the tail to fix broken MD link
      * *)
-    {
-      link with destination =
-                  String.concat "/" (new_link @ target);
-    }
+    String.concat "/" (new_link @ target)
+
+let handle_link_omd ~is_raw link =
+  {
+    link with destination = handle_link ~is_raw link.destination
+  }
+
+open Ez_html
+open Xml
+open Xml_types
+
+(* Function to change static links found in HTML code in md files *)
+let edit_attr ~is_raw (attr_name, attr_value) =
+  match attr_name with
+  | "href" | "src" ->
+    let newlink = handle_link ~is_raw attr_value
+    in (attr_name, newlink)
+  | _attr -> (attr_name, attr_value)
+
+let rec markdown_html_patch = function
+  | PCData data -> PCData data
+  | Element (tag, attrs, children) ->
+    match tag with
+    | "a" -> Element (tag, List.map (edit_attr ~is_raw:false) attrs, List.map markdown_html_patch children)
+    | "img" -> Element (tag, List.map (edit_attr ~is_raw:true) attrs, List.map markdown_html_patch children)
+    | _t -> Element (tag, attrs, List.map markdown_html_patch children)
+
+
+let handle_html html =
+  try
+    let h = Xml.parse_string html in
+    let xml = markdown_html_patch h in
+    to_string_fmt xml
+
+  with Error (msg, _loc) ->
+
+  match msg with
+  | EndOfTagExpected msg ->
+    Format.eprintf {|!!Warning!!@.
+    Tag "%s" has no corresponding closing tag \
+    OR character '\' not found in non-container tag:@.%s@.|} msg html;
+    html
+  | _ -> Format.printf "Ez_html.Xml error (Patchtml.handle_html)";
+    html
 
 let rec handle_inline = function
   | Concat (attr, attr_inline_list) -> Concat (attr, List.map handle_inline attr_inline_list)
@@ -117,13 +157,13 @@ let rec handle_inline = function
     if attr_link.destination = "" then
       attr_link.label
     else
-      Link (attr, handle_link ~is_raw:false attr_link)
+      Link (attr, handle_link_omd ~is_raw:false attr_link)
   | Image (attr, attr_link) ->
     if attr_link.destination = "" then
       attr_link.label
     else
-      Image (attr, handle_link ~is_raw:true attr_link)
-  | Html (attr, s) -> Html (attr, s)
+      Image (attr, handle_link_omd ~is_raw:true attr_link)
+  | Html (attr, s) -> Html (attr, handle_html s)
 
 let rec handle_block = function
   | Paragraph (attr, inline)-> Paragraph (attr, handle_inline inline)
@@ -135,11 +175,12 @@ let rec handle_block = function
   | Heading (attr, i, attr_inline) ->
     Heading (attr, i, (handle_inline attr_inline))
   | Code_block (attr, s1, s2) -> Code_block (attr, s1, s2)
-  | Html_block (attr, str) -> Html_block (attr, str)
+  | Html_block (attr, str) -> Html_block (attr, handle_html str)
   | Definition_list (attr, attr_def_elt_list) -> Definition_list (attr, attr_def_elt_list)
 
 let handle_file doc  =
   List.map handle_block doc
 
+(* This renders raw images in Source indexes *)
 let render_img img =
   Format.sprintf "<img src=\"raw/%s\"/>" img

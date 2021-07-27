@@ -30,7 +30,7 @@ let () =
       title = None
     }
     in
-    let result = Htmlize.Patchtml.handle_link ~is_raw:false sent in
+    let result = Htmlize.Patchtml.handle_link_omd ~is_raw:false sent in
     let ok = result = expected in
     if not ok then Format.printf "expected: %s but got %s@." expected.destination sent.destination;
 
@@ -63,7 +63,7 @@ let () =
       title = None
     }
     in
-    let result = Htmlize.Patchtml.handle_link ~is_raw:true sent in
+    let result = Htmlize.Patchtml.handle_link_omd ~is_raw:true sent in
     let ok = result = expected in
     if not ok then Format.printf "expected: %s but got %s@." expected.destination sent.destination;
 

@@ -48,7 +48,9 @@ let htmlize filename content =
   let ext = String.lowercase_ascii ext in
   match ext with
   | "md" ->
-    let content = try Omd.of_string content |> Patchtml.handle_file |> Omd.to_html with _ -> content in
+    let content =
+      Omd.of_string content |> Patchtml.handle_file |> Omd.to_html
+    in
     Printf.bprintf b {|%s|} content;
     Buffer.contents b
 
