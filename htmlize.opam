@@ -8,6 +8,7 @@ synopsis: "digodoc, opam switch mapper and documentation generator"
 description: """
 
 
+
 The Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro
 """
 authors: ["Fabrice Le Fessant <fabrice.le_fessant@origin-labs.com>"]
@@ -39,11 +40,11 @@ install: [
 depends: [
   "ocaml" {>= "4.10.0"}
   "dune" {>= "2.6.0"}
-  "lambdasoup" {>= "0.7.2" & < "1.0.0"}
   "ez_subst" {>= "0.1"}
   "ez_html" {>= "0.1"}
   "ez_file" {>= "0.2"}
   "ez_cmdliner" {>= "0.2"}
+  "digodoc_common" {= version}
   "crunch" {}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

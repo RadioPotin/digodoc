@@ -46,7 +46,6 @@ let update_index_page () =
   Lwt.return_unit
 
 let set_start_letter ch =
-  logs "PES";
   state.starts_with <- ch;
   state.last_id <- 0;
   clear_index_page ();
@@ -129,9 +128,13 @@ let onload _ =
 
 (* TODO: different onload in function to the type of page : index, doc, source *)
 let main () =
-  let footHandler = Html.handler (fun _ -> Headfoot.footerHandler (); _false) in
+  let footHandler = 
+    Html.handler (fun _ -> 
+      Headfoot.activate_bar ();
+      Headfoot.footerHandler ();
+      _false) in
   window##.onresize := footHandler;
-  if in_root_directory
+  if is_index_page 
   then window##.onload := Html.handler onload
   else window##.onload := footHandler
   

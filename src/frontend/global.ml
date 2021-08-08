@@ -85,4 +85,13 @@ let load_div : Html.element t =
   div##setAttribute (js "id") (js "load_div");
   div
 
-let in_root_directory : bool = Array.length reversed_path > 1
+let in_root_directory : bool = Array.length reversed_path < 3
+
+let is_index_page : bool =
+  in_root_directory && not (String.equal filename "about.html")
+
+let is_doc_page : bool =
+  reversed_path.(0) = "docs"
+
+let is_source_page : bool =
+  reversed_path.(0) = "sources"

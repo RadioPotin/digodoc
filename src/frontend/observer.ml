@@ -22,7 +22,6 @@ let observer : intersectionObserver t=
         if entry##.isIntersecting = _true then begin
           Dom.removeChild (get_main_div ()) load_div;
           Lwt.async (fun () -> 
-            logs "observer";
             let%lwt added = Requests.sendRequest () in
             if added then begin
               state.last_id <- state.last_id + 50;

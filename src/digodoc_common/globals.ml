@@ -10,7 +10,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzFile.OP
+
+let digodoc_dir = "_digodoc"
+
+let digodoc_html_dir = digodoc_dir // "docs"
+
+let htmlize_sources_dir = digodoc_dir // "sources"
+
+let db_update_index = ref false
+
+type frontentd_type = JS | JS_API | JS_OCAML
+
+let frontend = ref JS 
+
 (* options that are modified only using digodoc *)
 let sources = ref true
 
 let with_header = ref false
+

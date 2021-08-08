@@ -9,20 +9,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Digodoc_common.Utils
+
 let about_page = 
     Printf.sprintf
         {|<!DOCTYPE html>
         <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
             <title>About</title>
-            <link rel="stylesheet" href="_odoc-theme/odoc.css"/>
-            <script type="text/javascript" src="search.js" charset="utf-8"></script>
+            <link rel="stylesheet" href="static/styles/odoc/odoc.css"/>
+            <script type="text/javascript" src="static/scripts/search.js" charset="utf-8"></script>
             <meta charset="utf-8"/>
             <meta name="generator" content="digodoc 0.1"/>
             <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-            <script src="highlight.pack.js"></script>
+            <script src="static/scripts/highlight.pack.js"></script>
             <script>hljs.initHighlightingOnLoad();</script>
-            <script defer="defer" type="application/javascript" src="headerFooter.js"></script>
+            <script defer="defer" type="application/javascript" src="static/scripts/headerFooter.js"></script>
         </head>
         <body>
             %s 
@@ -33,26 +35,25 @@ let about_page =
         </body>
         </html>
         |}
-        (Html.file_content "header.html")
-        (Html.file_content "about.html")
-        (Html.file_content "footer.html")
+        (file_content "header.html")
+        (file_content "about.html")
+        (file_content "footer.html")
 
 (* Emulation of doc generation. To use only to check html style / scripts *)
 let generate () =
     if EzFile.exists "examples" then 
         EzFile.remove_dir ~all:true "examples";
-    EzFile.make_dir ~p:true "examples/html";
     EzFile.make_dir ~p:true "examples/sources";
 
     (* page example for docs: about.html *)
-    Process.call [|"rsync"; "-auv"; "html/.";  "examples/html/." |];
+    Process.call [|"rsync"; "-auv"; "html/.";  "examples/." |];
     let brace () var =
         match var with
         | "header_link" -> {| | <a href="#header">To the top</a>|}
         | _ -> ""
     in
     let about_html = Ez_subst.V1.EZ_SUBST.string about_page ~brace ~ctxt:() in
-    EzFile.write_file "examples/html/about.html" about_html;
+    EzFile.write_file "examples/about.html" about_html;
 
     (* pages examples for sources: config folder *)
     Htmlize.Main.htmlize "examples/sources/" ["config/"];

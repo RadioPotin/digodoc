@@ -22,39 +22,29 @@ let hide_with_letter first_letter =
 
 let insert_packages : packages_jsoo t -> unit  = 
     fun (packages : packages_jsoo t) -> 
-        logs "insert_packages";
         let pck : opam_entry_jsoo t = unoptdef @@ array_get packages 0 in
         let first_letter : js_string t ref = ref (pck##.name##charAt 0)##toLowerCase in
         hide_with_letter !first_letter;
 
         foreach 
             (fun _ elt -> 
-                logs "1";
                 let pkg = Html.createLi document in
                 pkg##setAttribute (js "class") (js "package");
-                logs "2";
                 let pkg_name = Html.createA document in
                 pkg_name##setAttribute (js "class") (js "digodoc-opam");
                 pkg_name##setAttribute (js "href") elt##.path;
-                logs "3";
                 let name = Html.createCode document in
                 name##.innerHTML := elt##.name;
-                logs "4";
                 Dom.appendChild pkg_name name;
                 Dom.appendChild pkg pkg_name;
-                logs "5";
                 pkg##.innerHTML := concat pkg##.innerHTML @@ concat (js " ") elt##.synopsis;
-                logs "6";
                 let elt_first_letter = (elt##.name##charAt 0)##toLowerCase in
-                logs (Format.sprintf "%s %s" (to_string !first_letter) (to_string elt_first_letter));
                 if not (!first_letter = elt_first_letter) then begin
                     first_letter := elt_first_letter;
                     hide_with_letter !first_letter;
                 end;
-                logs "7";
                 let pkg_set = unopt @@ document##getElementById (concat (js "packages-") !first_letter) in
                 Dom.appendChild pkg_set pkg;
-                logs "8";
             )
         packages
     

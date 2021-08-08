@@ -43,7 +43,7 @@ let get_api_host () =
 let wrap_res ?error f = function
   | Ok x -> f x
   | Error exn -> let s = Printexc.to_string exn in match error with
-    | None -> (*logs s*) ()
+    | None ->  ()
     | Some e -> e 500 (Some s)
 
 let get0 ?post ?headers ?params ?msg ~host service  =
@@ -108,7 +108,6 @@ let getEntriesNumber () =
 
 
 let sendRequest () = 
-    logs "sendrequest";
     let entry_info = entry_info_of_state ()  in
     begin 
         match filename with

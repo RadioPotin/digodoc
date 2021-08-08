@@ -9,7 +9,7 @@
 (package
  (name digodoc)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (digodoc_lib (= version))
@@ -22,7 +22,7 @@
 (package
  (name digodoc_lib)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (omd ( >= 1.3.1 ))
@@ -32,6 +32,7 @@
    (ez_opam_file ( >= 0.1 ))
    (ez_html ( >= 0.1 ))
    (ez_file (and (>= 0.1.0) (< 1.0.0)))
+   (digodoc_common (= version))
    (cohttp-lwt-unix ( >= 2.5.4 ))
    (cohttp-lwt ( >= 2.5.4 ))
    odoc
@@ -44,7 +45,7 @@
 (package
  (name meta_file)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (ocplib_stuff ( >= 0.1 ))
@@ -57,7 +58,7 @@
 (package
  (name ez_html)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (ocplib_stuff ( >= 0.1 ))
@@ -70,7 +71,7 @@
 (package
  (name htmlize)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (lambdasoup (and (>= 0.7.2) (< 1.0.0)))
@@ -78,6 +79,7 @@
    (ez_html ( >= 0.1 ))
    (ez_file ( >= 0.2 ))
    (ez_cmdliner ( >= 0.2 ))
+   (digodoc_common (= version))
    crunch
    ppx_inline_test
    ppx_expect
@@ -88,13 +90,26 @@
 (package
  (name frontend)
  (synopsis "digodoc, opam switch mapper and documentation generator")
- (description "\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
    (search-api ( >= ~dev ))
    (js_of_ocaml ( >= 3.0 ))
    (ppx_deriving_jsoo ( >= 0.1 ))
    (js_of_ocaml-ppx ( >= 3.0 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+ ))
+
+(package
+ (name digodoc_common)
+ (synopsis "digodoc, opam switch mapper and documentation generator")
+ (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
+ (depends
+   (ocaml (>= 4.10.0))
+   (ez_file (and (>= 0.1.0) (< 1.0.0)))
    ppx_inline_test
    ppx_expect
    odoc

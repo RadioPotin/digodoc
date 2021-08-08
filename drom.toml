@@ -26,6 +26,7 @@ version = "0.1.0"
 [project]
 description = """\n
 
+
 The Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro
 """
 
@@ -90,4 +91,8 @@ dir = "src/htmlize"
 [[package]]
 dir = "src/frontend"
 # edit 'src/frontend/package.toml' for package-specific options
+
+[[package]]
+dir = "src/digodoc_common"
+# edit 'src/digodoc_common/package.toml' for package-specific options
 

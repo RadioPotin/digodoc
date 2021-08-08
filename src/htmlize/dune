@@ -4,7 +4,7 @@
   (name htmlize)
   (public_name htmlize)
   (wrapped true)
-  (libraries lambdasoup ez_subst ez_html ez_file ez_cmdliner crunch )
+  (libraries ez_subst ez_html ez_file ez_cmdliner digodoc_common crunch )
   
   
   )
@@ -19,9 +19,4 @@
 (documentation
   (package htmlize))
 
-
-(rule
-  (targets files.ml)
-  (action
-      (run %{bin:ocaml-crunch} -m plain -o files.ml %{env:DIGODOC_CONFIG=../../../../config})))
 

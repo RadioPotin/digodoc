@@ -73,7 +73,7 @@ test:
 
 website: html/info.json
 	dune build ./src/frontend/main.bc.js --profile release
-	cp _build/default/src/frontend/main.bc.js html/frontend.js
+	cp _build/default/src/frontend/main.bc.js html/static/scripts/frontend.js
 
 clean:
 	rm -rf _build

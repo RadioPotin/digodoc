@@ -1,2 +1,2 @@
 make
-cp html/frontend.js _digodoc/html/frontend.js
+cp html/static/scripts/frontend.js _digodoc/static/scripts/frontend.js

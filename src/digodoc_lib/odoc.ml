@@ -13,7 +13,7 @@ open Ez_html.V1
 open EzCompat
 open EzFile.OP
 open Type
-
+open Digodoc_common
 (* Note:
    In our first version, we were computing dependencies at the module level,
   but that's incompatible with `odoc`, because `odoc` follows "false"
@@ -127,8 +127,8 @@ let call_odoc ~continue_on_error state mdl ~pkgs ext =
       Process.call ~continue_on_error ( Array.of_list cmd );
       let cmd = [
         "odoc" ; "html" ;
-        "--theme-uri"; "_odoc-theme" ;
-        "-o" ; Html.digodoc_html_dir ;
+        "--theme-uri"; "../static/styles/odoc" ;
+        "-o" ; Globals.digodoc_html_dir ;
         odoc_target ]
         @ includes
       in
@@ -166,7 +166,7 @@ let call_odoc_compile ~continue_on_error state mdl ~pkgs ext =
 
 let call_odoc_html ~continue_on_error mdl ~pkgs =
   let pkg = pkg_of_mdl mdl in
-  let html_target_dir = Html.digodoc_html_dir // pkg // mdl.mdl_name in
+  let html_target_dir = Globals.digodoc_html_dir // pkg // mdl.mdl_name in
   let odoc_source = digodoc_odoc_dir // pkg // mdl.mdl_basename ^ ".odoc" in
   let includes =
     List.flatten @@
@@ -177,8 +177,8 @@ let call_odoc_html ~continue_on_error mdl ~pkgs =
   if force_rebuild || not ( Sys.file_exists html_target_dir ) then begin
     let cmd = [
       "odoc" ; "html" ;
-      "--theme-uri"; "_odoc-theme" ;
-      "-o" ; Html.digodoc_html_dir ;
+      "--theme-uri"; "../static/styles/odoc" ;
+      "-o" ; Globals.digodoc_html_dir ;
       odoc_source ]
       @ includes
     in
@@ -211,8 +211,8 @@ let call_odoc_mld ~continue_on_error state pkg mldfile ~pkgs =
 
   let cmd = [
     "odoc" ; "html" ;
-    "--theme-uri"; "_odoc-theme" ;
-    "-o" ; Html.digodoc_html_dir ;
+    "--theme-uri"; "../static/styles/odoc"  ;
+    "-o" ; Globals.digodoc_html_dir ;
     odoc_target ]
     @ includes
   in
@@ -497,19 +497,19 @@ let libraries_to_html title map =
 
 
 let infos_of_opam state pkg opam =
-  let html_dir = Html.digodoc_html_dir // pkg in
+  let html_dir = Globals.digodoc_html_dir // pkg in
 
   let omd_generate_file file =
     let basename = Filename.basename file in
     let name,_ = EzFile.cut_extension basename in
-    let html_file = (pkg // name ^ ".html") in
+    let html_file = ("docs" // pkg // name ^ ".html") in
     let srcfile = ( state.opam_switch_prefix // file ) in
     if Sys.file_exists srcfile then begin
       EzFile.make_dir ~p:true html_dir ;
       let generate bb ~title =
         ignore title;
         let content = try EzFile.read_file srcfile |> Omd.of_string |> Omd.to_html with _ -> "" in
-        Printf.bprintf bb {|%s|} content
+        Printf.bprintf bb {|%s|} content 
       in
       Html.generate_page
         ~filename:html_file
@@ -582,7 +582,7 @@ let infos_of_opam state pkg opam =
 
 let save_line ~dir_name ~line_name line =
 
-  let mdl_dir = Html.digodoc_html_dir // dir_name in
+  let mdl_dir = Globals.digodoc_html_dir // dir_name in
   EzFile.make_dir ~p:true mdl_dir;
   EzFile.write_file ( mdl_dir // line_name )
     line;
@@ -621,7 +621,7 @@ let generate_library_pages state =
       let opam_pkg = pkg_of_opam lib.lib_opam in
 
       Index.SAVE.save_library_entry
-        ( Html.digodoc_html_dir // pkg // "ENTRY.LIBRARY." ^ lib.lib_name )
+        ( Globals.digodoc_html_dir // pkg // "ENTRY.LIBRARY." ^ lib.lib_name )
         lib;
 
       if not skip_packages then
@@ -661,7 +661,7 @@ let generate_library_pages state =
               let assets_dir = state.opam_switch_prefix // "doc" // mld_dir // "odoc-assets" in
               if Sys.file_exists assets_dir
               then Process.call [|
-                  "rsync"; "-auv"; assets_dir // ""; Html.digodoc_html_dir // pkg // "_assets"|];
+                  "rsync"; "-auv"; assets_dir // ""; Globals.digodoc_html_dir // pkg // "_assets"|];
               let in_chan = open_in @@ state.opam_switch_prefix // mld in
               let in_buffer = Bytes.create 1024 in
               let rec loop () =
@@ -715,8 +715,8 @@ let generate_library_pages state =
 
         let cmd = [
           "odoc" ; "html" ;
-          "--theme-uri"; "_odoc-theme" ;
-          "-o" ; Html.digodoc_html_dir ;
+          "--theme-uri"; "../static/styles/odoc" ;
+          "-o" ; Globals.digodoc_html_dir ;
           "-I" ; digodoc_odoc_dir // pkg ;
           odoc_target
         ] @
@@ -745,7 +745,7 @@ let generate_opam_pages ~continue_on_error state =
       let pkg = pkg_of_opam opam in
 
       Index.SAVE.save_opam_entry
-        ( Html.digodoc_html_dir // pkg // "ENTRY.OPAM." ^ opam.opam_name )
+        ( Globals.digodoc_html_dir // pkg // "ENTRY.OPAM." ^ opam.opam_name )
         opam ;
 
       if not skip_packages then
@@ -777,7 +777,7 @@ let generate_opam_pages ~continue_on_error state =
               let assets_dir = state.opam_switch_prefix // "doc" // opam.opam_name // "odoc-assets" in
               if Sys.file_exists assets_dir
               then Process.call [|
-                  "rsync"; "-auv"; assets_dir // ""; Html.digodoc_html_dir // pkg // "_assets"|];
+                  "rsync"; "-auv"; assets_dir // ""; Globals.digodoc_html_dir // pkg // "_assets"|];
               get_rec_deps := true;
               let in_chan = open_in @@ state.opam_switch_prefix // mld in
               let in_buffer = Bytes.create 1024 in
@@ -816,7 +816,7 @@ let generate_opam_pages ~continue_on_error state =
               let assets_dir = state.opam_switch_prefix // "doc" // plib // "odoc-assets" in
               if Sys.file_exists assets_dir
               then Process.call [|
-                  "rsync"; "-auv"; assets_dir // ""; Html.digodoc_html_dir // ppkg // "_assets"|];
+                  "rsync"; "-auv"; assets_dir // ""; Globals.digodoc_html_dir // ppkg // "_assets"|];
               let name = Filename.(chop_extension @@ basename mld) in
               Printf.bprintf b {|<li><a href="../%s/%s.html">%s</a></li>|}
                 ppkg name (String.capitalize_ascii name);
@@ -836,6 +836,7 @@ let generate_opam_pages ~continue_on_error state =
         let dir = digodoc_odoc_dir // pkg in
         EzFile.make_dir ~p:true dir;
 
+
         let infos = infos_of_opam state pkg opam in
         let infos =
           infos @ [
@@ -847,15 +848,15 @@ let generate_opam_pages ~continue_on_error state =
         in
         print_package_info b infos;
 
-        if !Htmlize.Globals.sources then begin
 
+        if !Globals.sources then begin 
           Printf.bprintf b "\n{1:sources Package sources}\n";
 
           let opam_sources = "sources" // fullname opam in
           Printf.bprintf b {|{%%html:<div><a href="../../%s/index.html">%s</a></div>%%}|}
             opam_sources opam.opam_name
         end;
-
+       
         Printf.bprintf b "\n{1:files Package files}\n";
         Printf.bprintf b {|{%%html:<pre>|};
         List.iter (fun (file, _) ->
@@ -880,8 +881,8 @@ let generate_opam_pages ~continue_on_error state =
 
         let cmd = [
           "odoc" ; "html" ;
-          "--theme-uri"; "_odoc-theme" ;
-          "-o" ; Html.digodoc_html_dir ;
+          "--theme-uri"; "../static/styles/odoc" ;
+          "-o" ; Globals.digodoc_html_dir ;
           "-I" ; digodoc_odoc_dir // pkg ;
           odoc_target
         ] @
@@ -912,7 +913,7 @@ let generate_module_entries state =
       let pkg = pkg_of_mdl mdl in
       if StringSet.mem "cmi" mdl.mdl_exts then
       Index.SAVE.save_module_entry
-        ( Html.digodoc_html_dir // pkg // "ENTRY.MODULE." ^ mdl.mdl_name )
+        ( Globals.digodoc_html_dir // pkg // "ENTRY.MODULE." ^ mdl.mdl_name )
         mdl ;
     ) state.ocaml_mdls ;
 
@@ -927,7 +928,7 @@ let generate_meta_pages state =
       let opam_pkg = pkg_of_opam opam in
 
       Index.SAVE.save_meta_entry
-        ( Html.digodoc_html_dir // pkg // "ENTRY.META." ^ meta.meta_name )
+        ( Globals.digodoc_html_dir // pkg // "ENTRY.META." ^ meta.meta_name )
         meta;
 
       if not skip_packages then
@@ -1010,8 +1011,8 @@ let generate_meta_pages state =
 
         let cmd = [
           "odoc" ; "html" ;
-          "--theme-uri"; "_odoc-theme" ;
-          "-o" ; Html.digodoc_html_dir ;
+          "--theme-uri"; "../static/styles/odoc" ;
+          "-o" ; Globals.digodoc_html_dir ;
           "-I" ; digodoc_odoc_dir // pkg ;
           odoc_target
         ]
@@ -1026,12 +1027,13 @@ let generate_meta_pages state =
 
 let generate ~state ~continue_on_error  =
   (* Iter on modules first *)
-  if Sys.file_exists Html.digodoc_html_dir then begin
-    EzFile.remove_dir ~all:true Html.digodoc_html_dir
+  if Sys.file_exists Globals.digodoc_html_dir then begin
+    EzFile.remove_dir ~all:true Globals.digodoc_html_dir
   end;
-  EzFile.make_dir ~p:true Html.digodoc_html_dir;
+  EzFile.make_dir ~p:true Globals.digodoc_html_dir;
+  (* STOPED HERE *)
   Process.call [|
-    "rsync"; "-auv"; "html/.";  Html.digodoc_html_dir // "." |];
+    "rsync"; "-auv"; "html/.";  Globals.digodoc_dir // "." |];
 
   let deps_of_pkg = deps_of_pkg state in
 
@@ -1061,8 +1063,8 @@ let generate ~state ~continue_on_error  =
       )
   end;
 
-  if !Htmlize.Globals.sources then begin
-    Htmlize.Globals.with_header := true;
+  if !Globals.sources then begin
+    Globals.with_header := true;
     EzFile.make_dir ~p:true sources_dir;
     StringMap.iter (fun _ opam ->
       let opam_sources = sources_of_opam opam
