@@ -1,0 +1,3 @@
+(test
+ (name patchtmltests)
+ (libraries htmlize omd))

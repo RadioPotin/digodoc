@@ -4,7 +4,7 @@
   (name digodoc_common)
   (public_name digodoc_common)
   (wrapped true)
-  (libraries ez_file lambdasoup)
+  (libraries ez_file lambdasoup ez_html omd)
   
   
   )

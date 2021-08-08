@@ -23,18 +23,18 @@ open Digodoc_common.Utils
 let string_of_color color =
   let open Color in
   match color with
-    | TEXT -> "t"
-    | COMMENT -> "c"
-    | KEYWORD -> "k"
-    | STRING -> "s"
-    | NUMBER -> "n"
-    | CHAR -> "ch"
-    | MODULE -> "m"
-    | LABEL -> "l"
-    | FUNCTION -> "f"
-    | ARGUMENT -> "a"
-    | TYPE -> "typ"
-    | SYNTAX -> "syn"
+  | TEXT -> "t"
+  | COMMENT -> "c"
+  | KEYWORD -> "k"
+  | STRING -> "s"
+  | NUMBER -> "n"
+  | CHAR -> "ch"
+  | MODULE -> "m"
+  | LABEL -> "l"
+  | FUNCTION -> "f"
+  | ARGUMENT -> "a"
+  | TYPE -> "typ"
+  | SYNTAX -> "syn"
 
 let pkg_of_opam opam_name opam_version =
   Printf.sprintf "OPAM.%s.%s"opam_name opam_version
@@ -46,12 +46,30 @@ let is_directory file =
 
 let htmlize filename content =
   let b = Buffer.create 1000 in
-  Printf.bprintf b {|<div class="wrap-x padding"><table class="content-table">
+
+  let basename = Filename.basename filename in
+  let _, ext = EzString.rcut_at basename '.' in
+  let ext = String.lowercase_ascii ext in
+  match ext with
+  | "md" ->
+    let content = 
+      Omd.of_string content |> Patchtml.handle_file |> Omd.to_html
+    in 
+    Printf.bprintf b {|%s|} content;
+    Buffer.contents b
+
+  | "jpeg" | "jpg" | "png" |"apng" | "gif" | "tiff" | "avif" | "svg" | "bmp" | "webp" ->
+    let content = Patchtml.render_img filename in
+    Printf.bprintf b {|%s|} content;
+    Buffer.contents b
+
+  | "" | _ ->
+    Printf.bprintf b {|<div class="wrap-x padding"><table class="content-table">
  <tbody>
 |};
-  let lines = Color.file filename content in
+    let lines = Color.file filename content in
 
-  List.iter (fun (i, line) ->
+    List.iter (fun (i, line) ->
       Printf.bprintf b {|  <tr class="line">
 |};
       Printf.bprintf b {|   <td id="L%d" class="line-num">%d</td>
@@ -59,21 +77,21 @@ let htmlize filename content =
       Printf.bprintf b {|   <td id="LC%d" class="line-code">|} i;
 
       List.iter (fun (color, s) ->
-          let s = HTML.encode s in
-          match color with
-          | Color.TEXT -> Buffer.add_string b s
-          | _ -> Printf.bprintf b {|<span class="sp-%s">%s</span>|}
-                  (string_of_color color) s
-        ) line;
+        let s = HTML.encode s in
+        match color with
+        | Color.TEXT -> Buffer.add_string b s
+        | _ -> Printf.bprintf b {|<span class="sp-%s">%s</span>|}
+            (string_of_color color) s
+      ) line;
 
       Printf.bprintf b {|</td>|};
       Printf.bprintf b {|  </tr>
 |};
     ) lines;
-  Printf.bprintf b {| </tbody>
+    Printf.bprintf b {| </tbody>
 </table></div>
 |};
-  Buffer.contents b
+    Buffer.contents b
 
 let content_info content =
   let lines = EzString.split content '\n' in
@@ -107,14 +125,14 @@ let title_info path =
     match list with
     | [] -> assert false
     | [ file ] -> [ Printf.sprintf "<b>%s</b>"
-                      (HTML.encode file) ]
+          (HTML.encode file) ]
     | dir :: file ->
-        let s =
-          Printf.sprintf "<a href='%s/index.html'>%s</a>"
-            (String.concat "/" (List.map (fun _s -> "..") file))
-            (HTML.encode dir)
-        in
-        s :: iter file
+      let s =
+        Printf.sprintf "<a href='%s/index.html'>%s</a>"
+          (String.concat "/" (List.map (fun _s -> "..") file))
+          (HTML.encode dir)
+      in
+      s :: iter file
   in
   let path_html =
     String.concat "/"
@@ -125,7 +143,7 @@ let title_info path =
       path_html
       (pkg_of_opam opam_name opam_version)
   in
-    String.concat {| <span class="separator">/</span> |} (pkg_link::iter path)
+  String.concat {| <span class="separator">/</span> |} (pkg_link::iter path)
 
 
 let htmlize_file destdir srcdir path file =
@@ -161,33 +179,33 @@ let htmlize_file destdir srcdir path file =
         in
         ".." // if s = "" then s else s ^ "/"
     | "header" -> begin
-      match !headerref with
-      | Some h -> h
-      | None -> ""
-    end
+        match !headerref with
+        | Some h -> h
+        | None -> ""
+      end
     | "footer" -> begin
-      match !footerref with
-      | Some f -> f
-      | None -> ""
-    end
+        match !footerref with
+        | Some f -> f
+        | None -> ""
+      end
     | "sources" ->
-      if !Globals.sources 
-      then 
+      if !Globals.sources
+      then
         Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
         (brace () "root")
       else ""
     | "header_link" ->
-        if !Globals.with_header 
-        then {| | <a href="#header">To the top</a>|} 
-        else ""
+      if !Globals.with_header
+      then {| | <a href="#header">To the top</a>|}
+      else ""
     | _ ->
-        Printf.kprintf failwith "Unknown var %S" var
+      Printf.kprintf failwith "Unknown var %S" var
   in
-  generate_page ~brace destdir 
+  generate_page ~brace destdir
 
 let dir_content srcdir files path =
   let b = Buffer.create 1000 in
-  
+
   let has_parent_directory =
     match path with
     | [] -> assert false
@@ -204,7 +222,7 @@ let dir_content srcdir files path =
   |};
     Printf.bprintf b {|     <td class="file-icon">%s</td>
   |} (file_content "svg_directory.html");
-  
+
     Printf.bprintf b {|     <td class="file-name">..</td>
   |};
     Printf.bprintf b {|     <td class="file-kind">Upper Directory</td>
@@ -215,56 +233,56 @@ let dir_content srcdir files path =
   end;
   let files = Array.to_list files in
   let files = List.map (fun file ->
-      let filename = srcdir // file in
-      let st = Unix.lstat filename in
+    let filename = srcdir // file in
+    let st = Unix.lstat filename in
 
-      st.st_kind <> Unix.S_DIR, file, st) files
+    st.st_kind <> Unix.S_DIR, file, st) files
   in
   let files = List.sort compare files in
   List.iteri (fun i (_, file, st) ->
-      let style =
-        if i = 0 && not has_parent_directory
-        then "file" 
-        else if i = (List.length files) - 1 
-        then "file top-border round-border"
-        else "file top-border"
-      in
-      Printf.bprintf b {|  <a class="file-link" href='%s/index.html'><div class='%s'>
+    let style =
+      if i = 0 && not has_parent_directory
+      then "file"
+      else if i = (List.length files) - 1
+      then "file top-border round-border"
+      else "file top-border"
+    in
+    Printf.bprintf b {|  <a class="file-link" href='%s/index.html'><div class='%s'>
         |} (HTML.encode (escape_file file)) style;
-      
-      Printf.bprintf b {|   <table class="file-tab"><tbody><tr>
+
+    Printf.bprintf b {|   <table class="file-tab"><tbody><tr>
         |};
 
-      (match st.Unix.st_kind with
-       | Unix.S_DIR ->
-           Printf.bprintf b {|  <td class="file-icon">%s</td>
+    (match st.Unix.st_kind with
+      | Unix.S_DIR ->
+        Printf.bprintf b {|  <td class="file-icon">%s</td>
           |} (file_content "svg_directory.html")
-       | _ ->
-           Printf.bprintf b {|  <td class="file-icon">%s</td>
+      | _ ->
+        Printf.bprintf b {|  <td class="file-icon">%s</td>
           |} (file_content "svg_file.html")
-      );
+    );
 
-      (match st.Unix.st_kind with
-       | Unix.S_DIR | Unix.S_REG ->
-           Printf.bprintf b {|   <td class="file-name">%s</td>
+    (match st.Unix.st_kind with
+      | Unix.S_DIR | Unix.S_REG ->
+        Printf.bprintf b {|   <td class="file-name">%s</td>
           |} (HTML.encode file);
-       | _ ->
-           Printf.bprintf b {|   <td class="file-name">%s</td>
+      | _ ->
+        Printf.bprintf b {|   <td class="file-name">%s</td>
           |} (HTML.encode file);
-      );
-      Printf.bprintf b {|   <td class="file-kind">%s</td>
+    );
+    Printf.bprintf b {|   <td class="file-kind">%s</td>
       |}
-        (match st.Unix.st_kind with
-         | Unix.S_REG ->
-             Printf.sprintf "%d bytes" st.Unix.st_size
-         | Unix.S_DIR ->
-             "Directory"
-         | _ -> "???");
-     Printf.bprintf b {|   </tr></tbody></table>
+      (match st.Unix.st_kind with
+        | Unix.S_REG ->
+          Printf.sprintf "%d bytes" st.Unix.st_size
+        | Unix.S_DIR ->
+          "Directory"
+        | _ -> "???");
+    Printf.bprintf b {|   </tr></tbody></table>
     |};
-  Printf.bprintf b {|  </div></a>
+    Printf.bprintf b {|  </div></a>
   |};
-    ) files;
+  ) files;
   Printf.bprintf b {|</div>
   |};
   Buffer.contents b
@@ -297,39 +315,39 @@ let rec htmlize_dir destdir srcdir path basename =
         in
         ".." // if s = "" then s else s ^ "/"
     | "header" -> begin
-      match !headerref with
-      | Some h -> h
-      | None -> ""
-    end
+        match !headerref with
+        | Some h -> h
+        | None -> ""
+      end
     | "footer" -> begin
       match !footerref with
       | Some f -> f
       | None -> ""
     end 
     | "sources" ->
-      if !Globals.sources 
-      then 
+      if !Globals.sources
+      then
         Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
             (brace () "root")
       else ""
     | "header_link" ->
-        if !Globals.with_header 
-        then {| | <a href="#header">To the top</a>|} 
-        else ""
+      if !Globals.with_header
+      then {| | <a href="#header">To the top</a>|}
+      else ""
     | _ ->
-        Printf.kprintf failwith "Unknown var %S" var
+      Printf.kprintf failwith "Unknown var %S" var
   in
   generate_page ~brace destdir;
   Array.iter (fun file ->
-      let filename = srcdir // file in
-      let st = Unix.lstat filename in
-      match st.Unix.st_kind with
-      | Unix.S_DIR ->
-          htmlize_dir destdir srcdir path file
-      | Unix.S_REG ->
-          htmlize_file destdir srcdir path file
-      | _ -> ()
-    ) files
+    let filename = srcdir // file in
+    let st = Unix.lstat filename in
+    match st.Unix.st_kind with
+    | Unix.S_DIR ->
+      htmlize_dir destdir srcdir path file
+    | Unix.S_REG ->
+      htmlize_file destdir srcdir path file
+    | _ -> ()
+  ) files
 
 let htmlize_dir destdir dir =
   let dirname = Filename.dirname dir in

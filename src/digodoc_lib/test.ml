@@ -11,10 +11,10 @@
 
 open Digodoc_common.Utils
 
-let about_page = 
-    Printf.sprintf
-        {|<!DOCTYPE html>
-        <html xmlns="http://www.w3.org/1999/xhtml">
+let about_page =
+  Printf.sprintf
+    {|<!DOCTYPE html>
+        <html lang="en">
         <head>
             <title>About</title>
             <link rel="stylesheet" href="static/styles/odoc/odoc.css"/>
@@ -27,7 +27,7 @@ let about_page =
             <script defer="defer" type="application/javascript" src="static/scripts/headerFooter.js"></script>
         </head>
         <body>
-            %s 
+            %s
             <div class="content">
                 %s
             </div>
@@ -55,5 +55,5 @@ let generate () =
     let about_html = Ez_subst.V1.EZ_SUBST.string about_page ~brace ~ctxt:() in
     EzFile.write_file "examples/about.html" about_html;
 
-    (* pages examples for sources: config folder *)
-    Htmlize.Main.htmlize "examples/sources/" ["config/"];
+  (* pages examples for sources: config folder *)
+  Htmlize.Main.htmlize "examples/sources/" ["config/"];

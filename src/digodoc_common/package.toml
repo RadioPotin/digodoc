@@ -37,8 +37,10 @@ gen-version = "version.ml"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 # ...
+ez_html = ">=0.1"
 ez_file = "0.1.0"
 lambdasoup = "0.7.2"
+omd = ">=2.0.0~alpha2"
 
 # package tools dependencies
 [tools]

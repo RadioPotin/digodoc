@@ -40,6 +40,7 @@ install: [
 depends: [
   "ocaml" {>= "4.10.0"}
   "dune" {>= "2.6.0"}
+  "omd" {>= "2.0.0~alpha2"}
   "ez_subst" {>= "0.1"}
   "ez_html" {>= "0.1"}
   "ez_file" {>= "0.2"}
