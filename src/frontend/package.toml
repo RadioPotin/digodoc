@@ -38,11 +38,13 @@ gen-version = "version.ml"
 [dependencies]
 js_of_ocaml = ">=3.0"
 search-api = ">=~dev"
+ez_api = ">=0.1.0"
 
 # package tools dependencies
 [tools]
 js_of_ocaml-ppx = ">=3.0"
 ppx_deriving_jsoo = ">=0.1"
+lwt_ppx = ">=2.0.2"
 
 # package fields (depends on package skeleton)
 [fields]
