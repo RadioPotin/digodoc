@@ -2,7 +2,7 @@
 
 # hash of toml configuration files
 # used for generation of all files
-c3eb60f15811c5533361a18f2cda86b0:.
+b811b08fe5e523d824cef3fff1af14b2:.
 # end context for .
 
 # begin context for .github/workflows/doc-deploy.yml
@@ -12,12 +12,12 @@ c3eb60f15811c5533361a18f2cda86b0:.
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-c2dee0b87cc3e8b15710e236f927bbdb:.github/workflows/workflow.yml
+72f72ca9d453401da06c850e8146fa68:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-db0cdb9cfc7ec8f26b6344386ca9d132:.gitignore
+b31de2e5f81bfffeefcff8087eaa714f:.gitignore
 # end context for .gitignore
 
 # begin context for .ocamlformat
@@ -47,22 +47,27 @@ d091b81b6155e5fd5d6556fc8bba0094:LICENSE.md
 
 # begin context for Makefile
 # file Makefile
-e19197cb80be3103c7206862bf80342f:Makefile
+f07db3f5eef64de6bf8598f41313b6c3:Makefile
 # end context for Makefile
 
 # begin context for README.md
 # file README.md
-9a9129d5fa32fe17fecaabb201ed8962:README.md
+2e718e2b0db1c1f5cb0d47dc47c66af1:README.md
 # end context for README.md
 
 # begin context for digodoc.opam
 # file digodoc.opam
-5a6fd5088796b7f4ea0e35b94ffe0ca3:digodoc.opam
+c9ecda9da29c7968b45e552b7822d51e:digodoc.opam
 # end context for digodoc.opam
+
+# begin context for digodoc_common.opam
+# file digodoc_common.opam
+5de7fff2e54c2406b8674dfd5dd41d8c:digodoc_common.opam
+# end context for digodoc_common.opam
 
 # begin context for digodoc_lib.opam
 # file digodoc_lib.opam
-891fd9598bd5c613776d122868b8d492:digodoc_lib.opam
+84cbd6bdb932e868318148065720900f:digodoc_lib.opam
 # end context for digodoc_lib.opam
 
 # begin context for docs/.nojekyll
@@ -87,7 +92,7 @@ e19197cb80be3103c7206862bf80342f:Makefile
 
 # begin context for docs/index.html
 # file docs/index.html
-cef3a30137e76cb3bd7f6d5559c390e6:docs/index.html
+c4d46e411fda01c70be4f11ceca32d31:docs/index.html
 # end context for docs/index.html
 
 # begin context for docs/sphinx/index.html
@@ -102,7 +107,7 @@ ec7bd7c977bb925908818597d08eb061:docs/sphinx/index.html
 
 # begin context for drom.toml
 # file drom.toml
-812d3969601fb714ec30aa5ffc13371f:drom.toml
+15389555fc56641774a292343d285742:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -112,22 +117,27 @@ df544cfaf9078d1bba2f90ed1b5adf5f:dune
 
 # begin context for dune-project
 # file dune-project
-de4b904136eb0eb911bdca8f3f644688:dune-project
+d5e9c882b4b70f3f1d5acdfd0561a26b:dune-project
 # end context for dune-project
 
 # begin context for ez_html.opam
 # file ez_html.opam
-f345f6ec3e5d6fcb17227d97233af7cb:ez_html.opam
+cacc33e14c7c4bb65a5f8fea53f5d4a5:ez_html.opam
 # end context for ez_html.opam
+
+# begin context for frontend.opam
+# file frontend.opam
+467f360dfb62a3efc8a73bca5f48e1fd:frontend.opam
+# end context for frontend.opam
 
 # begin context for htmlize.opam
 # file htmlize.opam
-41dd768c5e6d8c95e1aa3467cd41dbdd:htmlize.opam
+2ad9d56a00d34f41b0f14541ba985c6c:htmlize.opam
 # end context for htmlize.opam
 
 # begin context for meta_file.opam
 # file meta_file.opam
-d19e7a622f04aafee498af0ac024ccac:meta_file.opam
+913f3da5579e95aadbaa381738a97224:meta_file.opam
 # end context for meta_file.opam
 
 # begin context for scripts/after.sh
@@ -152,7 +162,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
-62f8e80d2ff76bed8ae90cde677457eb:sphinx/about.rst
+d6f372e1e07a0af2aa73129ec2ea2ce5:sphinx/about.rst
 # end context for sphinx/about.rst
 
 # begin context for sphinx/conf.py
@@ -205,14 +215,39 @@ a9fbe421d8fc3a9c3ac462e114333272:src/digodoc/index.mld
 fab8224b1866cef1103bca89068b73fe:src/digodoc/version.ml
 # end context for src/digodoc/version.ml
 
+# begin context for src/digodoc_common/dune
+# file src/digodoc_common/dune
+0c379dfee0d6c7411bc2874ee50c6e0b:src/digodoc_common/dune
+# end context for src/digodoc_common/dune
+
+# begin context for src/digodoc_common/index.mld
+# file src/digodoc_common/index.mld
+f32f62c2a079ff230f85f35eb4a3935b:src/digodoc_common/index.mld
+# end context for src/digodoc_common/index.mld
+
+# begin context for src/digodoc_common/main.ml
+# file src/digodoc_common/main.ml
+8313df5f631fc41ad809298c21070ba2:src/digodoc_common/main.ml
+# end context for src/digodoc_common/main.ml
+
+# begin context for src/digodoc_common/package.toml
+# file src/digodoc_common/package.toml
+4d71ae5c78e76c48164c0fe357296fb7:src/digodoc_common/package.toml
+# end context for src/digodoc_common/package.toml
+
+# begin context for src/digodoc_common/version.mlt
+# file src/digodoc_common/version.mlt
+e5152b4b8b0489050db1e38339e55a7e:src/digodoc_common/version.mlt
+# end context for src/digodoc_common/version.mlt
+
 # begin context for src/digodoc_lib/dune
 # file src/digodoc_lib/dune
-d0b3d2dc9011821b4305f3e45a9bfcf5:src/digodoc_lib/dune
+77aa2762707a904f45a0e860a57ac274:src/digodoc_lib/dune
 # end context for src/digodoc_lib/dune
 
 # begin context for src/digodoc_lib/index.mld
 # file src/digodoc_lib/index.mld
-359745cc02022287255ff52dd10f140a:src/digodoc_lib/index.mld
+c8d0d370a59bd987eafbcc14c0a76ca6:src/digodoc_lib/index.mld
 # end context for src/digodoc_lib/index.mld
 
 # begin context for src/digodoc_lib/main.ml
@@ -222,7 +257,7 @@ d0b3d2dc9011821b4305f3e45a9bfcf5:src/digodoc_lib/dune
 
 # begin context for src/digodoc_lib/package.toml
 # file src/digodoc_lib/package.toml
-a73167b84c7d267ee7c64538461bea5e:src/digodoc_lib/package.toml
+a76fb5cbbe6c609284b07e19e4e5ee72:src/digodoc_lib/package.toml
 # end context for src/digodoc_lib/package.toml
 
 # begin context for src/digodoc_lib/version.mlt
@@ -237,7 +272,7 @@ a73167b84c7d267ee7c64538461bea5e:src/digodoc_lib/package.toml
 
 # begin context for src/ez_html/index.mld
 # file src/ez_html/index.mld
-f6f9f13c572031aeaf771e6e7453e511:src/ez_html/index.mld
+cdc401a884c19d3174764b6008d48fad:src/ez_html/index.mld
 # end context for src/ez_html/index.mld
 
 # begin context for src/ez_html/package.toml
@@ -245,14 +280,34 @@ f6f9f13c572031aeaf771e6e7453e511:src/ez_html/index.mld
 e1bd27ee36ce397a21ed05e6312d7f0d:src/ez_html/package.toml
 # end context for src/ez_html/package.toml
 
+# begin context for src/frontend/dune
+# file src/frontend/dune
+71cb3129a6eed5915d89b280c5ca011d:src/frontend/dune
+# end context for src/frontend/dune
+
+# begin context for src/frontend/main.ml
+# file src/frontend/main.ml
+3358c8af43348f0350ede973a65548d8:src/frontend/main.ml
+# end context for src/frontend/main.ml
+
+# begin context for src/frontend/package.toml
+# file src/frontend/package.toml
+564049e9c4550bdd5178cc848f835a4b:src/frontend/package.toml
+# end context for src/frontend/package.toml
+
+# begin context for src/frontend/version.mlt
+# file src/frontend/version.mlt
+e5152b4b8b0489050db1e38339e55a7e:src/frontend/version.mlt
+# end context for src/frontend/version.mlt
+
 # begin context for src/htmlize/dune
 # file src/htmlize/dune
-189092a8779cb92e917b3f4f472faa92:src/htmlize/dune
+58f359b33814df33194b88a889d05830:src/htmlize/dune
 # end context for src/htmlize/dune
 
 # begin context for src/htmlize/index.mld
 # file src/htmlize/index.mld
-d083009cb760f54ec7584a5d45243f48:src/htmlize/index.mld
+dc862515b91768f3c2ece19a0db98e70:src/htmlize/index.mld
 # end context for src/htmlize/index.mld
 
 # begin context for src/htmlize/main.ml
@@ -262,7 +317,7 @@ b7bf043b394931c798f91fa638eb24d2:src/htmlize/main.ml
 
 # begin context for src/htmlize/package.toml
 # file src/htmlize/package.toml
-ac3c08df90039d64eeae1e9369bb4d9c:src/htmlize/package.toml
+6313f44af0d1a0334cb025c3fde06587:src/htmlize/package.toml
 # end context for src/htmlize/package.toml
 
 # begin context for src/htmlize/version.mlt
@@ -277,7 +332,7 @@ e5152b4b8b0489050db1e38339e55a7e:src/htmlize/version.mlt
 
 # begin context for src/meta_file/index.mld
 # file src/meta_file/index.mld
-8a492b152c983734cb47d5e41975d58a:src/meta_file/index.mld
+1808063d67682d547e5d5e84e627a365:src/meta_file/index.mld
 # end context for src/meta_file/index.mld
 
 # begin context for src/meta_file/main.ml
@@ -297,7 +352,7 @@ fab8224b1866cef1103bca89068b73fe:src/meta_file/version.ml
 
 # begin context for test/expect-tests/dune
 # file test/expect-tests/dune
-7fa5d2931634fe9deeb382ef9c69b492:test/expect-tests/dune
+e615d39651e4664f603e1df483a6fbea:test/expect-tests/dune
 # end context for test/expect-tests/dune
 
 # begin context for test/expect-tests/test.ml
@@ -307,7 +362,7 @@ fab8224b1866cef1103bca89068b73fe:src/meta_file/version.ml
 
 # begin context for test/inline-tests/dune
 # file test/inline-tests/dune
-ead7c37975d06c8e1e0385cf5118a4eb:test/inline-tests/dune
+53513b36ed6987289085b16e0f37351c:test/inline-tests/dune
 # end context for test/inline-tests/dune
 
 # begin context for test/inline-tests/test.ml
@@ -317,7 +372,7 @@ e001d04969100c711855223ad6c23e6a:test/inline-tests/test.ml
 
 # begin context for test/output-tests/dune
 # file test/output-tests/dune
-6a7f832fcda23f1696690229411ae087:test/output-tests/dune
+06ea914fb1d1e44c2514f6bd057ac325:test/output-tests/dune
 # end context for test/output-tests/dune
 
 # begin context for test/output-tests/test1.expected

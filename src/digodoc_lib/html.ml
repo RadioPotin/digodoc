@@ -11,10 +11,11 @@
 
 open Ez_html.V1
 open EzFile.OP
+open Digodoc_common
+open Globals
+open Utils
 
-let digodoc_html_dir = Globals.digodoc_dir // "html"
-
-(* generate page _digodoc/html/${filename} *)
+(* generate page _digodoc/docs/${filename} *)
 let generate_page ~filename ~title f =
 
   let dirname = EzFile.dirname filename in
@@ -29,38 +30,74 @@ let generate_page ~filename ~title f =
           path_list) in
   let root = if s = "" then s else s ^ "/" in
 
-  let script = if !Globals.dynamic_index then "search_api.js" else "search.js" in
-
   (* removed 'async' from the script line because unrecognized by ez_ml parser *)
   let bb = Buffer.create 10000 in
   Printf.bprintf bb {|<!DOCTYPE html>
 <html lang="en">
  <head>
   <title>%s</title>
-  <link rel="stylesheet" href="%s_odoc-theme/odoc.css"/>
-  <link rel="icon" href="%s_odoc-theme/favicon.png">
-  <script type="text/javascript" src="%s%s" charset="utf-8"></script>
+  <link rel="stylesheet" href="%sstatic/styles/odoc/odoc.css"/>
+  <link rel="icon" href="%sstatic/imgs/favicon.png" />
+  <script type="text/javascript" src="%sstatic/scripts/%s" charset="utf-8"></script>
   <meta charset="utf-8"/>
   <meta name="generator" content="digodoc 0.1"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <script src="%shighlight.pack.js"></script>
+  <script src="%sstatic/scripts/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
-|} title root root root script root;
+|} title root root root (get_script ()) root;
   Printf.bprintf bb
     {|
 <body>
+ <div id="header" class="topnav">
+    <a id="ocamlpro" href="https://www.ocamlpro.com/" target="_blank"><img id="logo" src="%sstatic/imgs/ocamlpro.svg"/></a>
+    <a id="about-item" href="%sabout.html">About</a>
+    <a id="packages-item" href="%sindex.html">Packages</a>
+    <a id="libraries-item" href="%slibraries.html">Libraries</a>
+    <a id="metas-item" href="%smetas.html">Metas</a>
+    <a id="modules-item" href="%smodules.html">Modules</a>
+    %s
+    <div class="topnav-right">
+        <div class="search">
+            <input id="search" class="search-query" type="text" placeholder="Search"/>
+        </div>
+    </div>
+ </div>
  <div class="content">
-|};
+|} root root root root root root 
+    (if !sources 
+    then Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|} root 
+    else "");
   f bb ~title;
   Printf.bprintf bb
     {|
+ </div>
+ <div id="footer">
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <i>Copyright 2021 OCamlPro and the authors of the libraries.</i>
+          </td>
+          <td>
+            <nav float="right">
+              <a href="https://www.ocamlpro.com/contact/">Contact page</a>
+              | <a href="#header">To the top</a>
+            </nav>
+          </td>
+          <td>
+            <nav>Paris, FRANCE (<a href="https://www.ocamlpro.com/legal-notice">Legal Notice</a>)
+            </nav>
+          </td>
+        </tr>
+      </tbody>
+    </table>
  </div>
 </body>
 </html>
 |};
   let contents = Buffer.contents bb in
-  EzFile.write_file (digodoc_html_dir // filename) contents;
+  EzFile.write_file (digodoc_dir // filename) contents;
   ()
 
 let encode = HTML.encode
@@ -155,77 +192,104 @@ let iter_html ?(check_links=false) ?(add_trailer=false) dir =
     ) dir;
   Printf.eprintf "Scan finished.\n%!"
 
-let file_content filename =
-  match Sys.getenv "DIGODOC_CONFIG" with
-  | dir when EzFile.exists (dir // filename) ->
-    EzFile.read_file (dir // filename)
-  | exception Not_found | _ ->
-    begin
-      match Htmlize.Files.read filename with
-      | None -> ""
-      | Some file_content -> file_content
-    end
-
-let add_header_footer () =
-  let open Htmlize in
-  Printf.eprintf "Adding header and footer...\n%!";
-  let html_dir = digodoc_html_dir in
-  let head_childs = [("link", {|<link rel="icon" href="${root-html}_odoc-theme/favicon.png">|});
-    ("script", {|<script defer="defer"
-                        type="application/javascript"
-                        src="${root-html}headerFooter.js">
-                        </script>|})] in
-
-
-  EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"*.html"
-    ~f:(fun path ->
-      if EzString.starts_with ~prefix:"ENTRY" (EzFile.basename path)
-      then ()
-      else begin
-        let file = html_dir // path in
-        let rec brace () var =
-          match var with
-          | "root-html" ->
-            let dirname = EzFile.dirname path in
-            let path_list =
-              if String.contains path '/'
-              then
-                String.split_on_char '/' dirname
-              else []
-            in
-            let s =
-              String.concat "/"
-                (List.map (fun _s -> "..")
-                    path_list)
-            in
-            if s = "" then s else s ^ "/"
-          | "sources" ->
-            if !Globals.sources
-            then
-              Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
-                (brace () "root-html")
-            else ""
-          | "header_link" ->
-            if !Globals.with_header
-            then {| | <a href="#header">To the top</a>|}
-            else ""
-          | _ ->
-            Printf.kprintf failwith "Unknown var %S" var
-        in
-
-        let html = EzFile.read_file file
-        and header = Ez_subst.V1.EZ_SUBST.string (file_content "header.html") ~brace ~ctxt:()
-        and footer = Ez_subst.V1.EZ_SUBST.string (file_content "footer.html") ~brace ~ctxt:()
-        and head_childs = List.map (fun (id,child) -> id, Ez_subst.V1.EZ_SUBST.string child ~brace ~ctxt:()) head_childs in
-
-        let html' = Patchtml.edit_html ~header ~footer ~head_childs html in
-
-        EzFile.remove file;
-
-        EzFile.write_file file html'
-      end
-    ) html_dir
-
-
 let write_file file ~content =
   EzFile.write_file file (HTML.check content)
+
+let add_header_footer () =
+  Printf.eprintf "Adding header and footer...\n%!";
+  let html_dir = digodoc_html_dir in
+  let head_childs = [("link", {|<link rel="icon" href="${root}static/imgs/favicon.png" />|});
+                     ("script", Printf.sprintf {|<script defer="defer" 
+                        type="application/javascript" 
+                        src="${root}static/scripts/%s">
+                        </script>|} (get_script ()))] in
+  EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"index.html"
+    ~f:(fun path ->
+        if EzString.starts_with ~prefix:"ENTRY" (EzFile.basename path) 
+        then ()
+        else begin
+          let file = html_dir // path in
+          let rec brace () var = 
+            match var with
+            | "root" ->
+              let dirname = EzFile.dirname path in 
+              let path_list = 
+                if String.contains path '/'   
+                then 
+                  String.split_on_char '/' dirname 
+                else []
+              in
+              let s =
+                String.concat "/"
+                  (List.map (fun _s -> "..") 
+                    path_list)
+              in
+              ".." // if s = "" then s else s ^ "/"
+            | "sources" -> 
+              if !sources 
+              then 
+                Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
+                (brace () "root")
+              else ""
+            | "header_link" ->
+              if !with_header 
+              then {| | <a href="#header">To the top</a>|} 
+              else ""
+            | _ -> 
+              Printf.kprintf failwith "Unknown var %S" var
+          in
+        
+          let html = EzFile.read_file file 
+          and header = Ez_subst.V1.EZ_SUBST.string (file_content "header.html") ~brace ~ctxt:()
+          and footer = Ez_subst.V1.EZ_SUBST.string (file_content "footer.html") ~brace ~ctxt:()
+          and head_childs = List.map (fun (id,child) -> id, Ez_subst.V1.EZ_SUBST.string child ~brace ~ctxt:()) head_childs in
+
+          let html' = Patchtml.edit_html ~header ~footer ~head_childs html in
+
+          EzFile.remove file;
+
+          EzFile.write_file file html'
+        end
+      ) html_dir
+
+let adjust_upper_link () =
+  let update_doc path upper = 
+    let file = path // "index.html" in
+    let html = EzFile.read_file file in
+    let html' = Patchtml.change_link_to_upper_directory html upper in 
+    EzFile.remove file;
+    EzFile.write_file file html'
+  in 
+    let html_dir = digodoc_html_dir in 
+    Array.iter (fun file ->
+        let path = html_dir // file in
+        let preffix,_ = EzString.cut_at file '.' in
+        match preffix with
+        | "MODULE" -> begin
+          Array.iter (fun modul ->
+              let path = path // modul in 
+              if EzFile.is_directory path then update_doc path "modules.html"
+            ) 
+            (EzFile.read_dir path)
+        end
+        | "LIBRARY" -> update_doc path "libraries.html"
+        | "META" -> update_doc path "metas.html"
+        | _ -> update_doc path "index.html"
+      )
+      (EzFile.read_dir html_dir)
+
+
+
+let adjust_docs () = 
+  Printf.eprintf "Docs adjusting...\n%!";
+  let html_dir = digodoc_html_dir in
+  adjust_upper_link ();
+  EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"index.html"
+    ~f:(fun path ->
+        let file = html_dir // path in
+        let html = EzFile.read_file file in
+        let html' = Patchtml.change_link_highlight html in 
+        EzFile.remove file;
+        EzFile.write_file file html'
+    )
+    html_dir

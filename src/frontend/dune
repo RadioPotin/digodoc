@@ -1,0 +1,32 @@
+
+
+(library
+ (name ui_lib)
+ (wrapped false)
+ (modules headfoot observer requests global insertion object)
+ (preprocess (pps js_of_ocaml-ppx ppx_deriving_jsoo lwt_ppx))
+ (libraries js_of_ocaml-lwt search-api.data_common search-api.api_services ez_api ez_api.ixhr_lwt))
+
+(executable
+ (name main)
+ (modules main)
+ (preprocess (pps js_of_ocaml-ppx lwt_ppx))
+ (libraries ui_lib)
+ (modes js)
+ (js_of_ocaml
+  (flags (:standard --no-sourcemap))))
+
+
+(install
+ (files (main.bc.js as frontend.js))
+ (section share)
+ (package frontend))
+
+
+(rule
+    (targets version.ml)
+    (deps (:script version.mlt) package.toml)
+    (action (with-stdout-to %{targets} (run %{ocaml} unix.cma %{script}))))
+
+(documentation
+  (package frontend))

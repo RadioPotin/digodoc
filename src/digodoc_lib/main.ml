@@ -24,9 +24,10 @@
 
 open EzCompat
 open EzFile.OP
-open Type
+open Type 
 open Ezcmd.V2
-
+open Digodoc_common.Globals
+ 
 let cache_file = "_digodoc/digodoc.state"
 
 type action =
@@ -72,6 +73,12 @@ let main () =
         match !action with
         | None -> action := Some a
         | Some _ -> failwith "Duplicate actions"
+  and set_frontend_type arg =
+    let ft = match arg with
+      | "js-api" -> JS_API
+      | "js-ocaml" -> JS_OCAML
+      | _ -> JS
+    in frontend := ft  
   in
   let arg_set_action a =
     EZCMD.TYPES.Arg.Unit (fun () -> set_action a)
@@ -85,16 +92,16 @@ let main () =
       "--no-objinfo", Arg.Clear objinfo,
       " do not call ocamlobjinfo to attach modules to libraries";
 
-      "--no-sources", Arg.Clear Htmlize.Globals.sources,
+      "--no-sources", Arg.Clear sources,
       "do not generate sources for opam packages";
 
       "--cached", Arg.Set cached,
-      " read cached state";
+      "read cached state";
 
-      "--api-index", Arg.Set Globals.dynamic_index,
-      "call api for generate dynamic index pages";
+      "--frontend", Arg.String set_frontend_type,
+      "set frontend type (js, js_api, js_ocaml)";
 
-      "--db-update", Arg.Set Globals.db_update_index,
+      "--db-update", Arg.Set db_update_index,
       "update database of index";
 
 
@@ -106,7 +113,6 @@ let main () =
 
       "--add-trailer", arg_set_action AddTrailer,
       "insert digodoc/ocamlpro trailer";
-
 
       "--gen-index", arg_set_action GenerateIndex,
       "generate the index";
@@ -157,16 +163,17 @@ let main () =
         let state = get_state ~state ~objinfo ~switch in
         Odoc.generate ~state ~continue_on_error;
         Index.generate ();
-        Html.add_header_footer ()
+        Html.add_header_footer ();
+        Html.adjust_docs ();
         (* Html.iter_html ~add_trailer:true Html.digodoc_html_dir *)
     | CheckLinks ->
-        Html.iter_html ~check_links:true Html.digodoc_html_dir
+        Html.iter_html ~check_links:true digodoc_html_dir
     | AddTrailer ->
-        Html.iter_html ~add_trailer:true Html.digodoc_html_dir
+        Html.iter_html ~add_trailer:true digodoc_html_dir
     | GenerateIndex ->
         Index.generate ()
     | OpenDoc ->
-        let index = Html.digodoc_html_dir // "index.html" in
+        let index = digodoc_html_dir // "index.html" in
         if Sys.file_exists index then
           Process.call [| "xdg-open" ; index |]
         else begin
@@ -200,7 +207,7 @@ let main () =
               exit 0
         end
     | HtmlizeSources dir ->
-        Htmlize.Main.htmlize Globals.htmlize_sources_dir [dir]
+        Htmlize.Main.htmlize htmlize_sources_dir [dir]
     | Test ->
         Test.generate ();
 

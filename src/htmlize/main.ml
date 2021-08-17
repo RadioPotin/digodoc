@@ -15,6 +15,10 @@ open Ez_subst.V1
 open Ezcmd.V2
 (* open EZCMD.TYPES *)
 open EzFile.OP
+open Digodoc_common
+open Digodoc_common.Globals
+open Digodoc_common.Utils
+
 
 let string_of_color color =
   let open Color in
@@ -48,9 +52,9 @@ let htmlize filename content =
   let ext = String.lowercase_ascii ext in
   match ext with
   | "md" ->
-    let content =
+    let content = 
       Omd.of_string content |> Patchtml.handle_file |> Omd.to_html
-    in
+    in 
     Printf.bprintf b {|%s|} content;
     Buffer.contents b
 
@@ -98,17 +102,6 @@ let headerref = ref None
 
 let footerref = ref None
 
-let file_content filename =
-  match Sys.getenv "DIGODOC_CONFIG" with
-  | dir when EzFile.exists (dir // filename) ->
-    EzFile.read_file (dir // filename)
-  | exception Not_found | _ ->
-    begin
-      match Files.read filename with
-      | None -> ""
-      | Some file_content -> file_content
-    end
-
 
 let generate_page ~brace destdir =
   let ctxt = () in
@@ -145,8 +138,8 @@ let title_info path =
     String.concat "/"
       (List.map (fun _s -> "..") path)
   and opam_name,opam_version = EzFile.cut_extension (List.hd path) in
-  let pkg_link =
-    Printf.sprintf {| <a class="digodoc-opam" href="%s/../html/%s/index.html">package</a>|}
+  let pkg_link =      
+    Printf.sprintf {| <a class="digodoc-opam" href="%s/../docs/%s/index.html">package</a>|}
       path_html
       (pkg_of_opam opam_name opam_version)
   in
@@ -173,19 +166,18 @@ let htmlize_file destdir srcdir path file =
     | "content-info" -> content_info content
     | "title" -> String.concat "/" path
     | "title-info" -> title_info path
+    | "script" ->
+        let script = match !frontend with
+          | JS_OCAML -> "frontend.js"
+          | _ -> "script_sources.js"
+        in
+          Printf.sprintf "%sstatic/scripts/%s" (brace () "root") script 
     | "root" ->
-      let s =
-        String.concat "/"
-          (List.map (fun _s -> "..") path)
-      in
-      if s = "" then s else s ^ "/"
-    | "root-html" ->
-      let s =
-        String.concat "/"
-          (List.map (fun _s -> "..") path)
-      in
-      let s = if s = "" then s else s ^ "/" in
-      s // "../html/"
+        let s =
+          String.concat "/"
+            (List.map (fun _s -> "..") path)
+        in
+        ".." // if s = "" then s else s ^ "/"
     | "header" -> begin
         match !headerref with
         | Some h -> h
@@ -200,7 +192,7 @@ let htmlize_file destdir srcdir path file =
       if !Globals.sources
       then
         Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
-          (brace () "root-html")
+        (brace () "root")
       else ""
     | "header_link" ->
       if !Globals.with_header
@@ -310,34 +302,33 @@ let rec htmlize_dir destdir srcdir path basename =
     | "content-info" -> dir_info files
     | "title" -> String.concat "/" path
     | "title-info" -> title_info path
+    | "script" ->
+        let script = match !frontend with
+          | JS_OCAML -> "frontend.js"
+          | _ -> "script_sources.js"
+        in
+          Printf.sprintf "%sstatic/scripts/%s" (brace () "root") script 
     | "root" ->
-      let s =
-        String.concat "/"
-          (List.map (fun _s -> "..") path)
-      in
-      if s = "" then s else s ^ "/"
-    | "root-html" ->
-      let s =
-        String.concat "/"
-          (List.map (fun _s -> "..") path)
-      in
-      let s = if s = "" then s else s ^ "/" in
-      s // "../html/"
+        let s =
+          String.concat "/"
+            (List.map (fun _s -> "..") path)
+        in
+        ".." // if s = "" then s else s ^ "/"
     | "header" -> begin
         match !headerref with
         | Some h -> h
         | None -> ""
       end
     | "footer" -> begin
-        match !footerref with
-        | Some f -> f
-        | None -> ""
-      end
+      match !footerref with
+      | Some f -> f
+      | None -> ""
+    end 
     | "sources" ->
       if !Globals.sources
       then
         Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
-          (brace () "root-html")
+            (brace () "root")
       else ""
     | "header_link" ->
       if !Globals.with_header
@@ -366,10 +357,6 @@ let htmlize_dir destdir dir =
 
 let htmlize target_dir dirs =
   EzFile.make_dir ~p:true target_dir;
-  let static_dir = target_dir // "_static" in
-  EzFile.make_dir ~p:true static_dir;
-  EzFile.write_file ( static_dir // "style_sources.css" )(file_content "style_sources.css");
-  EzFile.write_file ( static_dir // "script_sources.js" ) (file_content "script_sources.js");
 
   List.iter (htmlize_dir target_dir) dirs;
   ()

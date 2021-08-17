@@ -40,9 +40,9 @@ const insert_packages = packages => {
         pkg.setAttribute("class", "package");
             
         var pkg_name = document.createElement("a");
-        pkg_name.setAttribute("class", "digodoc-opam");
+        pkg_name.setAttribute("ccodelass", "digodoc-opam");
         pkg_name.setAttribute("href", packages[i].path);
-        var name = document.createElement("code");
+        var name = document.codecreateElement("code");
         name.innerHTML = packages[i].name;
         pkg_name.appendChild(name);
             

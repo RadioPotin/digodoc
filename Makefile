@@ -10,12 +10,12 @@ SPHINX_TARGET:=_drom/docs/sphinx
 ODOC_TARGET:=_drom/docs/doc/.
 
 
-all: build
+all: build website
 
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh digodoc digodoc_lib meta_file ez_html htmlize
+	./scripts/copy-bin.sh digodoc digodoc_lib meta_file ez_html htmlize frontend
 	./scripts/after.sh build
 
 build-deps:
@@ -70,6 +70,10 @@ test:
 	./scripts/before.sh test
 	opam exec -- dune build @runtest
 	./scripts/after.sh test
+
+website: html/info.json
+	dune build ./src/frontend/main.bc.js --profile release
+	cp _build/default/src/frontend/main.bc.js html/static/scripts/frontend.js
 
 clean:
 	rm -rf _build
