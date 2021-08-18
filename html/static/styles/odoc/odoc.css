@@ -338,26 +338,25 @@ input#search {
   border: 0px;
   font-size: 15px;
   width:206px;   
-  margin-top: 4px;
   height: 25px;
   outline: none;
-}
-
-button#search-button {
-  height: 35px;
-  width: 100px;
-  border: 1px;
-  background-color: lightblue;
-  border-radius: 0 20px 20px 0;
 }
 
 .topnav a {
   float: left;
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 16px;
+  padding: 15px 16px;
   text-decoration: none;
   font-size: 17px;
+}
+
+.topnav table {
+  margin-top: 0px;
+}
+
+.topnav td {
+  vertical-align: middle;
 }
 
 .topnav a:hover {
@@ -388,7 +387,21 @@ button#search-button {
 
 .search {
   float: left;
-  margin-top:10px;
+  margin-top: 0px;
+  margin-right:20px;
+}
+
+.search-query {
+  margin-top: 4px;
+}
+
+.search-input {
+  margin-top: 7px;
+}
+
+.search-index {
+  float: left;
+  margin-top: 10px;
   margin-right:20px;
 }
 
@@ -422,7 +435,7 @@ i {
 
 #ocamlpro {
   padding: 0px;
-  height: 53.5px;
+  height: 55.5px;
 }
 
 #logo {
@@ -430,4 +443,22 @@ i {
   margin: 0px;
   margin-left: 15px;
   margin-right: 15px;
+}
+
+#search-img {
+  height: 20px;
+}
+
+#search-button {
+  border: 0;
+  cursor: pointer;
+  height: 44px !important;
+  outline: 0;
+  position: relative;
+  top: 6px;
+  left: -6px;
+  width: 24px;
+  z-index: 105;
+  background: none;
+  opacity: .5;
 }

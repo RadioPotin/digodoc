@@ -1,4 +1,4 @@
-body {
+  body {
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
     font-size: 14px;
     line-height: 1.5;
@@ -25,7 +25,7 @@ body {
     float: left;
     color: #f2f2f2;
     text-align: center;
-    padding: 14px 16px;
+    padding: 15px 16px;
     text-decoration: none;
     font-size: 17px;
   }
@@ -120,9 +120,9 @@ body {
   }
 
   .search {
-      float: left;
-      margin-top:10px;
-      margin-right:20px;
+    float: left;
+    margin-top: 0px;
+    margin-right:20px;
   }
 
   #footer{
@@ -161,6 +161,14 @@ body {
     font-size:12px;
     min-width: 120px;
     width: 20%;
+  }
+
+  .topnav table {
+    margin-top: 0px;
+  }
+  
+  .topnav td {
+    vertical-align: middle;
   }
 
   /* Right-aligned section inside the top navigation */
@@ -223,17 +231,23 @@ body {
 
   /************ Inputs ***************/
 
-  .search-query{
+
+  input#search {
+    height: 35px;
     text-align: center;
-    width:200px;
-    height:25px;
-    border-radius: 20px;
+    background-color: white;
+    border-radius: 20px 20px 20px 20px;
+    border: 0px;
+    font-size: 15px;
+    width:206px;   
+    margin-top: 7px;
+    height: 25px;
     outline: none;
   }
 
   #ocamlpro {
     padding: 0px;
-    height: 53.5px;
+    height: 55.5px;
   }
 
   #logo {
@@ -242,3 +256,22 @@ body {
     margin-left: 15px;
     margin-right: 15px;
   }
+
+  #search-img {
+    height: 20px;
+  }
+
+  #search-button {
+    border: 0;
+    cursor: pointer;
+    height: 44px !important;
+    outline: 0;
+    position: relative;
+    top: 6px;
+    left: -6px;
+    width: 24px;
+    z-index: 105;
+    background: none;
+    opacity: .5;
+  }
+

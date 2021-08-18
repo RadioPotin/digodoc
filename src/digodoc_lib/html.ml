@@ -10,13 +10,14 @@
 (**************************************************************************)
 
 open Ez_html.V1
+open Ez_subst.V1
 open EzFile.OP
 open Digodoc_common
 open Globals
 open Utils
 
 (* generate page _digodoc/docs/${filename} *)
-let generate_page ~filename ~title f =
+let generate_page ~filename ~title ~is_index f =
 
   let dirname = EzFile.dirname filename in
   let path_list =
@@ -30,72 +31,55 @@ let generate_page ~filename ~title f =
           path_list) in
   let root = if s = "" then s else s ^ "/" in
 
+  let rec brace () var = match var with
+    | "root" -> root
+    | "sources" ->
+      if !Globals.sources
+      then
+        Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
+        (brace () "root")
+      else ""
+    | "header_link" ->
+      if !Globals.with_header
+      then {| | <a href="#header">To the top</a>|}
+      else ""
+    | "search" -> 
+      if is_index 
+      then file_content "search_index.html"
+      else EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+    | _ ->
+      Printf.kprintf failwith "Unknown var %S" var
+  in
+  let header = EZ_SUBST.string (file_content "header.html") ~ctxt:() ~brace
+  and footer = EZ_SUBST.string (file_content "footer.html") ~ctxt:() ~brace in
   (* removed 'async' from the script line because unrecognized by ez_ml parser *)
   let bb = Buffer.create 10000 in
   Printf.bprintf bb {|<!DOCTYPE html>
-<html lang="en">
- <head>
-  <title>%s</title>
-  <link rel="stylesheet" href="%sstatic/styles/odoc/odoc.css"/>
-  <link rel="icon" href="%sstatic/imgs/favicon.png" />
-  <script type="text/javascript" src="%sstatic/scripts/%s" charset="utf-8"></script>
-  <meta charset="utf-8"/>
-  <meta name="generator" content="digodoc 0.1"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <script src="%sstatic/scripts/highlight.pack.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
-</head>
-|} title root root root (get_script ()) root;
+    <html lang="en">
+      <head>
+        <title>%s</title>
+        <link rel="stylesheet" href="%sstatic/styles/odoc/odoc.css"/>
+        <link rel="icon" href="%sstatic/imgs/favicon.png" />
+        <script type="text/javascript" src="%sstatic/scripts/%s" charset="utf-8"></script>
+        <meta charset="utf-8"/>
+        <meta name="generator" content="digodoc 0.1"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+        <script src="%sstatic/scripts/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+      </head>
+      <body>
+    |} title root root root (get_script ()) root;
   Printf.bprintf bb
-    {|
-<body>
- <div id="header" class="topnav">
-    <a id="ocamlpro" href="https://www.ocamlpro.com/" target="_blank"><img id="logo" src="%sstatic/imgs/ocamlpro.svg"/></a>
-    <a id="about-item" href="%sabout.html">About</a>
-    <a id="packages-item" href="%sindex.html">Packages</a>
-    <a id="libraries-item" href="%slibraries.html">Libraries</a>
-    <a id="metas-item" href="%smetas.html">Metas</a>
-    <a id="modules-item" href="%smodules.html">Modules</a>
-    %s
-    <div class="topnav-right">
-        <div class="search">
-            <input id="search" class="search-query" type="text" placeholder="Search"/>
-        </div>
-    </div>
- </div>
- <div class="content">
-|} root root root root root root 
-    (if !sources 
-    then Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|} root 
-    else "");
+    {|%s 
+    <div class="content">
+    |} header;
   f bb ~title;
-  Printf.bprintf bb
-    {|
- </div>
- <div id="footer">
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <i>Copyright 2021 OCamlPro and the authors of the libraries.</i>
-          </td>
-          <td>
-            <nav float="right">
-              <a href="https://www.ocamlpro.com/contact/">Contact page</a>
-              | <a href="#header">To the top</a>
-            </nav>
-          </td>
-          <td>
-            <nav>Paris, FRANCE (<a href="https://www.ocamlpro.com/legal-notice">Legal Notice</a>)
-            </nav>
-          </td>
-        </tr>
-      </tbody>
-    </table>
- </div>
-</body>
-</html>
-|};
+  Printf.bprintf bb{|</div>
+        %s
+      </body>
+    </html>
+    |} footer;
+
   let contents = Buffer.contents bb in
   EzFile.write_file (digodoc_dir // filename) contents;
   ()
@@ -235,14 +219,15 @@ let add_header_footer () =
               if !with_header 
               then {| | <a href="#header">To the top</a>|} 
               else ""
+            | "search" -> EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
             | _ -> 
               Printf.kprintf failwith "Unknown var %S" var
           in
         
           let html = EzFile.read_file file 
-          and header = Ez_subst.V1.EZ_SUBST.string (file_content "header.html") ~brace ~ctxt:()
-          and footer = Ez_subst.V1.EZ_SUBST.string (file_content "footer.html") ~brace ~ctxt:()
-          and head_childs = List.map (fun (id,child) -> id, Ez_subst.V1.EZ_SUBST.string child ~brace ~ctxt:()) head_childs in
+          and header = EZ_SUBST.string (file_content "header.html") ~brace ~ctxt:()
+          and footer = EZ_SUBST.string (file_content "footer.html") ~brace ~ctxt:()
+          and head_childs = List.map (fun (id,child) -> id, EZ_SUBST.string child ~brace ~ctxt:()) head_childs in
 
           let html' = Patchtml.edit_html ~header ~footer ~head_childs html in
 
@@ -274,7 +259,7 @@ let adjust_upper_link () =
         end
         | "LIBRARY" -> update_doc path "libraries.html"
         | "META" -> update_doc path "metas.html"
-        | _ -> update_doc path "index.html"
+        | _ -> update_doc path "packages.html"
       )
       (EzFile.read_dir html_dir)
 

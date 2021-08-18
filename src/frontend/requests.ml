@@ -90,7 +90,7 @@ let getEntriesNumber () =
     let api = get_api_host () in
     let entry = 
         match filename with
-        | "index.html" -> "packages"
+        | "packages.html" -> "packages"
         | "modules.html" -> "modules"
         | "libraries.html" -> "libraries"
         | "metas.html" -> "metas"
@@ -111,7 +111,7 @@ let sendRequest () =
     let entry_info = entry_info_of_state ()  in
     begin 
         match filename with
-        | "index.html" -> begin
+        | "packages.html" -> begin
                 (get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
                     | Error _ ->Lwt.return_false
                     | Ok packages -> 

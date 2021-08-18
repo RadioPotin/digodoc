@@ -17,24 +17,17 @@ let activate_bar () =
     let item_bar = getElementById item in
     item_bar##.className := js "active"
   in
-    if not in_root_directory then begin
-        (* TODO : search input dispo through all the pages *)
-        let search = getElementById "search" in
-        search##.style##.display := js "none"
-    end
-    else begin
-        match filename with
-        | "about.html" -> 
-            activate "about-item";
-            let search = getElementById "search" in
-            search##.style##.display := js "none"
-        | "index.html" -> activate "packages-item"
-        | "libraries.html" -> activate "libraries-item"
-        | "metas.html" -> activate "metas-item"
-        | "modules.html" -> activate "modules-item"
-        | "sources.html" -> activate "sources-item"
-        | _ -> assert false
-    end
+    if in_root_directory then
+      match filename with
+      | "about.html" -> activate "about-item";
+      | "packages.html" -> activate "packages-item"
+      | "libraries.html" -> activate "libraries-item"
+      | "metas.html" -> activate "metas-item"
+      | "modules.html" -> activate "modules-item"
+      | "sources.html" -> activate "sources-item"
+      | _ -> assert false
+
+
 
 let footerHandler () = 
     let footer = getElementById "footer" in

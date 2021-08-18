@@ -77,7 +77,7 @@ let set_search_handler () =
   let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in
   search##.onkeyup := Html.handler (fun _ ->
     let re = search##.value in
-    if in_root_directory && not (filename = "about.html") 
+    if is_index_page 
     then begin
       clear_index_page ();
       let input = re##trim in
@@ -95,7 +95,7 @@ let onload_main () =
   let%lwt () = Requests.api_host () in 
   Headfoot.activate_bar ();
   Headfoot.footerHandler ();
-  if in_root_directory && not (filename = "about.html") 
+  if is_index_page
   then begin
     main_div := Some (getElementById "by-name");
     for index = 48 to 57 do
@@ -115,16 +115,18 @@ let onload_main () =
       Dom.appendChild (get_main_div ()) load_div;
       let selected_elt = unopt @@ document##querySelector (js "#load_div") in
       Observer.observer##observe selected_elt;
+      Headfoot.footerHandler ();
       Lwt.return_unit);
   end;
   Lwt.return_unit
     
 
-let onload _ =
+let index_onload _ =
   set_search_handler ();
   set_onclick_handlers ();
   Lwt.async onload_main;
   _false
+
 
 (* TODO: different onload in function to the type of page : index, doc, source *)
 let main () =
@@ -135,7 +137,7 @@ let main () =
       _false) in
   window##.onresize := footHandler;
   if is_index_page 
-  then window##.onload := Html.handler onload
+  then window##.onload := Html.handler index_onload
   else window##.onload := footHandler
   
 let () = main ()
