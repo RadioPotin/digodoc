@@ -3,7 +3,7 @@
 (library
  (name ui_lib)
  (wrapped false)
- (modules headfoot observer requests global insertion object)
+ (modules headfoot search index observer requests global insertion object)
  (preprocess (pps js_of_ocaml-ppx ppx_deriving_jsoo lwt_ppx))
  (libraries js_of_ocaml-lwt search-api.data_common search-api.api_services ez_api ez_api.ixhr_lwt))
 

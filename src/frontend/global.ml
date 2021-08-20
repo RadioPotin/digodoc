@@ -67,8 +67,17 @@ let getElementById (id:string) : Html.element t =
 let reversed_path : string array = 
   let pathname : js_string t = 
     Html.window##.location##.pathname in
+  let pathname = pathname##substring 1 (pathname##.length) in
   let reversed_path_js : js_string t js_array t = 
     (str_array (pathname##split (js "/")))##reverse in
+  array_map to_string reversed_path_js |> to_array
+
+let path : string array = 
+  let pathname : js_string t = 
+    Html.window##.location##.pathname in
+  let pathname = pathname##substring 1 (pathname##.length) in
+  let reversed_path_js : js_string t js_array t = 
+    (str_array (pathname##split (js "/"))) in
   array_map to_string reversed_path_js |> to_array
 
 let filename : string = reversed_path.(0) 
@@ -85,13 +94,24 @@ let load_div : Html.element t =
   div##setAttribute (js "id") (js "load_div");
   div
 
-let in_root_directory : bool = Array.length reversed_path < 3
+let search_ul : Html.uListElement t option ref = ref None
+
+let in_root_directory : bool = Array.length path == 1
 
 let is_index_page : bool =
   in_root_directory && not (String.equal filename "about.html")
 
 let is_doc_page : bool =
-  reversed_path.(0) = "docs"
+  path.(0) = "docs"
 
 let is_source_page : bool =
-  reversed_path.(0) = "sources"
+  path.(0) = "sources"
+
+let path_to_root : js_string t =
+  let root = ref "" in 
+  Array.iteri 
+    (fun i _e ->
+      if i > 0 then root := !root ^ "../"
+      ) 
+    path;
+  js !root

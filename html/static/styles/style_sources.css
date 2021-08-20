@@ -275,3 +275,73 @@
     opacity: .5;
   }
 
+  #search-button:hover {
+    opacity: 1;
+  }
+
+
+#search-result {
+  background: #fff;
+  position: absolute;
+  top: 57px;
+  right: 2px;
+  width: 22%;
+  z-index: 103;
+  display: block;
+  margin-top: 0px;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+}
+
+#search-result ul {
+  list-style: none;
+  margin-top: 0px;
+  padding-left : 0px;
+  margin-bottom: 0px;
+}
+
+.search-item {
+  display: block; 
+  margin-left: 0px;
+  height: 40px;
+  border-bottom: 1px solid rgba(189, 189, 189, 0.466);
+}
+
+
+.search-item a {
+  height: 100%;
+  display: inline-block;
+  width: 100%;
+  color:black;
+  text-decoration: none;
+}
+
+.search-item a:hover {
+  background-color: #f1f1f1;
+  --color-link : none;
+  text-decoration: none;
+}
+
+.item-indicator {
+  float: left ; 
+  height: 100%; 
+  margin:0px; 
+  width: 3%;
+}
+
+.item-indicator.item-pack {
+  background-color:  rgba(0, 128, 0, 0.4);
+}
+
+.item-indicator.item-lib {
+  background-color:  rgba(128, 0, 128, 0.4);
+}
+
+.item-indicator.item-mdl {
+  background-color:  rgba(0, 0, 255, 0.4);
+}
+
+.item-name {
+  margin-top: 0px; 
+  padding-top: 10px; 
+  padding-left: 15px;
+}

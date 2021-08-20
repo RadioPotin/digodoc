@@ -167,4 +167,11 @@ let sendRequest () =
                         else Lwt.return_false
             end
         | _ -> assert false
-    end;
+    end
+
+let sendSearchRequest () =
+    get1 ~host:(get_api_host ()) Services.search state.pattern >>= function
+        | Error _ -> Lwt.return_unit
+        | Ok search_result -> 
+            Insertion.insert_search_result (Object.search_result_to_jsoo search_result);
+            Lwt.return_unit
