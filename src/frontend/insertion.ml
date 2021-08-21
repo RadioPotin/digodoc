@@ -233,23 +233,41 @@ let insert_sources : sources_jsoo t -> unit  =
 let insert_search_result : search_result_jsoo t -> unit =
     fun (result : search_result_jsoo t) ->
         let search_ul = Option.get !search_ul in
-        let insert_item elt indicator =
+        let insert_pack pack =
+            let search_item = Html.createLi document in
+            search_item##setAttribute (js "class") (js "search-item");
+            let item_link = Html.createA document in
+            item_link##setAttribute (js "href") (path_to_root##concat pack##.path);
+            Dom.appendChild search_item item_link;
+            let item_indicator = Html.createDiv document
+            and item_name = Html.createDiv document in
+            item_indicator##setAttribute (js "class") (js ("item-indicator item-pack"));
+            item_name##setAttribute (js "class") (js "item-name");
+            item_name##.innerHTML := pack##.name;
+            Dom.appendChild item_link item_indicator;
+            Dom.appendChild item_link item_name;
+            Dom.appendChild search_ul search_item
+        and insert_item elt indicator =
             let search_item = Html.createLi document in
             search_item##setAttribute (js "class") (js "search-item");
             let item_link = Html.createA document in
             item_link##setAttribute (js "href") (path_to_root##concat elt##.path);
             Dom.appendChild search_item item_link;
             let item_indicator = Html.createDiv document
-            and item_name = Html.createDiv document in
+            and item_name = Html.createDiv document
+            and item_pack = Html.createDiv document in
             item_indicator##setAttribute (js "class") (js ("item-indicator " ^ indicator));
             item_name##setAttribute (js "class") (js "item-name");
             item_name##.innerHTML := elt##.name;
+            item_pack##setAttribute (js "class") (js "package-item");
+            item_pack##.innerHTML := elt##.opam;
             Dom.appendChild item_link item_indicator;
             Dom.appendChild item_link item_name;
+            Dom.appendChild item_link item_pack;
             Dom.appendChild search_ul search_item
         in
             foreach
-                (fun _ elt -> insert_item elt "item-pack")
+                (fun _ elt -> insert_pack elt)
                 result##.packages;
             foreach
                 (fun _ elt -> insert_item elt "item-lib")
