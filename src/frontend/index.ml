@@ -33,15 +33,29 @@ let clear_page () =
       title##.style##.display := js "none")
   done
 
+let update_entries_number () = 
+  let entry = match filename with
+    | "packages.html" -> "packages"
+    | "modules.html" -> "modules"
+    | "libraries.html" -> "libraries"
+    | "metas.html" -> "metas"
+    | "sources.html" -> "sources"
+    | _ -> assert false
+  in
+    let%lwt number = Requests.getEntriesNumber entry in
+    let indicator =  unopt @@ document##getElementById  (js "item-number") in
+    indicator##.innerHTML := js (number ^ " " ^ entry);
+    Lwt.return_unit
+
 let update_page () =
   let%lwt added = Requests.sendRequest () in
   if added then begin
     state.last_id <- state.last_id + 50;
     Dom.appendChild (get_main_div ()) load_div
   end;
-  let%lwt () = Requests.getEntriesNumber () in
-  Headfoot.footerHandler ();
-  Lwt.return_unit
+    let%lwt () = update_entries_number () in
+    Headfoot.footerHandler ();
+    Lwt.return_unit
 
 let set_start_letter ch =
   state.starts_with <- ch;
@@ -90,12 +104,10 @@ let set_search_handler () =
     end;
     _false)
 
-let onload_main () = 
-  let%lwt () = Requests.api_host () in 
-  Headfoot.activate_bar ();
-  Headfoot.footerHandler ();
-  if is_index_page
-  then begin
+let onload () = 
+  set_search_handler ();
+  set_onclick_handlers (); 
+  let%lwt () = 
     main_div := Some (getElementById "by-name");
     for index = 48 to 57 do
       let title_opt = document##getElementById (js @@ "name-" ^ fromCharCode index) in
@@ -107,20 +119,13 @@ let onload_main () =
       Opt.iter title_opt (fun title -> 
         title##.style##.display := js "none")
     done;
-    Lwt.async (fun () -> 
-      let%lwt _ = Requests.sendRequest () in
-      let%lwt () = Requests.getEntriesNumber () in
-      state.last_id <- state.last_id + 50;
-      Dom.appendChild (get_main_div ()) load_div;
-      let selected_elt = unopt @@ document##querySelector (js "#load_div") in
-      Observer.observer##observe selected_elt;
-      Headfoot.footerHandler ();
-      Lwt.return_unit);
-  end;
-  Lwt.return_unit
+    let%lwt _ = Requests.sendRequest () in
+    let%lwt () = update_entries_number () in
+    state.last_id <- state.last_id + 50;
+    Dom.appendChild (get_main_div ()) load_div;
+    let selected_elt = unopt @@ document##querySelector (js "#load_div") in
+    Observer.observer##observe selected_elt;
+    Lwt.return_unit
+  in
+    Lwt.return_unit
 
-  let onload _ = 
-    set_search_handler ();
-    set_onclick_handlers ();
-    Lwt.async onload_main;
-    _false

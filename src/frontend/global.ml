@@ -58,10 +58,13 @@ let fromCharCode (i:int) : string =
   let ch = Char.chr i in
   String.make 1 ch
 
-(* TODO: getelementbyid alias rewrite all *)
 let getElementById (id:string) : Html.element t = 
   unopt @@ document##getElementById (js id)
 
+let open_url url =
+  let _ =window##open_ url (js "_self") (Opt.return (js "")) in
+  ()
+  
 (********** Globals **********)
 
 let reversed_path : string array = 
@@ -99,13 +102,18 @@ let search_ul : Html.uListElement t option ref = ref None
 let in_root_directory : bool = Array.length path == 1
 
 let is_index_page : bool =
-  in_root_directory && not (String.equal filename "about.html")
+  in_root_directory 
+  && not (String.equal filename "about.html")
+  && not (String.equal filename "search.html")
 
 let is_doc_page : bool =
   path.(0) = "docs"
 
 let is_source_page : bool =
   path.(0) = "sources"
+
+let is_search_page : bool =
+  path.(0) = "search.html"
 
 let path_to_root : js_string t =
   let root = ref "" in 
@@ -115,3 +123,15 @@ let path_to_root : js_string t =
       ) 
     path;
   js !root
+
+type page_info = {
+  num : int; 
+  entries_interval : int * int;
+  href : string 
+}
+
+type pagination_info = {
+  active_ind : int;
+  pages : page_info list;
+  entries_number: int
+}

@@ -1,0 +1,40 @@
+
+<input type="button" id="update-filters" value="Update filters">
+<form id="search-form">
+      <label for="fpattern">Search pattern:</label><br>
+      <input type="text" id="fpattern" name="fpattern" value=""><br>
+      <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+      <label for="fpackages">Packages</label><br>
+      <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+      <label for="flibraries">Libraries</label>
+      <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+      <label for="fmodules">Modules</label><br>
+      <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+      <label for="fmetas">Metas</label>
+      <input type="checkbox" id="fsources" name="fsources" value="Sources">
+      <label for="fsources">Sources</label><br>
+      <input type="submit" value="Search">
+</form>
+<nav>
+  <a id="packages-results" style="display: none;">Packages</a>
+  <a id="libraries-results" style="display: none;">Libraries</a>
+  <a id="modules-results" style="display: none;">Modules</a>
+  <a id="metas-results" style="display: none;">Metas</a>
+  <a id="sources-results" style="display: none;">Sources</a>
+</nav>
+<div id="result-div">
+  <div id="page-info">
+
+  </div>
+  <div id="results">
+    <ol id="results-list">
+
+    </ol>
+  </div>
+  <nav id="pagination-nav">
+    <a id="previous-page" style="display: none;" href="">FleshL</a>
+    <ol id="pages" style="display: inline;">
+    </ol>
+    <a id="next-page" style="display: none;" href="">FleshR</a>
+  </nav>
+</div>

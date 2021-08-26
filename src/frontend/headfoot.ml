@@ -20,6 +20,7 @@ let activate_bar () =
     if in_root_directory then
       match filename with
       | "about.html" -> activate "about-item";
+      | "search.html" -> activate "search-page-item";
       | "packages.html" -> activate "packages-item"
       | "libraries.html" -> activate "libraries-item"
       | "metas.html" -> activate "metas-item"

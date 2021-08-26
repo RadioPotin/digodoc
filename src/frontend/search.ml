@@ -22,13 +22,14 @@ let redirection_handler () =
             let item =  unopt @@ search_items##item 0 in
             let link =  unopt @@ Dom.CoerceTo.element @@ unopt @@ item##.firstChild in
             let href = unopt @@ link##getAttribute (js "href") in
-            window##open_ href (js "_self") (Opt.return (js ""))
+            open_url href
         end
         else
-            let url = js ("search.html?pattern=" ^ state.pattern) in 
-            window##open_ url (js "_self") (Opt.return (js "")) 
+            let display_query = "&current=packages&page=0" in
+            let entries_query = "&entry=packages&entry=libraries&entry=modules" in
+            let url = js ("search.html?pattern=" ^ state.pattern^ entries_query ^ display_query) in 
+            open_url url
     in
-        logs "PES";
         ()
 
 let clear_search () =
@@ -72,15 +73,8 @@ let set_button_handler () =
         redirection_handler ();
         _false)
 
-let onload_main () =
-    let%lwt () = Requests.api_host () in
+let onload () =
     clear_search ();
     set_search_handler ();
     set_button_handler ();
-    Headfoot.activate_bar ();
-    Headfoot.footerHandler ();
     Lwt.return_unit
-
-let onload _ = 
-    Lwt.async onload_main; 
-    _false

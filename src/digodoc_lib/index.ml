@@ -558,5 +558,13 @@ let generate () =
       )
   end;
 
+  Html.generate_page
+    ~is_index:false
+    ~filename:"search.html"
+    ~title:"Search"
+    (fun bb ~title ->
+      ignore title;
+      Printf.bprintf bb "%s" (Utils.file_content "search_page.html"));
+
   Printf.eprintf "Index generation done.\n%!";
   ()
