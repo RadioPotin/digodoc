@@ -484,11 +484,6 @@ let generate () =
     Printf.bprintf bb
       {|
   <h1>OCaml Documentation: %s</h1>
-  <h2>OCaml Distribution</h2>
-  <ul>
-    <li><a href="https://ocaml.org/manual/">OCaml Manual</a></li>
-    <li><a href="docs/LIBRARY.stdlib@ocaml-base-compiler.%s/Stdlib/index.html#modules">Stdlib Modules</a></li>
-  </ul>
   <nav class="toc">
   <ul>
     <li><a href="https://ocaml.org/manual/">OCaml Manual</a></li>
@@ -497,7 +492,7 @@ let generate () =
   </nav>
   </header>
   <h2>Index</h2>
-|} title stdlib_version stdlib_version;
+|} title stdlib_version;
   in
 
   let trailer _bb =
@@ -505,6 +500,7 @@ let generate () =
   in
 
   Html.generate_page
+    ~is_index:false
     ~filename:"about.html"
     ~title:"About"
     (fun bb ~title ->
@@ -512,8 +508,9 @@ let generate () =
       Printf.bprintf bb "%s" (Utils.file_content "about.html"));
 
   Html.generate_page
-    ~filename:"index.html"
-    ~title:"Main Index"
+    ~is_index:true
+    ~filename:"packages.html"
+    ~title:"Packages Index"
     (fun bb ~title ->
         header bb ~title;
         generate_opam_index state bb;
@@ -521,6 +518,7 @@ let generate () =
     );
 
   Html.generate_page
+    ~is_index:true
     ~filename:"libraries.html"
     ~title:"Libraries Index"
     (fun bb ~title  ->
@@ -530,6 +528,7 @@ let generate () =
     );
 
   Html.generate_page
+    ~is_index:true
     ~filename:"metas.html"
     ~title:"Meta Index"
     (fun bb ~title ->
@@ -539,6 +538,7 @@ let generate () =
     );
 
   Html.generate_page
+    ~is_index:true
     ~filename:"modules.html"
     ~title:"Modules Index"
     (fun bb ~title ->
@@ -548,6 +548,7 @@ let generate () =
     );
   if !Globals.sources then begin
     Html.generate_page
+      ~is_index:true
       ~filename:"sources.html"
       ~title:"Sources Index"
       (fun bb ~title ->
@@ -556,6 +557,14 @@ let generate () =
           trailer bb;
       )
   end;
+
+  Html.generate_page
+    ~is_index:false
+    ~filename:"search.html"
+    ~title:"Search"
+    (fun bb ~title ->
+      ignore title;
+      Printf.bprintf bb "%s" (Utils.file_content "search_page.html"));
 
   Printf.eprintf "Index generation done.\n%!";
   ()

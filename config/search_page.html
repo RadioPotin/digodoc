@@ -1,0 +1,82 @@
+
+<button id="update-filters"><img src="static/imgs/filter.ico"/></button>
+<div id="form-div">
+  <form id="search-form">
+    <table>
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <label for="fpattern">Search pattern:</label><br>
+            <input type="text" id="fpattern" name="fpattern" value=""><br>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+            <label for="fpackages">Packages</label>
+          </td>
+          <td>
+            <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+            <label for="flibraries">Libraries</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+            <label for="fmodules">Modules</label><br>
+          </td>
+          <td>
+            <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+            <label for="fmetas">Metas</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="fsources" name="fsources" value="Sources">
+            <label for="fsources">Sources</label><br>
+          </td>
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" colspan="2">
+            <input type="submit" value="Search">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+<div id="entries-nav">
+  <table>
+    <tbody>
+    <tr>
+      <td><a id="packages-results" style="display: none;">Packages</a></td>
+      <td><a id="libraries-results" style="display: none;">Libraries</a></td>
+      <td><a id="modules-results" style="display: none;">Modules</a></td>
+      <td><a id="metas-results" style="display: none;">Metas</a></td>
+      <td><a id="sources-results" style="display: none;">Sources</a></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+<div id="result-div">
+  <div id="page-info">
+
+  </div>
+  <div id="results">
+    <ol id="results-list">
+
+    </ol>
+  </div>
+  <nav id="pagination-nav">
+    <a id="previous-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M14.5 19v-3h5v-3h-5v-3L9 14.5z"></path></svg>
+    </a>
+    <ol id="pages">
+    </ol>
+    <a id="next-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M15 19v-3h-5v-3h5v-3l5.5 4.5z"></path></svg>
+    </a>
+  </nav>
+</div>

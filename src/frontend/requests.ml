@@ -83,36 +83,24 @@ let api_host () =
        api_host := Some (EzAPI.BASE api);
        Lwt.return_unit
 
-
-
-
-let getEntriesNumber () = 
+let getEntriesNumber ?entry_info entry = 
     let api = get_api_host () in
-    let entry = 
-        match filename with
-        | "index.html" -> "packages"
-        | "modules.html" -> "modules"
-        | "libraries.html" -> "libraries"
-        | "metas.html" -> "metas"
-        | "sources.html" -> "sources"
-        | _ -> assert false
-    in
-    let entry_info = entry_info_of_state ()
+    let entry_info = 
+        match entry_info with
+        | Some ei -> ei
+        | None -> entry_info_of_state ()
     and command = Utils.command_of_string @@ "count+" ^ entry in
         get2 ~host:api Services.exec_command command entry_info >>= function
-            | Error _ ->Lwt.return_unit
-            | Ok {result} -> 
-                let indicator =  unopt @@ document##getElementById  (js "item-number") in
-                indicator##.innerHTML := js (result ^ " " ^ entry);
-                Lwt.return_unit
+            | Error _ -> failwith "Request issue"
+            | Ok {result} -> Lwt.return result
 
 
 let sendRequest () = 
     let entry_info = entry_info_of_state ()  in
     begin 
         match filename with
-        | "index.html" -> begin
-                (get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
+        | "packages.html" -> begin
+                get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
                     | Error _ ->Lwt.return_false
                     | Ok packages -> 
                         if not (packages = []) 
@@ -120,7 +108,7 @@ let sendRequest () =
                             Insertion.insert_packages (Object.packages_to_jsoo packages);
                             Lwt.return_true
                         end
-                        else Lwt.return_false);
+                        else Lwt.return_false;
             end
         | "modules.html" ->  begin
                 get1 ~host:(get_api_host ()) Services.module_entries entry_info >>= function
@@ -167,4 +155,70 @@ let sendRequest () =
                         else Lwt.return_false
             end
         | _ -> assert false
-    end;
+    end
+
+let sendSearchRequest () =
+    get1 ~host:(get_api_host ()) Services.search state.pattern >>= function
+        | Error _ -> Lwt.return_unit
+        | Ok search_result -> 
+            Insertion.insert_search_result (Object.search_result_to_jsoo search_result);
+            Lwt.return_unit
+
+let sendAdvancedSearchRequest entry entry_info =
+    match entry with
+    | "packages" -> begin
+            (get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
+                | Error _ ->Lwt.return_false
+                | Ok packages -> 
+                    if not (packages = []) 
+                    then begin
+                        Insertion.insert_search_packages (Object.packages_to_jsoo packages);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false);
+        end
+    | "libraries" -> begin
+            get1 ~host:(get_api_host ()) Services.library_entries entry_info >>= function
+                | Error _ -> Lwt.return_false
+                | Ok libraries -> 
+                    if not (libraries = []) 
+                    then begin
+                        Insertion.insert_search_libraries (Object.libraries_to_jsoo libraries);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false
+        end
+    | "modules" ->  begin
+            get1 ~host:(get_api_host ()) Services.module_entries entry_info >>= function
+                | Error _ -> Lwt.return_false
+                | Ok modules -> 
+                    if not (modules = []) 
+                    then begin
+                        Insertion.insert_search_modules (Object.modules_to_jsoo modules);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false
+        end
+    | "metas" -> begin
+            get1 ~host:(get_api_host ()) Services.meta_entries entry_info >>= function
+                | Error _ -> Lwt.return_false
+                | Ok metas -> 
+                    if not (metas = []) 
+                    then begin
+                        Insertion.insert_search_metas (Object.metas_to_jsoo metas);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false
+        end
+    | "sources" -> begin
+            get1 ~host:(get_api_host ()) Services.source_entries entry_info >>= function
+                | Error _ -> Lwt.return_false
+                | Ok sources -> 
+                    if not (sources = []) 
+                    then begin
+                        Insertion.insert_search_sources (Object.sources_to_jsoo sources);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false
+        end
+    | _ -> assert false

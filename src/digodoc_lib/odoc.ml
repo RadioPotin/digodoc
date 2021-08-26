@@ -529,6 +529,7 @@ let infos_of_opam state pkg opam =
         Printf.bprintf bb {|%s|} content 
       in
       Html.generate_page
+        ~is_index:false
         ~filename:html_file
         ~title:"basename"
         generate ;

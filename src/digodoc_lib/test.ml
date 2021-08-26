@@ -50,6 +50,7 @@ let generate () =
     let brace () var =
         match var with
         | "header_link" -> {| | <a href="#header">To the top</a>|}
+        | "search" -> file_content "search_index.html"
         | _ -> ""
     in
     let about_html = Ez_subst.V1.EZ_SUBST.string about_page ~brace ~ctxt:() in

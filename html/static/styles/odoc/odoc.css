@@ -46,7 +46,7 @@ table { border-collapse: collapse; border-spacing: 0; width: inherit; height: in
    See also media adjustments at the end of the stylesheet. */
 
 body { 
-      min-width: 900px;
+      min-width: 1000px;
       background-color: var(--color-bg);
        color: var(--color-fg); }
 
@@ -338,26 +338,25 @@ input#search {
   border: 0px;
   font-size: 15px;
   width:206px;   
-  margin-top: 4px;
   height: 25px;
   outline: none;
-}
-
-button#search-button {
-  height: 35px;
-  width: 100px;
-  border: 1px;
-  background-color: lightblue;
-  border-radius: 0 20px 20px 0;
 }
 
 .topnav a {
   float: left;
   color: #f2f2f2;
   text-align: center;
-  padding: 14px 16px;
+  padding: 15px 16px;
   text-decoration: none;
   font-size: 17px;
+}
+
+.topnav table {
+  margin-top: 0px;
+}
+
+.topnav td {
+  vertical-align: middle;
 }
 
 .topnav a:hover {
@@ -388,7 +387,21 @@ button#search-button {
 
 .search {
   float: left;
-  margin-top:10px;
+  margin-top: 0px;
+  margin-right:20px;
+}
+
+.search-query {
+  margin-top: 4px;
+}
+
+.search-input {
+  margin-top: 7px;
+}
+
+.search-index {
+  float: left;
+  margin-top: 10px;
   margin-right:20px;
 }
 
@@ -422,7 +435,7 @@ i {
 
 #ocamlpro {
   padding: 0px;
-  height: 53.5px;
+  height: 55.5px;
 }
 
 #logo {
@@ -430,4 +443,325 @@ i {
   margin: 0px;
   margin-left: 15px;
   margin-right: 15px;
+}
+
+#search-img {
+  height: 20px;
+}
+
+#search-button {
+  border: 0;
+  cursor: pointer;
+  height: 44px !important;
+  outline: 0;
+  position: relative;
+  top: 6px;
+  left: -6px;
+  width: 24px;
+  z-index: 105;
+  background: none;
+  opacity: .5;
+}
+
+#search-button:hover {
+  opacity: 1;
+}
+
+#search-result {
+  background: #fff;
+  position: absolute;
+  top: 57px;
+  right: 2px;
+  min-width: 22%;
+  z-index: 103;
+  display: block;
+  margin-top: 0px;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+#search-result ul {
+  list-style: none;
+  margin-top: 0px;
+  font-size: 14px;
+}
+
+.search-item {
+  display: block; 
+  margin-left: 0px;
+  height: 40px;
+  border-bottom: 1px solid rgba(189, 189, 189, 0.466);
+}
+
+
+.search-item a {
+  height: 100%;
+  display: inline-block;
+  width: 100%;
+  color:black;
+  text-decoration: none;
+}
+
+.search-item a:hover {
+  background-color: #f1f1f1;
+  --color-link : none;
+  text-decoration: none;
+}
+
+.item-indicator {
+  float: left ; 
+  height: 100%; 
+  margin:0px; 
+  width: 3%;
+}
+
+.item-indicator.item-pack {
+  background-color:  rgba(0, 128, 0, 0.4);
+}
+
+.item-indicator.item-lib {
+  background-color:  rgba(128, 0, 128, 0.4);
+}
+
+.item-indicator.item-mdl {
+  background-color:  rgba(0, 0, 255, 0.4);
+}
+
+.item-name {
+  margin-top: 0px; 
+  padding-top: 10px; 
+  padding-left: 15px;
+}
+
+.package-item {
+  padding-right: 5px;
+  margin-top: -1px;
+  color: green; 
+  float: right; 
+  font-size: 11px;
+}
+
+#page-info {
+  background-color: #f6f8fa;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 10px;
+  margin-top: 0px;
+  border: 1px solid #c4c4c4;
+  width: 100%;
+  border-bottom: 0px; 
+}
+
+#results {
+  margin-top: 0px;
+  border: 1px solid #c4c4c4;
+  width: 100%;
+  background-color: white;
+}
+
+#results-list {
+  list-style: none;
+  padding-right: 5px;
+  padding-bottom: 10px;
+}
+
+#pagination-nav {
+  text-align: center;
+  font-size: 90%;
+  background-color: #f6f8fa;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border: 1px solid #c4c4c4;
+  margin-top: 0px;
+  border-top: 0px;
+  width: 100%;
+}
+
+#pages {
+  display: inline-flex;
+  list-style: none;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+#pages li {
+  margin-left: 0px;
+}
+
+#pages a {
+  padding: 4px 9px;
+  color:gray;
+}
+
+#pages a:hover {
+  background-color: #ddd;
+  color: #659CD6;
+  --color-link : none;
+  text-decoration: none;
+}
+
+#pages a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#previous-page {
+  --color-link: none;
+}
+
+#next-page {
+  --color-link: none;
+}
+
+#previous-page svg{
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
+
+#next-page svg{
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
+
+#entries-nav {
+  font-size: 16px;
+background-color: #f6f8fa;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 10px;
+border-top-left-radius: 10px;
+border-top-right-radius: 10px;
+border: 1px solid #c4c4c4;
+}
+
+
+#entries-nav {
+  font-size: 16px;
+  background-color: #f6f8fa;
+  border: 1px solid #c4c4c4;
+  width : 660px;
+}
+
+#entries-nav table {
+  margin-top: 0px;
+  height: 37px;
+ }
+
+#entries-nav td {
+ text-align: center;
+ vertical-align: middle;
+}
+
+#entries-nav a:hover {
+  background-color: #ddd;
+  border:1px solid #c4c4c4;
+  color: #659CD6;
+  --color-link: none;
+ }
+
+#entries-nav a {
+  display:block;
+  padding: 10px;
+  color: grey;
+}
+
+#entries-nav a.active-nav {
+  background-color: #FF8F99;
+  color: white;
+  border:1px solid #c4c4c4;
+}
+
+#empty-result {
+  font-size: larger;
+  font-weight: bold;
+}
+
+
+#entries-nav {
+  font-size: 16px;
+  background-color: white;
+  border: 1px solid #c4c4c4;
+  width : 660px;
+}
+
+#entries-nav table {
+  margin-top: 0px;
+  height: 37px;
+ }
+
+#entries-nav td {
+ text-align: center;
+ vertical-align: middle;
+}
+
+#entries-nav a:hover {
+  background-color: #ddd;
+  border:1px solid #c4c4c4;
+  color: #659CD6;
+  --color-link: none;
+ }
+
+#entries-nav a {
+  display:block;
+  padding: 10px;
+  color: grey;
+}
+
+#entries-nav a.active-nav {
+  background-color: #FF8F99;
+  color: white;
+  border:1px solid #c4c4c4;
+}
+
+#empty-result {
+  font-size: larger;
+  font-weight: bold;
+}
+
+#form-div {
+  text-align: center;
+  width: 25%;
+  margin-bottom: 30px;
+  background-color: #e4dede;
+  border: 2px solid #c4c4c4;
+  padding: 20px;
+  border-radius: 40px;
+}
+
+#search-form {
+  display: inline;
+}
+
+#search-form table {
+  display: block;
+  margin: 0px;
+}
+
+#search-form td {
+  text-align: left;
+}
+
+#fpattern {
+  width: 100%;
+}
+
+#update-filters {
+  border: 0;
+  cursor: pointer;
+  height: 44px !important;
+  outline: 0;
+  position: relative;
+  top: 10px;
+  width: 24px;
+  z-index: 105;
+  background: none;
+  opacity: .3;
+}
+
+#update-filters:hover {
+  opacity: .7;
+}
+
+#update-filters img {
+  height: 20px;
 }
