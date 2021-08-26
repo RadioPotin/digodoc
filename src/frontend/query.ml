@@ -133,7 +133,7 @@ let update_form () =
 
 let set_handlers () =
     let form = unopt @@ Html.CoerceTo.form @@ getElementById "search-form" in
-    let update_button = get_input "update-filters" in
+    let update_button = unopt @@ Html.CoerceTo.button @@ getElementById "update-filters" in
     form##.onsubmit := Html.handler (fun _ ->
         if update_state () 
         then begin
@@ -142,7 +142,7 @@ let set_handlers () =
         _false
     );
     update_button##.onclick := Html.handler (fun _ ->
-        let form = getElementById "search-form" in
+        let form = getElementById "form-div" in
         update_button##.style##.display := js "none";
         form##.style##.display := js "";
         update_form ();
@@ -151,9 +151,11 @@ let set_handlers () =
 
 let uninitialized_page () =
     let button = getElementById "update-filters" 
-    and results = getElementById "result-div" in
+    and results = getElementById "result-div" 
+    and entries_nav = getElementById "entries-nav" in
     button##.style##.display := js "none";
     results##.style##.display := js "none";
+    entries_nav##.style##.display := js "none";
     Lwt.return_unit 
 
 let link_to_entry {pattern; entries; _} entry link =
@@ -194,28 +196,22 @@ let pagination_info {pattern; entries; current_entry; page} entries_number =
         {active_ind; pages; entries_number}
 
 let insert_content state =
-    logs "1";
     let entry_info = state_to_entry_info () in
     let entry = (get_state_info ()).current_entry in
-    logs "2";
     let%lwt added = Requests.sendAdvancedSearchRequest entry entry_info in
     if added
     then begin
-        logs "3";
         let%lwt entries_number = Requests.getEntriesNumber ~entry_info entry in
-        logs "4";
         let number = int_of_string entries_number in
         let pages_info = pagination_info state number in
-        logs "5";
         Insertion.insert_pagination pages_info;
-        logs "6";
         Lwt.return_unit
     end 
     else begin
         let result_div = getElementById "result-div" in 
         result_div##.innerHTML := js "";
         let mess = Html.createSpan document in
-        mess##setAttribute (js "class") (js "empty-result");
+        mess##setAttribute (js "id") (js "empty-result");
         mess##.innerHTML := js @@ "No " ^ entry ^ " found.";
         Dom.appendChild result_div mess;
         Lwt.return_unit
@@ -225,7 +221,7 @@ let search_page () =
     match !state with
     | Uninitialized -> failwith "should not occur"
     | Search state -> begin
-        let form = getElementById "search-form" in
+        let form = getElementById "form-div" in
         let result_nav = getElementById @@ state.current_entry ^ "-results" in
         let results = getElementById "results-list" in
         results##.innerHTML := js "";
