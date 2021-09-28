@@ -753,3 +753,8 @@ i {
   height: 20px;
   margin-bottom: 5px;
 }
+
+#result-div {
+  max-width: 100ch;
+  width: 100%;
+}

@@ -29,8 +29,27 @@ let pp_val_desc ident pp vdesc =
         |> String.split_on_char '\n'
         |> String.concat " "
         |> String.split_on_char ' '
-    in
-    Format.fprintf pp "%s" (pp_aux vdesc_l "")
+    in 
+        let vdesc = pp_aux vdesc_l ""
+        and buff = Buffer.create 13 
+        and i = ref 0 in
+        while !i < String.length vdesc do
+            if vdesc.[!i] = '/'
+            then begin
+                incr i;
+                while !i < String.length vdesc &&
+                           vdesc.[!i] >= '0' && 
+                           vdesc.[!i] <= '9' do
+                    incr i
+                done
+            end;
+            if !i < String.length vdesc
+            then begin
+                Buffer.add_char buff vdesc.[!i];
+                incr i
+            end;
+        done;
+        Format.fprintf pp "%s" (Buffer.contents buff)
 
 let getVals {cmi_sign; _} = 
     let vals = List.filter (function | Sig_value _ -> true | _ -> false) cmi_sign in

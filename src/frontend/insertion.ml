@@ -407,6 +407,37 @@ let insert_search_sources : sources_jsoo t -> unit  =
             )
         sources
 
+let insert_search_vals : vals_jsoo t -> unit  = 
+    fun (vals : vals_jsoo t) -> 
+        foreach 
+            (fun _ elt -> 
+                let vall = Html.createLi document in
+                vall##setAttribute (js "class") (js "package");
+                let vall_word = Html.createCode document in
+                vall_word##.style##.color := js "red";
+                vall_word##.innerHTML := js "val ";
+                Dom.appendChild vall vall_word;
+                vall##.innerHTML := concat vall##.innerHTML (concat elt##.ident (js " : "));
+                let vall_val = Html.createCode document in
+                vall_val##.style##.color := js "green";
+                vall_val##.innerHTML := elt##.value;
+                Dom.appendChild vall vall_val;
+                vall##.innerHTML := concat vall##.innerHTML (js " in opam ");
+                let vall_opam = Html.createA document in
+                vall_opam##setAttribute  (js "class") (js "digodoc-opam");
+                vall_opam##setAttribute  (js "href") elt##.opampath;
+                vall_opam##.innerHTML := elt##.opam;
+                Dom.appendChild vall vall_opam;
+                vall##.innerHTML := concat vall##.innerHTML (js " in ");
+                let vall_mdl = Html.createA document in
+                vall_mdl##setAttribute (js "href") elt##.mdlpath;
+                vall_mdl##.innerHTML := elt##.mdl;
+                Dom.appendChild vall vall_mdl;
+                let vall_set = getElementById "results-list" in
+                Dom.appendChild vall_set vall;
+            )
+        vals
+
 let s i = string_of_int i  
 
 let insert_page_info {active_ind; pages; entries_number} =

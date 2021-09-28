@@ -60,6 +60,18 @@ type nonrec source_entry = Data_types.source_entry = {
 
 type nonrec sources = source_entry list [@@deriving jsoo]
 
+type nonrec val_entry = Data_types.val_entry = {
+  ident : string;
+  value : string;
+  mdl : string;
+  mdlpath : string;
+  opam : string;
+  opampath : string;
+}
+[@@deriving jsoo]
+
+type nonrec vals = val_entry list [@@deriving jsoo]
+
 type nonrec search_result = Data_types.search_result = {
   packages : packages;
   libraries : libraries;

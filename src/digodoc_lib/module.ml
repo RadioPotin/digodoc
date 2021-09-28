@@ -42,6 +42,8 @@ let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
           mdl_metas = StringMap.empty;
           mdl_intf = None;
           mdl_impl = None;
+          mdl_cmi_info = None;
+          mdl_cmt_info = None
         } in
         Hashtbl.add state.ocaml_mdls_by_name
           ( long_name ~mdl_name ~mdl_opam ) mdl;
@@ -54,6 +56,19 @@ let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
     | mdl -> mdl
   in
   mdl.mdl_exts <- StringSet.add mdl_ext mdl.mdl_exts ;
+
+  (* Extract cmi/cmt info *)
+    begin 
+    match mdl_ext with
+    | "cmt" | "cmti" | "cmi" -> begin
+      match Cmt_format.read (state.opam_switch_prefix // file mdl ~ext:("." ^ mdl_ext)) with
+      | Some cmi, _ when mdl.mdl_cmi_info = None -> mdl.mdl_cmi_info <- Some cmi
+      | _, Some cmt when mdl.mdl_cmt_info = None -> mdl.mdl_cmt_info <- Some cmt
+      | _ -> ()
+      end
+    | _ -> ()
+  end;
+
   (* TODO: check that, if this mdlule is already added, it is the same
      one. Otherwise, it means two opam packages have added different
      files for this mdlule *)

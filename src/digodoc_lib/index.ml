@@ -103,6 +103,17 @@ module SAVE = struct
         (String.trim lib.lib_opam.opam_version)
     ) mdl.mdl_libs;
     close_out oc
+
+  let save_module_vals file mdl =
+    let oc = open_out file in
+    Printf.fprintf oc "%s\n" mdl.mdl_name;
+    Printf.fprintf oc "%s\n" mdl.mdl_opam.opam_name;
+    Printf.fprintf oc "%s\n" (String.trim mdl.mdl_opam.opam_version);
+    List.iter (fun  (ident,vall) ->
+      Printf.fprintf oc "%s\n%s\n" ident vall
+    ) (Cmt.getVals @@ Option.get mdl.mdl_cmi_info);
+    close_out oc
+  
 end
 
 open TYPES

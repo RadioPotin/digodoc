@@ -38,7 +38,9 @@ let get_first_entry entries =
     then "modules"
     else if StringSet.mem "metas" entries
     then "metas"
-    else "sources"
+    else if StringSet.mem "sources" entries
+    then "sources"
+    else "vals"
 
 let state_of_args args =
     let state =  { pattern = ""; entries = StringSet.empty; current_entry = ""; page = 1 } in
@@ -96,6 +98,7 @@ let update_state () =
             | "fmodules" -> "modules"
             | "fmetas" -> "metas"
             | "fsources" -> "sources"
+            | "fvals" -> "vals"
             | _ -> assert false
         in
             if to_bool @@ (get_input id)##.checked
@@ -113,6 +116,7 @@ let update_state () =
         handle_checkbox "fmodules" state_info;
         handle_checkbox "fmetas" state_info;
         handle_checkbox "fsources" state_info;
+        handle_checkbox "fvals" state_info;
         match state_info.entries with
         | set when StringSet.is_empty set -> false
         | set -> 
@@ -227,7 +231,7 @@ let search_page () =
         results##.innerHTML := js "";
         form##.style##.display := js "none";
         result_nav##.className := js "active-nav";
-        let entries = StringSet.elements state.entries 
+        let entries = StringSet.elements state.entries
         and entry_info = state_to_entry_info () in
         let%lwt () = 
             Lwt_list.iter_p (fun entry -> 

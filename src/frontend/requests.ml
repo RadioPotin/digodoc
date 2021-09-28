@@ -221,4 +221,15 @@ let sendAdvancedSearchRequest entry entry_info =
                     end
                     else Lwt.return_false
         end
+    | "vals" -> begin
+            get1 ~host:(get_api_host ()) Services.val_entries entry_info >>= function
+                | Error _ -> Lwt.return_false
+                | Ok vals -> 
+                    if not (vals = []) 
+                    then begin
+                        Insertion.insert_search_vals (Object.vals_to_jsoo vals);
+                        Lwt.return_true
+                    end
+                    else Lwt.return_false
+        end
     | _ -> assert false
