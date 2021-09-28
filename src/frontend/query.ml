@@ -227,13 +227,23 @@ let search_page () =
         results##.innerHTML := js "";
         form##.style##.display := js "none";
         result_nav##.className := js "active-nav";
-        StringSet.iter (fun entry -> 
+        let entries = StringSet.elements state.entries 
+        and entry_info = state_to_entry_info () in
+        let%lwt () = 
+            Lwt_list.iter_p (fun entry -> 
                 let nav_bar = getElementById @@ entry ^ "-results" in
                 link_to_entry state entry nav_bar;
-                nav_bar##.style##.display := js ""
+                let%lwt entries_nbr = Requests.getEntriesNumber ~entry_info entry in
+                let span = Html.createSpan document in
+                nav_bar##.innerHTML := nav_bar##.innerHTML##concat (js " ");
+                span##.innerHTML := js ("("^entries_nbr^")");
+                Dom.appendChild nav_bar span;
+                nav_bar##.style##.display := js "";
+                Lwt.return_unit
             )
-            state.entries;
-        insert_content state
+            entries 
+        in
+            insert_content state
     end
 
 let onload () =

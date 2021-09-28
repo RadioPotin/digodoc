@@ -118,6 +118,9 @@ and ocaml_mdl = {
 
   mutable mdl_intf : comp_unit option ;
   mutable mdl_impl : comp_unit option ;
+
+  mutable mdl_cmi_info : Cmi_format.cmi_infos option;
+  mutable mdl_cmt_info : Cmt_format.cmt_infos option 
 }
 
 and state = {

@@ -626,20 +626,9 @@ i {
 
 #entries-nav {
   font-size: 16px;
-background-color: #f6f8fa;
-border-bottom-right-radius: 10px;
-border-bottom-left-radius: 10px;
-border-top-left-radius: 10px;
-border-top-right-radius: 10px;
-border: 1px solid #c4c4c4;
-}
-
-
-#entries-nav {
-  font-size: 16px;
-  background-color: #f6f8fa;
+  background-color: white;
   border: 1px solid #c4c4c4;
-  width : 660px;
+  width: 660px;
 }
 
 #entries-nav table {
@@ -671,17 +660,13 @@ border: 1px solid #c4c4c4;
   border:1px solid #c4c4c4;
 }
 
+#entries-nav span {
+  font-size: 11px;
+}
+
 #empty-result {
   font-size: larger;
   font-weight: bold;
-}
-
-
-#entries-nav {
-  font-size: 16px;
-  background-color: white;
-  border: 1px solid #c4c4c4;
-  width : 660px;
 }
 
 #entries-nav table {
@@ -756,6 +741,8 @@ border: 1px solid #c4c4c4;
   z-index: 105;
   background: none;
   opacity: .3;
+  width: 100px;
+  margin-bottom: 25px;
 }
 
 #update-filters:hover {
@@ -764,4 +751,5 @@ border: 1px solid #c4c4c4;
 
 #update-filters img {
   height: 20px;
+  margin-bottom: 5px;
 }
