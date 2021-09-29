@@ -30,7 +30,8 @@ let pp_val_desc ident pp vdesc =
         |> String.concat " "
         |> String.split_on_char ' '
     in 
-        let vdesc = pp_aux vdesc_l ""
+        let vdesc = pp_aux vdesc_l "" in
+        let vdesc = fst @@ EzString.cut_at vdesc '='
         and buff = Buffer.create 13 
         and i = ref 0 in
         while !i < String.length vdesc do
