@@ -110,7 +110,7 @@ let update_state () =
         let pattern_input = get_input "fpattern" in
         let value = to_string pattern_input##.value##trim in
 
-        state_info.pattern <- if value = "" then "~" else value;
+        state_info.pattern <- if value = "" then "~empty~" else value;
         handle_checkbox "fpackages" state_info;
         handle_checkbox "flibraries" state_info;
         handle_checkbox "fmodules" state_info;
@@ -131,7 +131,8 @@ let update_form () =
         match !state with
         | Uninitialized -> assert false
         | Search state -> 
-            (get_input "fpattern")##.value := js state.pattern; 
+            (get_input "fpattern")##.value := 
+                js (if state.pattern = "~empty~" then "" else state.pattern); 
             StringSet.iter (fun entry -> check_input @@ "f" ^ entry)
                 state.entries
 

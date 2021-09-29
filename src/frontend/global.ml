@@ -34,7 +34,7 @@ type state = {
 let state = {
   last_id = 0;
   starts_with = ".";
-  pattern = "~"
+  pattern = "~empty~"
 }
 
 

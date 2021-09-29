@@ -97,7 +97,7 @@ let set_search_handler () =
       begin  
         if input##.length > 0
         then state.pattern <- to_string input
-        else state.pattern <- "~";
+        else state.pattern <- "~empty~";
       end;
       state.last_id <- 0;
       Lwt.async update_page
