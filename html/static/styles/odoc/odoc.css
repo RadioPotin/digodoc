@@ -758,3 +758,17 @@ i {
   max-width: 100ch;
   width: 100%;
 }
+
+a.val {
+  color : darkgray;
+}
+
+.keyword {
+  color : red
+}
+
+.type-annot {
+  color : #B57EDC
+}
+
+

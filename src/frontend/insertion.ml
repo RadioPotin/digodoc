@@ -414,12 +414,18 @@ let insert_search_vals : vals_jsoo t -> unit  =
                 let vall = Html.createLi document in
                 vall##setAttribute (js "class") (js "package");
                 let vall_word = Html.createCode document in
-                vall_word##.style##.color := js "red";
+                vall_word##setAttribute (js "class") (js "keyword");
                 vall_word##.innerHTML := js "val ";
                 Dom.appendChild vall vall_word;
-                vall##.innerHTML := concat vall##.innerHTML (concat elt##.ident (js " : "));
+                let vall_ident = Html.createA document in
+                let vall_href = concat (js "#val-") elt##.ident in 
+                vall_ident##setAttribute (js "href") (concat elt##.mdlpath vall_href);
+                vall_ident##setAttribute (js "class") (js "val");
+                vall_ident##.innerHTML := elt##.ident;
+                Dom.appendChild vall vall_ident;
+                vall##.innerHTML := concat vall##.innerHTML (js " : ");
                 let vall_val = Html.createCode document in
-                vall_val##.style##.color := js "green";
+                vall_val##setAttribute  (js "class") (js "type-annot");
                 vall_val##.innerHTML := elt##.value;
                 Dom.appendChild vall vall_val;
                 vall##.innerHTML := concat vall##.innerHTML (js " in opam ");
