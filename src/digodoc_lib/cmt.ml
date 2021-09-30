@@ -11,6 +11,18 @@
 open Types
 open Cmi_format
 
+let infix name =
+  match name with
+  | "asr" | "land" | "lnot" | "lor" | "lsl" | "lsr"
+  | "lxor" | "mod" -> "(" ^ name ^ ")"
+  | _ ->
+    if (String.length name > 0) then
+      match name.[0] with
+      | 'a' .. 'z' | '\223' .. '\246' | '\248' .. '\255' | '_'
+      | 'A' .. 'Z' | '\192' .. '\214' | '\216' .. '\222' -> name
+      | _ -> "(" ^ name ^ ")"
+    else name
+
 let pp_val_desc ident pp vdesc =
     let rec pp_aux l acc =
         match l with
@@ -58,6 +70,6 @@ let getVals {cmi_sign; _} =
         (fun sign ->
             match sign with
             | Sig_value (ident, vald, _) -> 
-                Ident.name ident, Format.asprintf "%a" (pp_val_desc ident) vald
+                infix (Ident.name ident), Format.asprintf "%a" (pp_val_desc ident) vald
             | _ -> failwith "should not occur")
         vals
