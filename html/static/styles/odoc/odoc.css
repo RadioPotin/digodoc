@@ -59,18 +59,22 @@ body {
   position: relative;
   max-width: 120ch;
   margin: 0 auto;
-  padding: calc(1.5 * var(--size-line));
-  padding-top: calc(0.5 * var(--size-line)); }
+  /* padding: calc(1.5 * var(--size-line)); */         /*using pad-left and right instead of padding*/
+  padding-left: calc(6.5 * var(--size-line));
+  padding-right: calc(2.5 * var(--size-line));
+  padding-top: /*calc(0.5 * var(--size-line))*/ 0px; } /*no padding top, seems better*/
 
 .content > * { max-width: 78ch; width: 75% }
+
 .toc
 { position: absolute;
-  top: 0px; right: 0px;
-  width: 20%;
+  top: 0px; left: -10px;
+  text-align: left;                                 /* à changer ~*/
+  width: 12%;
   margin-left: var(--size-line);
-  margin-top: calc(3 * var(--size-line));
+  margin-top: calc(3.27 * var(--size-line))         /*0px*/;
   margin-right: var(--size-line);
-  border-top: solid thin var(--color-rule); }
+  border-top: solid thin var(--color-rule);  /*border-right when at the right place*/}
 
 /* Horizontal rules. The way to do it is not so nice, e.g. for
    anchoring it makes huge blobs on heading linking. It would be
@@ -93,7 +97,9 @@ h1, h2, h3, h4, h5, h6
 
 h1 { font-size: var(--size-font-huge); }
 h2 { font-size: var(--size-font-big); }
-h3 { font-size: var(--size-font-large); }
+h3 
+{ margin-left: 20px;                  /* small slide to the right for name tags in index*/
+  font-size: var(--size-font-large); }
 
 h1, h2 { line-height: calc(1.5 * var(--size-line));
          padding-top: calc(0.75 * var(--size-line)); }
@@ -229,7 +235,7 @@ pre { background: var(--color-code-block-bg);
    Is there a better way ? */
 
 .modules, .packages { list-style-type: none; margin-left: -2ch; }
-.modules li, .packages li { padding-left: 2ch; text-indent: -2ch; }
+.modules li, .packages li { padding-left: 2ch; text-indent: -2ch;}
 .modules li a.anchor, .packages li a.anchor
 { padding-right: 0.5ch; padding-left: 2ch; }
 
@@ -254,7 +260,7 @@ h1 nav { display: inline-block;
 { font-family: var(--font-headings);
   font-size: var(--size-font-large);
   text-transform: uppercase;
-  margin-right: 1ch;
+  margin-right: 0.5ch;
   display: inline-block; }
 
 .by-tag ol { list-style-type: none; }
