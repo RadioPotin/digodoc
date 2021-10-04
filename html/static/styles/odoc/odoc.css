@@ -23,12 +23,12 @@
         --size-line: calc(var(--size-line-ratio) * var(--size-font));
         --size-half-line: calc(0.5 * var(--size-line)); }
 
-/* Reset a few things. */
+/* Reset a few things. */  /*Start working on form*/
 
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,
 a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,select,
 small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,
-fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,
+fieldset,/*----->*/form/*<-----*/,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,
 article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,
 menu,nav,output,ruby,section,summary,time,mark,audio,video,button
 { margin: 0; padding: 0; border: 0; /* outline: 0; */
@@ -60,19 +60,19 @@ body {
   max-width: 120ch;
   margin: 0 auto;
   /* padding: calc(1.5 * var(--size-line)); */         /*using pad-left and right instead of padding*/
-  padding-left: calc(6.5 * var(--size-line));
-  padding-right: calc(2.5 * var(--size-line));
-  padding-top: /*calc(0.5 * var(--size-line))*/ 0px; } /*no padding top, seems better*/
+  padding-left: calc(7.8 * var(--size-line));
+  padding-right: calc(1.5 * var(--size-line));
+  padding-top: calc(0.5 * var(--size-line)) /*0px*/; } /*no padding top, seems better*/
 
 .content > * { max-width: 78ch; width: 75% }
 
 .toc
 { position: absolute;
-  top: 0px; left: -10px;
-  text-align: left;                                 /* à changer ~*/
-  width: 12%;
+  top: 0px; left: -18px;
+  text-align: center;                                 /* à changer ~*/
+  width: 15%;
   margin-left: var(--size-line);
-  margin-top: calc(3.27 * var(--size-line))         /*0px*/;
+  margin-top: calc(3 * var(--size-line))         /*0px*/;
   margin-right: var(--size-line);
   border-top: solid thin var(--color-rule);  /*border-right when at the right place*/}
 
@@ -142,7 +142,7 @@ a.anchor
  }
 
 a.digodoc-opam { color: green; }
-a.digodoc-lib { color: purple; }
+a.digodoc-lib { color: purple;}
 
 *:target /* Linked highlight */
 { background-color: var(--color-bg-highlight);
@@ -190,7 +190,7 @@ dt.spec > a.anchor { padding-right: 0.5ch; padding-left: 2ch; }
    records. This makes :target highlight be off. And poses
    other problems (e.g. need to indent back the last ] or }.
    A better markup strategy should be found here. */
-dt.spec.type { padding-left: 0; text-indent: 0 }
+dt.spec.type { padding-left: 0; text-indent: 0 ;}
 dt.spec.type > a.anchor
 { padding-left: 1ch; padding-right: 1ch; /* values from a.anchor */ }
 
@@ -235,7 +235,16 @@ pre { background: var(--color-code-block-bg);
    Is there a better way ? */
 
 .modules, .packages { list-style-type: none; margin-left: -2ch; }
-.modules li, .packages li { padding-left: 2ch; text-indent: -2ch;}
+
+.modules li, .packages li 
+{ padding-left: 2ch;
+  text-indent: -2ch;
+  /*********/
+  /*text-align: right;*/
+  /*text-align-last: right; or end*/ 
+
+  }
+
 .modules li a.anchor, .packages li a.anchor
 { padding-right: 0.5ch; padding-left: 2ch; }
 
@@ -260,8 +269,14 @@ h1 nav { display: inline-block;
 { font-family: var(--font-headings);
   font-size: var(--size-font-large);
   text-transform: uppercase;
-  margin-right: 0.5ch;
-  display: inline-block; }
+  margin-right: 0.25ch;
+  display: inline-block;
+  /*flex-direction: row;
+  flex-wrap: wrap;*/
+  text-align: center;
+  /* white-space: nowrap;  */
+  align-items: stretch;
+}
 
 .by-tag ol { list-style-type: none; }
 .by-tag ol.tags li { margin-left: 1ch; display: inline-block }
@@ -726,16 +741,16 @@ border: 1px solid #c4c4c4;
 
 #form-div {
   text-align: center;
-  width: 25%;
+  width: 85%;
+  background-color: #659CD6;
   margin-bottom: 30px;
-  background-color: #e4dede;
   border: 2px solid #c4c4c4;
   padding: 20px;
   border-radius: 40px;
 }
 
 #search-form {
-  display: inline;
+  display: inline-block;
 }
 
 #search-form table {
@@ -748,7 +763,9 @@ border: 1px solid #c4c4c4;
 }
 
 #fpattern {
-  width: 100%;
+  width: 400px;
+  height: 30px;
+  align-items: center;
 }
 
 #update-filters {
