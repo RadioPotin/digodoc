@@ -648,12 +648,12 @@ i {
 
 #entries-nav {
   font-size: 16px;
-background-color: #f6f8fa;
-border-bottom-right-radius: 10px;
-border-bottom-left-radius: 10px;
-border-top-left-radius: 10px;
-border-top-right-radius: 10px;
-border: 1px solid #c4c4c4;
+  background-color: #f6f8fa;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border: 1px solid #c4c4c4;
 }
 
 
@@ -661,7 +661,9 @@ border: 1px solid #c4c4c4;
   font-size: 16px;
   background-color: #f6f8fa;
   border: 1px solid #c4c4c4;
-  width : 660px;
+  /*width : 660px;*/
+  max-width: 78ch;
+  width: 75%;
 }
 
 #entries-nav table {
@@ -691,6 +693,10 @@ border: 1px solid #c4c4c4;
   background-color: #FF8F99;
   color: white;
   border:1px solid #c4c4c4;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 #empty-result {
@@ -704,6 +710,8 @@ border: 1px solid #c4c4c4;
   background-color: white;
   border: 1px solid #c4c4c4;
   width : 660px;
+  max-width: 78ch; /*make search bar fit with the result entries located just under*/
+  /*width: 75%*/;
 }
 
 #entries-nav table {
@@ -721,6 +729,10 @@ border: 1px solid #c4c4c4;
   border:1px solid #c4c4c4;
   color: #659CD6;
   --color-link: none;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
  }
 
 #entries-nav a {
