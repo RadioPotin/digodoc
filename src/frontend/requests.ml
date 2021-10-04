@@ -71,7 +71,7 @@ end
 let entry_info_of_state () =
     {
         last_id = Int64.of_int state.last_id;
-        pattern = state.pattern;
+        pattern = encode_path state.pattern;
         starts_with = state.starts_with
     }
 
@@ -157,8 +157,8 @@ let sendRequest () =
         | _ -> assert false
     end
 
-let sendSearchRequest () =
-    get1 ~host:(get_api_host ()) Services.search state.pattern >>= function
+let sendSearchRequest pattern () =
+    get1 ~host:(get_api_host ()) Services.search pattern >>= function
         | Error _ -> Lwt.return_unit
         | Ok search_result -> 
             Insertion.insert_search_result (Object.search_result_to_jsoo search_result);

@@ -27,7 +27,7 @@ let redirection_handler () =
         else
             let display_query = "&current=packages&page=0" in
             let entries_query = "&entry=packages&entry=libraries&entry=modules" in
-            let url = js ("search.html?pattern=" ^ state.pattern^ entries_query ^ display_query) in 
+            let url = js ("search.html?pattern=" ^ encode_query_val state.pattern ^ entries_query ^ display_query) in 
             open_url url
     in
         ()
@@ -47,7 +47,9 @@ let clear_search () =
         Dom.insertBefore body search_div eltAfter
     end
 
-let update_search () = Lwt.async Requests.sendSearchRequest
+let update_search pattern =
+    let pattern = encode_path pattern in 
+    Lwt.async @@ Requests.sendSearchRequest pattern
 
 let set_search_handler () =
     let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in
@@ -62,7 +64,7 @@ let set_search_handler () =
                 let input = re##trim in
                 state.pattern <- to_string input;
                 if String.length state.pattern > 2
-                then update_search ();
+                then update_search state.pattern;
             end
         end;
         _false)

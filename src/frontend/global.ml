@@ -124,6 +124,15 @@ let path_to_root : js_string t =
     path;
   js !root
 
+let encode_query_val qval =
+  Uri.pct_encode ~component:`Query_value qval
+
+let encode_path path =
+  Uri.pct_encode path
+
+let decodeUriComponent uri =
+  Uri.pct_decode uri
+
 type page_info = {
   num : int; 
   entries_interval : int * int;

@@ -90,18 +90,15 @@ let set_search_handler () =
   let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in
   search##.onkeyup := Html.handler (fun _ ->
     let re = search##.value in
-    if is_index_page 
-    then begin
-      clear_page ();
-      let input = re##trim in
-      begin  
-        if input##.length > 0
-        then state.pattern <- to_string input
-        else state.pattern <- "~empty~";
-      end;
-      state.last_id <- 0;
-      Lwt.async update_page
+    clear_page ();
+    let input = re##trim in
+    begin  
+      if input##.length > 0
+      then state.pattern <- to_string input
+      else state.pattern <- "~empty~";
     end;
+    state.last_id <- 0;
+    Lwt.async update_page;
     _false)
 
 let onload () = 

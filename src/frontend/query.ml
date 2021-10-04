@@ -46,7 +46,7 @@ let state_of_args args =
     let state =  { pattern = ""; entries = StringSet.empty; current_entry = ""; page = 1 } in
     List.iter (fun (key,elt) ->
             match key with
-            | "pattern" -> state.pattern <- elt
+            | "pattern" -> state.pattern <- decodeUriComponent elt
             | "entry" -> state.entries <- StringSet.add elt state.entries
             | "current" -> state.current_entry <- elt
             | "page" -> state.page <- int_of_string elt
@@ -61,7 +61,7 @@ let state_to_args ?st () =
     | Uninitialized -> ""
     | Search {pattern; entries; current_entry; page} ->
         Printf.sprintf "pattern=%s&%s&current=%s&page=%d"
-            pattern
+            (encode_query_val pattern)
             (String.concat "&" 
                 @@ StringSet.elements 
                 @@ StringSet.map (fun elt -> ("entry=" ^ elt)) entries)
@@ -85,7 +85,7 @@ let state_to_entry_info () =
     let state = get_state_info () in
     {
         Data_types.last_id = Int64.of_int @@ (state.page - 1) * 50;
-        pattern = state.pattern;
+        pattern = encode_path state.pattern;
         starts_with = "."
     }
 
@@ -200,8 +200,7 @@ let pagination_info {pattern; entries; current_entry; page} entries_number =
         and active_ind = !active_ind in
         {active_ind; pages; entries_number}
 
-let insert_content state =
-    let entry_info = state_to_entry_info () in
+let insert_content entry_info state =
     let entry = (get_state_info ()).current_entry in
     let%lwt added = Requests.sendAdvancedSearchRequest entry entry_info in
     if added
@@ -248,7 +247,7 @@ let search_page () =
             )
             entries 
         in
-            insert_content state
+            insert_content entry_info state
     end
 
 let onload () =
@@ -256,4 +255,4 @@ let onload () =
     initialise_state ();
     match !state with
     | Uninitialized -> uninitialized_page ()
-    | _ -> search_page ()
+    | _ -> search_page () 
