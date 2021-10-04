@@ -68,7 +68,7 @@ body {
 
 .toc
 { position: absolute;
-  top: 0px; left: -18px;
+  top: 0px; left: -20px;
   text-align: center;                                 /* à changer ~*/
   width: 15%;
   margin-left: var(--size-line);
@@ -378,6 +378,7 @@ input#search {
 
 .topnav td {
   vertical-align: middle;
+  width: 35%;
 }
 
 .topnav a:hover {
