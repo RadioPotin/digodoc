@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Search</title>
+    <link rel="stylesheet" href="static/styles/odoc/odoc.css" />
+    <link rel="icon" href="static/imgs/favicon.png" />
+    <script type="text/javascript" src="static/scripts/frontend.js" charset="utf-8"></script>
+    <meta charset="utf-8" />
+    <meta name="generator" content="digodoc 0.1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+</head>
+<style>
+.collapsible-div {
+  background-color: rgb(25, 124, 25);
+  color: whitesmoke;
+  cursor: pointer;
+  padding: 20px;
+  width: 100%;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border: 1px solid #c4c4c4;
+  text-align: left;
+  outline: none;
+  font-size: var(--size-font-mono-ratio);
+}
+
+.active, .collapsible-div:hover {
+  background-color: #659CD6;
+}
+
+.inner-collapsible-content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+  </style>
+<button id="update-filters"><img src="home/digodoc/html/static/imgs/filter.ico" /></button>
+<div id="form-div">
+    <form id="main-search-form">
+        <button type="button" class="collapsible-div">Recherche des entrées</button>
+        <div id="inner-collapsible-content"><p>Helleo</p></div>
+        <button type="button" class="collapsible-div">Recherche des éléments (fonctions / types ...)</button>
+        <div id="inner-collapsible-content"><p>Helleo</p></div>
+        <button type="button" class="collapsible-div">Recherche fulltext</button>
+        <div id="inner-collapsible-content"><p>Helleo</p></div>
+    </form>
+</div>
+
+<script>
+    var coll = document.getElementsByClassName("collapsible-div");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+    </script>
+
+
+</html>
