@@ -758,13 +758,19 @@ i {
 
 #form-div {
   text-align: center;
+  margin-top: -15px;
   width: 100%;
   background-color: #659CD6;
-  margin-bottom: 30px;
-  border: 2px solid #c4c4c4;
+  margin-bottom: 10px;
+  border: 1px solid #c4c4c4;
   padding: 20px;
-  border-radius: 40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   max-width: 110ch;
+  display: none;
+  overflow: hidden;
 }
 
 #search-form {
@@ -815,23 +821,65 @@ i {
 /****************** New search forms*******************************************/
 
 .collapsible-div {
-  background-color: rgb(25, 124, 25);
+  /*background-color: rgb(25, 124, 25);*/
+  background-color: green;
   color: whitesmoke;
   cursor: pointer;
   padding: 20px;
   width: 100%;
+  max-width: 110ch;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  border: 1px solid #c4c4c4;
+  /*border: 1px solid #c4c4c4;*/
   text-align: left;
   outline: none;
   font-size: var(--size-font-mono-ratio);
 }
 
-.active, .collapsible-div:hover {
+.collapsible-div:hover {
   background-color: #659CD6;
+  border-top-color: rgb(196, 196, 196);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-color: rgb(196, 196, 196);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-bottom-color: rgb(196, 196, 196);
+  border-bottom-style: solid;
+  border-bottom-width: 0px; /*no bottom after collapse*/
+  border-left-color: rgb(196, 196, 196);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+}
+
+.active {
+  background-color: #659CD6;
+  border-top-color: rgb(196, 196, 196);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-color: rgb(196, 196, 196);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-bottom-color: rgb(196, 196, 196);
+  border-bottom-style: solid;
+  border-bottom-width: 0px; /*no bottom after collapse*/
+  border-left-color: rgb(196, 196, 196);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 
 .inner-collapsible-content {
@@ -839,4 +887,66 @@ i {
   display: none;
   overflow: hidden;
   background-color: #f1f1f1;
+}
+
+/****************** Switch button Styling ****************/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
