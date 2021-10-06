@@ -2,71 +2,299 @@
 <html lang="en">
 
 <head>
-    <title>Search</title>
-    <link rel="stylesheet" href="static/styles/odoc/odoc.css" />
-    <link rel="icon" href="static/imgs/favicon.png" />
-    <script type="text/javascript" src="static/scripts/frontend.js" charset="utf-8"></script>
-    <meta charset="utf-8" />
-    <meta name="generator" content="digodoc 0.1" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Search</title>
+  <link rel="stylesheet" href="static/styles/odoc/odoc.css" />
+  <link rel="icon" href="static/imgs/favicon.png" />
+  <script type="text/javascript" src="static/scripts/frontend.js" charset="utf-8"></script>
+  <meta charset="utf-8" />
+  <meta name="generator" content="digodoc 0.1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <script src="static/scripts/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
-<style>
-.collapsible-div {
-  background-color: rgb(25, 124, 25);
-  color: whitesmoke;
-  cursor: pointer;
-  padding: 20px;
-  width: 100%;
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border: 1px solid #c4c4c4;
-  text-align: left;
-  outline: none;
-  font-size: var(--size-font-mono-ratio);
-}
 
-.active, .collapsible-div:hover {
-  background-color: #659CD6;
-}
+<body>
+  <div id="header" class="topnav">
+    <a id="ocamlpro" href="https://www.ocamlpro.com/" target="_blank"><img id="logo" src=static/imgs/ocamlpro.svg /></a>
+    <a id="about-item" href="about.html">About</a>
+    <a id="packages-item" href="packages.html">Packages</a>
+    <a id="libraries-item" href="libraries.html">Libraries</a>
+    <a id="metas-item" href="metas.html">Metas</a>
+    <a id="modules-item" href="modules.html">Modules</a>
+    <a id="sources-item" href="sources.html">Sources</a>
+    <a id="search-page-item" href="search.html">Search</a>
+    <div class="topnav-right">
+      <div class="search">
+        <table>
+          <tbody>
+            <tr>
+              <td><button id="search-button"><img id="search-img" src="static/imgs/loupe_white.png" /></button></td>
+              <td><input id="search" class="search-query" type="text" placeholder="Search" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-.inner-collapsible-content {
-  padding: 0 18px;
-  display: none;
-  overflow: hidden;
-  background-color: #f1f1f1;
-}
+  <div class="content">
 
-  </style>
-<button id="update-filters"><img src="home/digodoc/html/static/imgs/filter.ico" /></button>
-<div id="form-div">
-    <form id="main-search-form">
-        <button type="button" class="collapsible-div">Recherche des entrées</button>
-        <div id="inner-collapsible-content"><p>Helleo</p></div>
-        <button type="button" class="collapsible-div">Recherche des éléments (fonctions / types ...)</button>
-        <div id="inner-collapsible-content"><p>Helleo</p></div>
-        <button type="button" class="collapsible-div">Recherche fulltext</button>
-        <div id="inner-collapsible-content"><p>Helleo</p></div>
-    </form>
-</div>
+    <button id="update-filters"><img src="static/imgs/filter.ico" /></button>
+    
+    <!-- Recherche par entrée 1-->
+
+    <button type="button" class="collapsible-div">Search by entry</button>
+    
+    <div id="form-div" style="display: block;">
+        <form id="search-form">
+          <table>
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <label for="fpattern">Search pattern:</label><br>
+                  <input type="text" id="fpattern" name="fpattern" value=""><br>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+                  <label for="fpackages">Packages</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+                  <label for="flibraries">Libraries</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+                  <label for="fmodules">Modules</label><br>
+                </td>
+                <td>
+                  <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+                  <label for="fmetas">Metas</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fsources" name="fsources" value="Sources">
+                  <label for="fsources">Sources</label><br>
+                </td>
+                <td>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center;" colspan="2">
+                  <input type="submit" value="Search">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+      <!-- Recherche par fonction et types -->
+
+    <button type="button" class="collapsible-div">Search by function name and types </button>
+    
+    <div id="form-div">
+        <form id="search-form">
+          <table>
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <label for="fpattern">Search pattern:</label>
+                  <input type="text" id="fpattern" name="fpattern" value=""><br>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                  </label>
+                  <label> Regex ou Motif</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fvalues" name="fvalues" value="Values">
+                  <label for="fvalues">Values</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="fclass" name="fclass" value="Class">
+                  <label for="fclass">Class</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="ftypes" name="ftypes" value="Types">
+                  <label for="ftypes">Types</label><br>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input type="checkbox" id="ftextpackages" name="ftextpackages" value="Package">
+                  <label for="ftextpackages">in Packages</label>
+                  <input type="text" id="ftextpackages" name="ftextpackages" value=""><br>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input type="checkbox" id="ftextmodule" name="ftextmodule" value="Module">
+                  <label for="ftextmodule">in Modules&nbsp;</label>
+                  <input type="text" id="ftextmodule" name="ftextmodule" value=""><br>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center;" colspan="2">
+                  <input type="submit" value="Search">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+
+      <!-- Recherche Fulltext-->
+
+    <button type="button" class="collapsible-div">Search Fulltext</button>
+    
+    <div id="form-div">
+        <form id="search-form">
+          <table>
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <label for="fpattern">Search pattern:</label><br>
+                  <input type="text" id="fpattern" name="fpattern" value=""><br>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+                  <label for="fpackages">Packages</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+                  <label for="flibraries">Libraries</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+                  <label for="fmodules">Modules</label><br>
+                </td>
+                <td>
+                  <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+                  <label for="fmetas">Metas</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="fsources" name="fsources" value="Sources">
+                  <label for="fsources">Sources</label><br>
+                </td>
+                <td>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center;" colspan="2">
+                  <input type="submit" value="Search">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    
+    
+    <div id="entries-nav">
+      <table>
+        <tbody>
+          <tr>
+            <td><a id="packages-results" style="display: none;">Packages</a></td>
+            <td><a id="libraries-results" style="display: none;">Libraries</a></td>
+            <td><a id="modules-results" style="display: none;">Modules</a></td>
+            <td><a id="metas-results" style="display: none;">Metas</a></td>
+            <td><a id="sources-results" style="display: none;">Sources</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="result-div">
+      <div id="page-info">
+
+      </div>
+      <div id="results">
+        <ol id="results-list">
+
+        </ol>
+      </div>
+      <nav id="pagination-nav">
+        <a id="previous-page" style="display: none;" href="">
+          <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg">
+            <circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle>
+            <path fill="#FFF" d="M14.5 19v-3h5v-3h-5v-3L9 14.5z"></path>
+          </svg>
+        </a>
+        <ol id="pages">
+        </ol>
+        <a id="next-page" style="display: none;" href="">
+          <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg">
+            <circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle>
+            <path fill="#FFF" d="M15 19v-3h-5v-3h5v-3l5.5 4.5z"></path>
+          </svg>
+        </a>
+      </nav>
+    </div>
+  </div>
+  <div id="footer">
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <i>Copyright 2021 OCamlPro and the authors of the libraries.</i>
+          </td>
+          <td>
+            <nav float="right">
+              <a href="https://www.ocamlpro.com/contact/">Contact page</a>
+              | <a href="#header">To the top</a>
+            </nav>
+          </td>
+          <td>
+            <nav>Paris, FRANCE (<a href="https://www.ocamlpro.com/legal-notice">Legal Notice</a>)
+            </nav>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+
 
 <script>
-    var coll = document.getElementsByClassName("collapsible-div");
-    var i;
-    
-    for (i = 0; i < coll.length; i++) {
-      coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
-        if (content.style.display === "block") {
-          content.style.display = "none";
-        } else {
-          content.style.display = "block";
+var coll = document.getElementsByClassName("collapsible-div");
+var i;
+  
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      for (j=0; j < coll.length; j++) {
+        if (coll[j] != coll[i]) {
+          var nocontent = coll[j].nextElementSibling;
+          nocontent.style.display = "none";
         }
-      });
-    }
-    </script>
-
+      }
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+  </script>
 
 </html>

@@ -822,7 +822,9 @@ i {
 
 .collapsible-div {
   /*background-color: rgb(25, 124, 25);*/
-  background-color: green;
+  /*background-color: #4caf50;*/ /*green*/
+  margin-top: 10px;
+  background-color: #659CD6;
   color: whitesmoke;
   cursor: pointer;
   padding: 20px;
@@ -836,6 +838,37 @@ i {
   text-align: left;
   outline: none;
   font-size: var(--size-font-mono-ratio);
+}
+
+.collapsible-div:after {
+  content: "\002B";
+  float: right;
+}
+
+.collapsible-div:active {
+  background-color: #659CD6;
+  border-top-color: rgb(196, 196, 196);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-color: rgb(196, 196, 196);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-bottom-color: rgb(196, 196, 196);
+  border-bottom-style: solid;
+  border-bottom-width: 0px; /*no bottom after collapse*/
+  border-left-color: rgb(196, 196, 196);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+
+  content: "\2212";
+  background-color: #659CD6;
 }
 
 .collapsible-div:hover {
@@ -859,33 +892,18 @@ i {
   border-image-width: 1;
 }
 
-.active {
+/* 
+collapsible-div:active {
+  content: "\2212";
   background-color: #659CD6;
-  border-top-color: rgb(196, 196, 196);
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-right-color: rgb(196, 196, 196);
-  border-right-style: solid;
-  border-right-width: 1px;
-  border-bottom-color: rgb(196, 196, 196);
-  border-bottom-style: solid;
-  border-bottom-width: 0px; /*no bottom after collapse*/
-  border-left-color: rgb(196, 196, 196);
-  border-left-style: solid;
-  border-left-width: 1px;
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  border-bottom-right-radius: 0px;
-  border-bottom-left-radius: 0px;
 }
-
+ */
+ 
 .inner-collapsible-content {
-  padding: 0 18px;
+  /*padding: 0 18px;*/
   display: none;
   overflow: hidden;
+  transition: max-height 0.9s ease-out;
   background-color: #f1f1f1;
 }
 
@@ -894,8 +912,8 @@ i {
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 24px;
 }
 
 .switch input {
@@ -919,8 +937,8 @@ i {
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 16px;
+  width: 16px;
   left: 4px;
   bottom: 4px;
   background-color: white;
@@ -929,11 +947,11 @@ i {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #4caf50;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px #4caf50;
 }
 
 input:checked + .slider:before {
@@ -949,4 +967,16 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/*******************  Hide inpute text until checked : Search by function name/type **************/
+
+input[type="checkbox"] ~ input {
+  visibility: hidden;
+  opacity: 0;
+}
+input[type="checkbox"]:checked ~ input {
+  transition: visibility 0s, opacity 0.4s linear;
+  visibility: visible;
+  opacity: 1;
 }
