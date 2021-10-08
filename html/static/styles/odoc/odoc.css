@@ -664,9 +664,10 @@ i {
   font-size: 11px;
 }
 
-#empty-result {
+#message-result {
   font-size: larger;
   font-weight: bold;
+  color : red;
 }
 
 #entries-nav table {
@@ -698,10 +699,6 @@ i {
   border:1px solid #c4c4c4;
 }
 
-#empty-result {
-  font-size: larger;
-  font-weight: bold;
-}
 
 #form-div {
   text-align: center;

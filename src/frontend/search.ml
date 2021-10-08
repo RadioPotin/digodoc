@@ -13,24 +13,21 @@
 open Js_of_ocaml
 open Js
 open Global
+open Requests
 
 let redirection_handler () =
     let search_items = document##getElementsByClassName (js "search-item") in
-    let _ = 
-        if search_items##.length == 1
-        then begin
-            let item =  unopt @@ search_items##item 0 in
-            let link =  unopt @@ Dom.CoerceTo.element @@ unopt @@ item##.firstChild in
-            let href = unopt @@ link##getAttribute (js "href") in
+    if search_items##.length == 1
+    then 
+        let item =  unopt @@ search_items##item 0 in
+        let link =  unopt @@ Dom.CoerceTo.element @@ unopt @@ item##.firstChild in
+        let href = unopt @@ link##getAttribute (js "href") in
             open_url href
-        end
-        else
-            let display_query = "&current=packages&page=0" in
-            let entries_query = "&entry=packages&entry=libraries&entry=modules" in
-            let url = js ("search.html?pattern=" ^ encode_query_val state.pattern ^ entries_query ^ display_query) in 
-            open_url url
-    in
-        ()
+    else
+        let display_query = "&current=packages&page=0" in
+        let entries_query = "&entry=packages&entry=libraries&entry=modules" in
+        let url = js ("search.html?pattern=" ^ encode_query_val state.pattern ^ entries_query ^ display_query) in 
+        open_url url
 
 let clear_search () =
     match !search_ul with 
@@ -49,7 +46,21 @@ let clear_search () =
 
 let update_search pattern =
     let pattern = encode_path pattern in 
-    Lwt.async @@ Requests.sendSearchRequest pattern
+    Lwt.async @@ 
+        send_generic_request
+            ~request:(Requests.sendSearchRequest pattern)
+            ~callback:(fun () -> 
+                valid_input ();
+                Lwt.return_unit)
+            ~error:(fun err ->
+                clear_search ();
+                begin 
+                    match err with
+                    | InvalidRegex -> invalid_input ()
+                    | _ -> warn "Unknown error"
+                end;
+                Lwt.return_unit
+            )
 
 let set_search_handler () =
     let search = unopt @@ Html.CoerceTo.input @@ getElementById "search" in

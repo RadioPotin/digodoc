@@ -13,6 +13,7 @@
 open Js_of_ocaml
 open Js
 open Global
+open Requests
 
 module StringSet = Set.Make(String)
 
@@ -200,26 +201,47 @@ let pagination_info {pattern; entries; current_entry; page} entries_number =
         and active_ind = !active_ind in
         {active_ind; pages; entries_number}
 
+let write_message message =
+    let result_div = getElementById "result-div" in 
+    result_div##.innerHTML := js "";
+    let mess = Html.createSpan document in
+    mess##setAttribute (js "id") (js "message-result");
+    mess##.innerHTML := js message;
+    Dom.appendChild result_div mess
+
 let insert_content entry_info state =
-    let entry = (get_state_info ()).current_entry in
-    let%lwt added = Requests.sendAdvancedSearchRequest entry entry_info in
-    if added
-    then begin
-        let%lwt entries_number = Requests.getEntriesNumber ~entry_info entry in
-        let number = int_of_string entries_number in
-        let pages_info = pagination_info state number in
-        Insertion.insert_pagination pages_info;
-        Lwt.return_unit
-    end 
-    else begin
-        let result_div = getElementById "result-div" in 
-        result_div##.innerHTML := js "";
-        let mess = Html.createSpan document in
-        mess##setAttribute (js "id") (js "empty-result");
-        mess##.innerHTML := js @@ "No " ^ entry ^ " found.";
-        Dom.appendChild result_div mess;
-        Lwt.return_unit
-    end
+    let entry = state.current_entry in
+    send_generic_request
+        ~request:(Requests.sendAdvancedSearchRequest entry entry_info)
+        ~callback:(fun added ->
+            if added
+            then begin
+                send_generic_request
+                    ~request:(Requests.getEntriesNumber ~entry_info entry)
+                    ~callback:(fun entries_number ->
+                        let number = int_of_string entries_number in
+                        let pages_info = pagination_info state number in
+                        Insertion.insert_pagination pages_info;
+                        Lwt.return_unit
+                    )
+                ()
+            end
+            else begin
+                write_message ("No " ^ entry ^ " found.");
+                Lwt.return_unit
+            end
+        )
+        ~error:(fun err -> 
+            begin 
+                match err with
+                | InvalidRegex -> 
+                    write_message ("Invalid regex " ^ state.pattern ^ ".")
+                | Unknown ->
+                    write_message ("Server error occured, please try again later.")
+            end;
+            Lwt.return_unit
+        )
+        ()
 
 let search_page () =
     match !state with
@@ -233,21 +255,25 @@ let search_page () =
         result_nav##.className := js "active-nav";
         let entries = StringSet.elements state.entries
         and entry_info = state_to_entry_info () in
-        let%lwt () = 
+        Lwt.async (fun () ->
             Lwt_list.iter_p (fun entry -> 
-                let nav_bar = getElementById @@ entry ^ "-results" in
-                link_to_entry state entry nav_bar;
-                let%lwt entries_nbr = Requests.getEntriesNumber ~entry_info entry in
-                let span = Html.createSpan document in
-                nav_bar##.innerHTML := nav_bar##.innerHTML##concat (js " ");
-                span##.innerHTML := js ("("^entries_nbr^")");
-                Dom.appendChild nav_bar span;
-                nav_bar##.style##.display := js "";
-                Lwt.return_unit
-            )
-            entries 
-        in
-            insert_content entry_info state
+                    let nav_bar = getElementById @@ entry ^ "-results" in
+                    link_to_entry state entry nav_bar;
+                    send_generic_request
+                        ~request:(Requests.getEntriesNumber ~entry_info entry)
+                        ~callback:(fun entries_nbr ->
+                            let span = Html.createSpan document in
+                            nav_bar##.innerHTML := nav_bar##.innerHTML##concat (js " ");
+                            span##.innerHTML := js ("("^entries_nbr^")");
+                            Dom.appendChild nav_bar span;
+                            nav_bar##.style##.display := js "";
+                            Lwt.return_unit
+                        )
+                        ()
+                )
+                entries
+            );
+        insert_content entry_info state
     end
 
 let onload () =

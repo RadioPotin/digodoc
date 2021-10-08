@@ -15,6 +15,13 @@ open Js_of_ocaml
 open Data_types
 open Lwt.Infix
 
+type error =
+    | InvalidRegex
+    | Unknown
+
+type 'res response = ('res, error) result
+
+
 let url () =
   match Url.url_of_string (Js.to_string window##.location##.href) with
   | None -> assert false
@@ -31,20 +38,12 @@ let web_host =
         | _ -> "http://localhost:8888"
     end 
 
-
-
 let api_host = ref None
 
 let get_api_host () =
     match !api_host with
     | Some api -> api
     | None -> assert false
-
-let wrap_res ?error f = function
-  | Ok x -> f x
-  | Error exn -> let s = Printexc.to_string exn in match error with
-    | None ->  ()
-    | Some e -> e 500 (Some s)
 
 let get0 ?post ?headers ?params ?msg ~host service  =
   EzReq_lwt.get0 host service ?msg ?post ?headers ?params 
@@ -75,15 +74,45 @@ let entry_info_of_state () =
         starts_with = state.starts_with
     }
 
+let handle_error err =
+    Lwt.return @@
+    match err with
+    | EzReq_lwt_S.KnownError {code;_} when code = 500 ->
+        Error InvalidRegex
+    | _ -> Error Unknown
+
+let handle_response (resp:'res) : 'res response Lwt.t = 
+    Lwt.return @@
+    Ok resp
+
+let default_error_handler err =
+    begin 
+        match err with
+        | InvalidRegex -> warn "Invalid regex"
+        | Unknown -> warn "Unknown error"
+    end;
+    Lwt.return_unit
+
+let send_generic_request 
+        ~(request: unit -> 'res response Lwt.t) 
+        ~(callback: 'res -> unit Lwt.t)
+        ?(error: error ->  unit Lwt.t = default_error_handler) 
+        ()
+        : unit Lwt.t =
+    let%lwt resp = request () in
+    match resp with
+    | Ok res -> callback res
+    | Error err -> error err
+
 let api_host () =
   get0 ~host:web_host Service.info >>= function
-     | Error _ -> Lwt.return_unit
+     | Error err -> handle_error err
      | Ok {www_apis} ->
        let api = List.nth www_apis (Random.int @@ List.length www_apis) in
        api_host := Some (EzAPI.BASE api);
-       Lwt.return_unit
+       handle_response ()
 
-let getEntriesNumber ?entry_info entry = 
+let getEntriesNumber ?entry_info entry () = 
     let api = get_api_host () in
     let entry_info = 
         match entry_info with
@@ -91,8 +120,8 @@ let getEntriesNumber ?entry_info entry =
         | None -> entry_info_of_state ()
     and command = Utils.command_of_string @@ "count+" ^ entry in
         get2 ~host:api Services.exec_command command entry_info >>= function
-            | Error _ -> failwith "Request issue"
-            | Ok {result} -> Lwt.return result
+            | Error err -> handle_error err
+            | Ok {result} -> handle_response result
 
 
 let sendRequest () = 
@@ -101,135 +130,135 @@ let sendRequest () =
         match filename with
         | "packages.html" -> begin
                 get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
-                    | Error _ ->Lwt.return_false
+                    | Error err -> handle_error err
                     | Ok packages -> 
                         if not (packages = []) 
                         then begin
                             Insertion.insert_packages (Object.packages_to_jsoo packages);
-                            Lwt.return_true
+                            handle_response true
                         end
-                        else Lwt.return_false;
+                        else handle_response false
             end
         | "modules.html" ->  begin
                 get1 ~host:(get_api_host ()) Services.module_entries entry_info >>= function
-                    | Error _ -> Lwt.return_false
+                    | Error err -> handle_error err
                     | Ok modules -> 
                         if not (modules = []) 
                         then begin
                             Insertion.insert_modules (Object.modules_to_jsoo modules);
-                            Lwt.return_true
+                            handle_response true
                         end
-                        else Lwt.return_false
+                        else handle_response false
             end
         | "libraries.html" -> begin
                 get1 ~host:(get_api_host ()) Services.library_entries entry_info >>= function
-                    | Error _ -> Lwt.return_false
+                    | Error err -> handle_error err
                     | Ok libraries -> 
                         if not (libraries = []) 
                         then begin
                             Insertion.insert_libraries (Object.libraries_to_jsoo libraries);
-                            Lwt.return_true
+                            handle_response true
                         end
-                        else Lwt.return_false
+                        else handle_response false
             end
         | "metas.html" -> begin
                 get1 ~host:(get_api_host ()) Services.meta_entries entry_info >>= function
-                    | Error _ -> Lwt.return_false
+                    | Error err -> handle_error err
                     | Ok metas -> 
                         if not (metas = []) 
                         then begin
                             Insertion.insert_metas (Object.metas_to_jsoo metas);
-                            Lwt.return_true
+                            handle_response true
                         end
-                        else Lwt.return_false
+                        else handle_response false
             end
         | "sources.html" -> begin
                 get1 ~host:(get_api_host ()) Services.source_entries entry_info >>= function
-                    | Error _ -> Lwt.return_false
+                    | Error err -> handle_error err
                     | Ok sources -> 
                         if not (sources = []) 
                         then begin
                             Insertion.insert_sources (Object.sources_to_jsoo sources);
-                            Lwt.return_true
+                            handle_response true
                         end
-                        else Lwt.return_false
+                        else handle_response false
             end
         | _ -> assert false
     end
 
 let sendSearchRequest pattern () =
     get1 ~host:(get_api_host ()) Services.search pattern >>= function
-        | Error _ -> Lwt.return_unit
+        | Error err -> handle_error err
         | Ok search_result -> 
             Insertion.insert_search_result (Object.search_result_to_jsoo search_result);
-            Lwt.return_unit
+            handle_response ()
 
-let sendAdvancedSearchRequest entry entry_info =
+let sendAdvancedSearchRequest entry entry_info () =
     match entry with
     | "packages" -> begin
             (get1 ~host:(get_api_host ()) Services.package_entries entry_info >>= function
-                | Error _ ->Lwt.return_false
+                | Error err ->handle_error err
                 | Ok packages -> 
                     if not (packages = []) 
                     then begin
                         Insertion.insert_search_packages (Object.packages_to_jsoo packages);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false);
+                    else handle_response false);
         end
     | "libraries" -> begin
             get1 ~host:(get_api_host ()) Services.library_entries entry_info >>= function
-                | Error _ -> Lwt.return_false
+                | Error err -> handle_error err
                 | Ok libraries -> 
                     if not (libraries = []) 
                     then begin
                         Insertion.insert_search_libraries (Object.libraries_to_jsoo libraries);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false
+                    else handle_response false
         end
     | "modules" ->  begin
             get1 ~host:(get_api_host ()) Services.module_entries entry_info >>= function
-                | Error _ -> Lwt.return_false
+                | Error err -> handle_error err
                 | Ok modules -> 
                     if not (modules = []) 
                     then begin
                         Insertion.insert_search_modules (Object.modules_to_jsoo modules);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false
+                    else handle_response false
         end
     | "metas" -> begin
             get1 ~host:(get_api_host ()) Services.meta_entries entry_info >>= function
-                | Error _ -> Lwt.return_false
+                | Error err -> handle_error err
                 | Ok metas -> 
                     if not (metas = []) 
                     then begin
                         Insertion.insert_search_metas (Object.metas_to_jsoo metas);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false
+                    else handle_response false
         end
     | "sources" -> begin
             get1 ~host:(get_api_host ()) Services.source_entries entry_info >>= function
-                | Error _ -> Lwt.return_false
+                | Error err -> handle_error err
                 | Ok sources -> 
                     if not (sources = []) 
                     then begin
                         Insertion.insert_search_sources (Object.sources_to_jsoo sources);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false
+                    else handle_response false
         end
     | "vals" -> begin
             get1 ~host:(get_api_host ()) Services.val_entries entry_info >>= function
-                | Error _ -> Lwt.return_false
+                | Error err -> handle_error err
                 | Ok vals -> 
                     if not (vals = []) 
                     then begin
                         Insertion.insert_search_vals (Object.vals_to_jsoo vals);
-                        Lwt.return_true
+                        handle_response true
                     end
-                    else Lwt.return_false
+                    else handle_response false
         end
     | _ -> assert false

@@ -13,6 +13,7 @@
 open Js_of_ocaml
 open Js
 open Global
+open Requests
 
 let clear_page () =
   let load_opt = document##getElementById (js "load_div") in
@@ -42,20 +43,37 @@ let update_entries_number () =
     | "sources.html" -> "sources"
     | _ -> assert false
   in
-    let%lwt number = Requests.getEntriesNumber entry in
-    let indicator =  unopt @@ document##getElementById  (js "item-number") in
-    indicator##.innerHTML := js (number ^ " " ^ entry);
-    Lwt.return_unit
-
+    send_generic_request
+      ~request:(Requests.getEntriesNumber entry)
+      ~callback:(fun number ->
+        let indicator =  unopt @@ document##getElementById  (js "item-number") in
+        indicator##.innerHTML := js (number ^ " " ^ entry);
+        Lwt.return_unit
+      )
+      ()
+    
 let update_page () =
-  let%lwt added = Requests.sendRequest () in
-  if added then begin
-    state.last_id <- state.last_id + 50;
-    Dom.appendChild (get_main_div ()) load_div
-  end;
-    let%lwt () = update_entries_number () in
-    Headfoot.footerHandler ();
-    Lwt.return_unit
+  send_generic_request
+    ~request:Requests.sendRequest 
+    ~callback:(fun added ->
+      valid_input ();
+      if added then begin
+        state.last_id <- state.last_id + 50;
+        Dom.appendChild (get_main_div ()) load_div
+      end;
+      let%lwt () = update_entries_number () in
+      Headfoot.footerHandler ();
+      Lwt.return_unit
+    )
+    ~error:(fun err ->
+      begin 
+        match err with
+        | InvalidRegex -> invalid_input ()
+        | _ -> ()
+      end;
+      Lwt.return_unit
+    )
+    ()
 
 let set_start_letter ch =
   state.starts_with <- ch;
@@ -101,28 +119,31 @@ let set_search_handler () =
     Lwt.async update_page;
     _false)
 
+let initialise () =
+  main_div := Some (getElementById "by-name");
+  for index = 48 to 57 do
+    let title_opt = document##getElementById (js @@ "name-" ^ fromCharCode index) in
+    Opt.iter title_opt (fun title -> 
+      title##.style##.display := js "none")
+  done;
+  for index = 97 to 122 do
+    let title_opt = document##getElementById (js @@ "name-" ^ fromCharCode index) in
+    Opt.iter title_opt (fun title -> 
+      title##.style##.display := js "none")
+  done;
+  send_generic_request
+    ~request:Requests.sendRequest
+    ~callback:(fun _ ->
+      let%lwt () = update_entries_number () in
+      state.last_id <- state.last_id + 50;
+      Dom.appendChild (get_main_div ()) load_div;
+      let selected_elt = unopt @@ document##querySelector (js "#load_div") in
+      Observer.observer##observe selected_elt;
+      Lwt.return_unit)
+    () 
+
 let onload () = 
   set_search_handler ();
   set_onclick_handlers (); 
-  let%lwt () = 
-    main_div := Some (getElementById "by-name");
-    for index = 48 to 57 do
-      let title_opt = document##getElementById (js @@ "name-" ^ fromCharCode index) in
-      Opt.iter title_opt (fun title -> 
-        title##.style##.display := js "none")
-    done;
-    for index = 97 to 122 do
-      let title_opt = document##getElementById (js @@ "name-" ^ fromCharCode index) in
-      Opt.iter title_opt (fun title -> 
-        title##.style##.display := js "none")
-    done;
-    let%lwt _ = Requests.sendRequest () in
-    let%lwt () = update_entries_number () in
-    state.last_id <- state.last_id + 50;
-    Dom.appendChild (get_main_div ()) load_div;
-    let selected_elt = unopt @@ document##querySelector (js "#load_div") in
-    Observer.observer##observe selected_elt;
-    Lwt.return_unit
-  in
-    Lwt.return_unit
+  initialise ()
 

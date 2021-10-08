@@ -21,13 +21,18 @@ let observer : intersectionObserver t=
         let entry = unoptdef @@ array_get entries 0 in
         if entry##.isIntersecting = _true then begin
           Dom.removeChild (get_main_div ()) load_div;
-          Lwt.async (fun () -> 
-            let%lwt added = Requests.sendRequest () in
-            if added then begin
-              state.last_id <- state.last_id + 50;
-              Dom.appendChild (get_main_div ()) load_div
-            end;
-            Lwt.return_unit)
+          Lwt.async (fun () ->
+            Requests.send_generic_request
+              ~request:Requests.sendRequest
+              ~callback:(fun added ->
+                  if added then begin
+                    state.last_id <- state.last_id + 50;
+                    Dom.appendChild (get_main_div ()) load_div
+                  end;
+                  Lwt.return_unit
+                )
+              ()
+            )
         end;
     )
   and options : intersectionObserverOptions t = empty_intersection_observer_options () in

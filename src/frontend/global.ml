@@ -40,7 +40,9 @@ let state = {
 
 (********** Utils **********)
 
-let logs s = Firebug.console##warn (Js.string s)
+let logs s = Firebug.console##log (Js.string s)
+
+let warn s = Firebug.console##warn (Js.string s)
 
 let unoptdef (valeur : 'a optdef) : 'a  =
   Optdef.get valeur (fun () -> assert false)
@@ -91,6 +93,14 @@ let get_main_div () : Html.element t =
   match !main_div with
   | Some div -> div
   | None -> assert false
+
+let invalid_input () =
+  let input = getElementById "search" in
+  input##.style##.backgroundColor := js "#FF2E40"
+
+let valid_input () =
+  let input = getElementById "search" in
+  input##.style##.backgroundColor := js "white"
 
 let load_div : Html.element t = 
   let div = document##createElement (js "div") in

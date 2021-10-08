@@ -18,10 +18,14 @@ let genericHandler handler =
   Html.handler (fun _ ->
     Lwt.async (fun () ->
       Headfoot.activate_bar ();
-      let%lwt () = Requests.api_host () in
-      let%lwt () = handler () in
-      Headfoot.footerHandler ();
-      Lwt.return_unit
+      Requests.send_generic_request
+        ~request:Requests.api_host
+        ~callback:(fun _ ->
+          let%lwt () = handler () in
+          Headfoot.footerHandler ();
+          Lwt.return_unit
+        )
+        ()
     );
     _false
   )
