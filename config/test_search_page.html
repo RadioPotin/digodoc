@@ -85,7 +85,7 @@
               </tr>
               <tr>
                 <td style="text-align: center;" colspan="2">
-                  <input type="submit" value="Search">
+                  <input type="submit" class="submitstyle" value="Search">
                 </td>
               </tr>
             </tbody>
@@ -113,7 +113,7 @@
                     <input type="checkbox" checked>
                     <span class="slider round"></span>
                   </label>
-                  <label> Regex ou Motif</label>
+                  <label>Motif ou <a style="color: green;">RegEx</a></label>
                 </td>
               </tr>
               <tr>
@@ -148,7 +148,7 @@
               </tr>
               <tr>
                 <td style="text-align: center;" colspan="2">
-                  <input type="submit" value="Search">
+                  <input type="submit" class="submitstyle" value="Search">
                 </td>
               </tr>
             </tbody>
@@ -200,7 +200,7 @@
               </tr>
               <tr>
                 <td style="text-align: center;" colspan="2">
-                  <input type="submit" value="Search">
+                  <input type="submit" class="submitstyle" value="Search">
                 </td>
               </tr>
             </tbody>
@@ -280,18 +280,19 @@ var i;
   
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
-      this.classList.toggle("active");
       for (j=0; j < coll.length; j++) {
         if (coll[j] != coll[i]) {
           var nocontent = coll[j].nextElementSibling;
           nocontent.style.display = "none";
         }
       }
+      this.classList.toggle("active");
       var content = this.nextElementSibling;
       if (content.style.display === "block") {
         content.style.display = "none";
       } else {
         content.style.display = "block";
+        
       }
     });
   }
