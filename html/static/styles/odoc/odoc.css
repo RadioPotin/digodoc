@@ -152,7 +152,8 @@ a.digodoc-lib { color: purple;}
 
 *:target /* Linked highlight */
 { background-color: var(--color-bg-highlight);
-  box-shadow: /*0 0 0 3px*/ -6px 0px 0px var(/*--color-bg-highlight*/--color-code-keyword);}
+  box-shadow: /*0 0 0 3px*/ -6px 0px 0px var(/*--color-bg-highlight*/--color-code-keyword);
+  border-radius: 5px;}
 
 .xref-unresolved { box-shadow:0 1px 0 0 var(--color-broken-link)}
 
@@ -188,16 +189,26 @@ dt + dt { padding-top: var(--size-line) } /* When there are no doc strings */
 .variant .doc, .record .doc { padding-left: 1ch; }
 
 /* Indent on wrap */
-td.field, td.constructor, dt.spec { padding-left: 4ch; text-indent: -4ch ;
-  padding: 10px;
-  box-shadow: -6px 0px 0px var(--color-code-keyword);
+td.field, td.constructor { padding-left: 4ch; text-indent: -4ch ;
+  padding: 0px;
   margin-bottom: 0.7ch;
   padding-left: 0;
   text-indent: 20px;
   border-radius: 5px;
   /*border-top-left-radius: 0%;
   border-bottom-left-radius: 0%;*/
-  background-color: #dad4d4ea;}
+  background-color: #ddd6d6;}
+  
+  dt.spec { padding-left: 4ch; text-indent: -4ch ;
+    padding: 10px;
+    box-shadow: -6px 0px 0px var(--color-code-keyword);
+    margin-bottom: 0.7ch;
+    padding-left: 0;
+    text-indent: 20px;
+    border-radius: 5px;
+    /*border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;*/
+    background-color: #ddd6d6;}
 
 td.field > a.anchor, td.constructor > a.anchor,
 dt.spec > a.anchor { padding-right: 0.5ch; padding-left: 0ch; opacity: 1; margin-left: -40px; }
@@ -211,7 +222,7 @@ dt.spec.type {
   padding-left: 0;
   text-indent: 20px;
   border-radius: 5px;
-  background-color: #dad4d4ea;
+  background-color: #ddd6d6;
 }
 dt.spec.type > a.anchor
 { padding-left: 0ch; padding-right: 5ch;
@@ -231,7 +242,7 @@ code
   font-weight: 400;
   font-size: calc(1em * var(--size-font-mono-ratio));
   color: #000000;
-  background-color: #dad4d4ea;
+  background-color: #ddd6d6;
   border-radius: 5px;
 }
 
@@ -260,7 +271,7 @@ pre { /*background: var(--color-code-block-bg);*/
       padding-top: 1ch; padding-bottom: 1ch;
       white-space: pre-wrap;
       word-wrap: break-word;
-      background-color: #dad4d4ea; }
+      background-color: #ddd6d6; }
 
 .keyword , .hljs-keyword { color : var(--color-code-keyword); }
 .hljs-type { color : var(--color-code-type-id); }
@@ -355,7 +366,7 @@ h1 nav { display: inline-block;
    --color-fg: black;
    --color-rule: #DADBDB;
 
-   --color-code-block-bg: #dad4d4ea;
+   --color-code-block-bg: #ddd6d6;
    --color-code-fg: #16191D;
    --color-code-comment: #747679;
    --color-code-keyword: #874aa9;
