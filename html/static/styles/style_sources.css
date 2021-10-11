@@ -137,6 +137,7 @@
   }
 
   .container{
+    width: 80%; /*currently changing this*/
     margin-left: 10px;
     margin-right: 10px;
   }

@@ -203,7 +203,7 @@ td.field, td.constructor { padding-left: 4ch; text-indent: -4ch ;
     padding: 10px;
     box-shadow: -6px 0px 0px var(--color-code-keyword);
     margin-bottom: 0.7ch;
-    padding-left: 0;
+    padding-left: 20px;
     text-indent: 20px;
     border-radius: 5px;
     /*border-top-left-radius: 0%;
@@ -219,7 +219,7 @@ dt.spec > a.anchor { padding-right: 0.5ch; padding-left: 0ch; opacity: 1; margin
    A better markup strategy should be found here. */
 dt.spec.type {
   margin-top: 1.5ch;
-  padding-left: 0;
+  padding-left: 20px;
   text-indent: 20px;
   border-radius: 5px;
   background-color: #ddd6d6;
@@ -260,7 +260,11 @@ code span, pre span /* Allows to use spans to control breakpoints */
 { display: inline-block;
   text-indent: 0; /* That bit is important because of dt.spec's text-indent */ }
 
-pre code { font-size: inherit } /* don't apply transform twice... */
+pre code { font-size: inherit;
+  color: white;
+  background-color: #000000;
+  padding-left: 10px;} /* don't apply transform twice... */
+
 a code { color: inherit }
 h1 code, h2 code, h3 code, h4 code, h5 code, h6 code { text-transform: none; }
 
@@ -271,7 +275,8 @@ pre { /*background: var(--color-code-block-bg);*/
       padding-top: 1ch; padding-bottom: 1ch;
       white-space: pre-wrap;
       word-wrap: break-word;
-      background-color: #ddd6d6; }
+      background-color: #000000;
+      color: white; }
 
 .keyword , .hljs-keyword { color : var(--color-code-keyword); }
 .hljs-type { color : var(--color-code-type-id); }
@@ -471,7 +476,7 @@ input#search {
 
 .search-index {
   float: left;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-right:20px;
 }
 
@@ -991,7 +996,7 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/*******************  Hide inpute text until checked : Search by function name/type **************/
+/*******************  Hide inpute text until checked in Search by function name/type **************/
 
 input[type="checkbox"] ~ input {
   visibility: hidden;
@@ -1003,7 +1008,7 @@ input[type="checkbox"]:checked ~ input {
   opacity: 1;
 }
 
-/******************  Round corners text input ******************************************/
+/******************  Round corners for text inputs ******************************************/
 
 #ftextmodule {
   border-radius: 8px 8px 8px 8px;
