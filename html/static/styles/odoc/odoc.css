@@ -72,8 +72,8 @@ body {
   position: sticky;*/
   top: calc(0.5 * var(--size-line))/*0px*/;
   left: -20px;
-  text-align: left;                                 /* à changer ~*/
-  width: 10%;
+  text-align: center;                                 /* à changer ~*/
+  width: 15%;
   margin-left: var(--size-line);
   margin-top: calc(3 * var(--size-line))         /*0px*/;
   margin-right: var(--size-line);
@@ -268,12 +268,13 @@ a code { color: inherit }
 h1 code, h2 code, h3 code, h4 code, h5 code, h6 code { text-transform: none; }
 
 pre { /*background: var(--color-code-block-bg);*/
-      box-shadow: -6px 0px 0px var(--color-code-keyword);
+      /*box-shadow: -6px 0px 0px var(--color-code-keyword);*/
       padding-left: 0.8ch; padding-right: 0.8ch;
       margin-left: -0.8ch; margin-right: -0.8ch;
       padding-top: 1ch; padding-bottom: 1ch;
       white-space: pre-wrap;
       word-wrap: break-word;
+      text-indent: 0;
       background-color: #000000;
       color: white; }
 

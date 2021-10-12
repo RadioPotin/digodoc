@@ -236,4 +236,4 @@ let handle_file doc  =
 
 (* This renders raw images in Source indexes *)
 let render_img img =
-  Format.sprintf "<img src=\"raw/%s\"/>" img
+  Format.sprintf {|<img src="raw/%s" class="centered-image"/>|} img
