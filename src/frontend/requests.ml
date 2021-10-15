@@ -15,11 +15,19 @@ open Js_of_ocaml
 open Data_types
 open Lwt.Infix
 
-type error =
-    | InvalidRegex
-    | Unknown
+(* Server side possible errors *)
 
+
+(* Response type *)
 type 'res response = ('res, error) result
+
+(* Polymorphic GET requests *)
+let get0 ?post ?headers ?params ?msg ~host service  =
+  EzReq_lwt.get0 host service ?msg ?post ?headers ?params 
+let get1 ?post ?headers ?params  ?msg ~host service  arg =
+  EzReq_lwt.get1 host service ?msg ?post ?headers  ?params arg  
+let get2 ?post ?headers ?params ?msg ~host service  arg1 arg2 =
+  EzReq_lwt.get2 host service ?msg ?post ?headers ?params arg1 arg2 
 
 
 let url () =
@@ -44,13 +52,6 @@ let get_api_host () =
     match !api_host with
     | Some api -> api
     | None -> assert false
-
-let get0 ?post ?headers ?params ?msg ~host service  =
-  EzReq_lwt.get0 host service ?msg ?post ?headers ?params 
-let get1 ?post ?headers ?params  ?msg ~host service  arg =
-  EzReq_lwt.get1 host service ?msg ?post ?headers  ?params arg  
-let get2 ?post ?headers ?params ?msg ~host service  arg1 arg2 =
-  EzReq_lwt.get2 host service ?msg ?post ?headers ?params arg1 arg2 
 
 
 module Service = struct
