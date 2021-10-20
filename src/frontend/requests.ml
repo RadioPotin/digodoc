@@ -10,18 +10,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Global
 open Js_of_ocaml
 open Data_types
 open Lwt.Infix
+open Globals
 
-let url () =
-  match Url.url_of_string (Js.to_string window##.location##.href) with
-  | None -> assert false
-  | Some url -> url
-
-let web_host =
-  EzAPI.BASE
+let web_host =  
+    let url () =
+        match Url.url_of_string (Js.to_string window##.location##.href) with
+        | None -> assert false
+        | Some url -> url
+    in 
+    EzAPI.BASE
     begin 
         match url() with
         | Url.Http hu ->
@@ -39,12 +39,6 @@ let get_api_host () =
     match !api_host with
     | Some api -> api
     | None -> assert false
-
-let wrap_res ?error f = function
-  | Ok x -> f x
-  | Error exn -> let s = Printexc.to_string exn in match error with
-    | None ->  ()
-    | Some e -> e 500 (Some s)
 
 let get0 ?post ?headers ?params ?msg ~host service  =
   EzReq_lwt.get0 host service ?msg ?post ?headers ?params 

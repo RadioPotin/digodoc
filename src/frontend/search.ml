@@ -12,7 +12,7 @@
 
 open Js_of_ocaml
 open Js
-open Global
+open Globals
 
 let redirection_handler () =
     let search_items = document##getElementsByClassName (js "search-item") in
@@ -43,7 +43,7 @@ let clear_search () =
         Dom.appendChild search_div ul;
         search_ul := Some ul;
         let body = document##.body in
-        let eltAfter = document##getElementById (js "footer") in
+        let eltAfter = get_element_by_id_opt "footer" in
         Dom.insertBefore body search_div eltAfter
     end
 

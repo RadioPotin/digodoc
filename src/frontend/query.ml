@@ -12,7 +12,7 @@
 
 open Js_of_ocaml
 open Js
-open Global
+open Globals
 
 module StringSet = Set.Make(String)
 
