@@ -12,25 +12,56 @@
 
 open Js_of_ocaml
 open Js
-open Global
-open Requests
+open Globals
+
+let main_div : Html.element t option ref = ref None 
+
+let get_main_div () : Html.element t =
+  match !main_div with
+  | Some div -> div
+  | None -> assert false
+
+let load_div : Html.element t = 
+  let div = document##createElement (js "div") in
+  div##setAttribute (js "id") (js "load_div");
+  div
+
+let observer : IntersectionObserver.intersectionObserver t=
+  let open IntersectionObserver in
+  let f : intersectionObserverEntry t js_array t -> intersectionObserver t -> unit = 
+    (fun entries _ ->
+        let entry = unoptdef @@ array_get entries 0 in
+        if entry##.isIntersecting = _true then begin
+          Dom.removeChild (get_main_div ()) load_div;
+          Lwt.async (fun () -> 
+            let%lwt added = Requests.sendRequest () in
+            if added then begin
+              state.last_id <- state.last_id + 50;
+              Dom.appendChild (get_main_div ()) load_div
+            end;
+            Lwt.return_unit)
+        end;
+    )
+  and options : intersectionObserverOptions t = empty_intersection_observer_options () in
+  let a : float js_array t= new%js array_empty  in
+  array_set a 0 1.0;
+  options##.threshold := a;
+  new%js intersectionObserver (wrap_callback f) options
 
 let clear_page () =
-  let load_opt = document##getElementById (js "load_div") in
-  Opt.iter load_opt (fun _ -> Dom.removeChild (get_main_div ()) load_div);
- 
+  Dom.removeChild (get_main_div ()) load_div;
   for index = 48 to 57 do
-    let set_opt = document##getElementById (js @@ "packages-" ^ (fromCharCode index)) in
+    let set_opt = get_element_by_id_opt ("packages-" ^ (fromCharCode index)) in
     Opt.iter set_opt (fun set -> 
       set##.innerHTML := js "";
-      let title = unopt @@ document##getElementById (js @@ "name-" ^ (fromCharCode index)) in
+      let title = getElementById ("name-" ^ (fromCharCode index)) in
       title##.style##.display := js "none")
   done;
   for index = 97 to 122 do
-    let set_opt = document##getElementById (js @@ "packages-" ^ (fromCharCode index)) in
+    let set_opt = get_element_by_id_opt ("packages-" ^ (fromCharCode index)) in
     Opt.iter set_opt (fun set -> 
       set##.innerHTML := js "";
-      let title = unopt @@ document##getElementById (js @@ "name-" ^ (fromCharCode index)) in
+      let title = getElementById ("name-" ^ (fromCharCode index)) in
       title##.style##.display := js "none")
   done
 
@@ -92,14 +123,14 @@ let set_onclick_handlers () =
     for index = 48 to 57 do
       let ch = fromCharCode index in
       let id = "letter-" ^ ch in
-      match Opt.to_option @@ document##getElementById (js id) with
+      match Opt.to_option @@ get_element_by_id_opt id with
       | Some a -> a##.onclick := Html.handler (onclick_handler ch)
       | None -> ()  
     done;
     for index = 97 to 122 do
       let ch = fromCharCode index in
       let id = "letter-" ^ ch in
-      match Opt.to_option @@ document##getElementById (js id) with
+      match Opt.to_option @@ get_element_by_id_opt id with
       | Some a -> a##.onclick := Html.handler (onclick_handler ch)
       | None -> () 
     done

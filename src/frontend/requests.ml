@@ -10,7 +10,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Global
 open Js_of_ocaml
 open Data_types
 open Lwt.Infix

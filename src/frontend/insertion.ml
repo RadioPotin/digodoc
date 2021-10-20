@@ -13,7 +13,7 @@
 open Js_of_ocaml
 open Js
 open Object
-open Global
+open Globals
 
 let hide_with_letter first_letter = 
     let name_elt : Html.element t = 
@@ -237,7 +237,7 @@ let insert_search_result : search_result_jsoo t -> unit =
             let search_item = Html.createLi document in
             search_item##setAttribute (js "class") (js "search-item");
             let item_link = Html.createA document in
-            item_link##setAttribute (js "href") (path_to_root##concat pack##.path);
+            item_link##setAttribute (js "href") (concat path_to_root pack##.path);
             Dom.appendChild search_item item_link;
             let item_indicator = Html.createDiv document
             and item_name = Html.createDiv document in
@@ -251,7 +251,7 @@ let insert_search_result : search_result_jsoo t -> unit =
             let search_item = Html.createLi document in
             search_item##setAttribute (js "class") (js "search-item");
             let item_link = Html.createA document in
-            item_link##setAttribute (js "href") (path_to_root##concat elt##.path);
+            item_link##setAttribute (js "href") (concat path_to_root elt##.path);
             Dom.appendChild search_item item_link;
             let item_indicator = Html.createDiv document
             and item_name = Html.createDiv document

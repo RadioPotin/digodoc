@@ -12,7 +12,7 @@
 
 open Js_of_ocaml
 open Js
-open Global
+open Globals
 
 let genericHandler handler =
   Html.handler (fun _ ->
