@@ -23,6 +23,20 @@ type state_info = {
     mutable page : int
 }
 
+(**type state_funselement = {
+    mutable pattern : string;
+    mutable elt_entries : StringSet.t;
+    mutable current_eltentries : string;
+    mutable page : int;
+}
+
+type state_fullselt = {
+    mutable pattern : string;
+    mutable fullelt_entries : StringSet.t;
+    mutable current_fullelt_entries : string;
+    mutable page : int;
+}*)
+
 type search_state = 
     | Uninitialized
     | Search of state_info
@@ -87,6 +101,7 @@ let state_to_entry_info () =
         starts_with = "."
     }
 
+
 let update_state () =
     let handle_checkbox id state_info =
         let entry =
@@ -144,7 +159,7 @@ let set_handlers () =
     update_button##.onclick := Html.handler (fun _ ->
         let form = getElementById "form-div" in
         update_button##.style##.display := js "none";
-        form##.style##.display := js "";
+        form##.style##.display := js "";       
         update_form ();
         _false
     )

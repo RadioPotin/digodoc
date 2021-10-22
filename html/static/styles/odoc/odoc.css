@@ -62,22 +62,21 @@ body {
   /* padding: calc(1.5 * var(--size-line)); */         /*using pad-left and right instead of padding*/
   padding-left: calc(7.8 * var(--size-line));
   padding-right: calc(1.5 * var(--size-line));
-  padding-top: calc(0.5 * var(--size-line)) /*0px*/; } /*no padding top, seems better*/
+  padding-top: calc(0.5 * var(--size-line)); }
 
 .content > * { max-width: 78ch; width: 75% }
 
 .toc
-{ position: /*absolute*/ absolute;
-  /*position: -webkit-sticky;
-  position: sticky;*/
+{ position: /*absolute*/ fixed;
   top: calc(0.5 * var(--size-line))/*0px*/;
   left: -20px;
-  text-align: center;                                 /* à changer ~*/
+  text-align: left;
   width: 15%;
-  margin-left: var(--size-line);
-  margin-top: calc(3 * var(--size-line))         /*0px*/;
+  margin-left: 5% /*-200px*/;
+  margin-top: calc(3 * var(--size-line)) /*0px*/;
   margin-right: var(--size-line);
-  border-top: solid thin var(--color-rule);  /*border-right when at the right place*/}
+  /*border-top: solid thin var(--color-rule);*/
+  border-right: solid thin var(--color-rule);}
 
 /* Horizontal rules. The way to do it is not so nice, e.g. for
    anchoring it makes huge blobs on heading linking. It would be
@@ -996,12 +995,13 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-/*******************  Hide inpute text until checked in Search by function name/type **************/
+/*******************  Hide input text until checked in Search by function name/type **************/
 
 input[type="checkbox"] ~ input {
   visibility: hidden;
   opacity: 0;
 }
+
 input[type="checkbox"]:checked ~ input {
   transition: visibility 0s, opacity 0.4s linear;
   visibility: visible;
@@ -1015,12 +1015,66 @@ input[type="checkbox"]:checked ~ input {
   border-width: 0px;
   height: 20px;
 }
+/***************************************************************/
 
-#ftextpackages {
+.newSearchbyPack {
+  background : white;
+  box-sizing: content-box;
+  cursor: pointer;
+  transition: 0.1s all;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  margin-top: 0;
+  overflow: auto;
+}
+
+.newSearchbyPack > .tag {
+  background: #4aa987;
+  margin: 2px;
+  color: white;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  padding-left: 4px;
+  display: inline list-item;
+}
+
+.newSearchbyPack > .tag :hover {
+  content: 'x';
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+}
+
+.newSearchbyPack > .tag > .remove {
+  content: 'x';
+  color: white;
+  padding-left: 0px;
+  margin: 1ch;
+}
+
+.newSearchbyPack > .tag > .remove:before {
+  color: white;
+  content: 'x';
+  padding-left: 0px;
+}
+
+.newSearchbyPack > input[name="packinput"]{
+  border-radius: 8px 8px 8px 8px;
+  border-color: #874aa9;
+  border-width: 0px;
+  font-size: 16px;
+  background: white;
+  padding: 4px;
+  max-width: 8vw;
+  outline: none;
+}
+   
+/****************************************************************/  
+
+/*#ftextpackages {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   height: 20px;
-}
+}*/
 
 .submitstyle {
   margin-top: 10px;

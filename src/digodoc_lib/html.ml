@@ -28,27 +28,27 @@ let generate_page ~filename ~title ~is_index f =
   let s =
     String.concat "/"
       (List.map (fun _s -> "..")
-          path_list) in
+         path_list) in
   let root = if s = "" then s else s ^ "/" in
 
   let rec brace () var = match var with
     | "root" -> root
     | "sources" ->
-      if !Globals.sources
-      then
-        Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
-        (brace () "root")
-      else ""
+        if !Globals.sources
+        then
+          Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
+            (brace () "root")
+        else ""
     | "header_link" ->
-      if !Globals.with_header
-      then {| | <a href="#header">To the top</a>|}
-      else ""
+        if !Globals.with_header
+        then {| | <a href="#header">To the top</a>|}
+        else ""
     | "search" -> 
-      if is_index 
-      then file_content "search_index.html"
-      else EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+        if is_index 
+        then file_content "search_index.html"
+        else EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
     | _ ->
-      Printf.kprintf failwith "Unknown var %S" var
+        Printf.kprintf failwith "Unknown var %S" var
   in
   let header = EZ_SUBST.string (file_content "header.html") ~ctxt:() ~brace
   and footer = EZ_SUBST.string (file_content "footer.html") ~ctxt:() ~brace in
@@ -66,6 +66,9 @@ let generate_page ~filename ~title ~is_index f =
         <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
         <script src="%sstatic/scripts/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
+        
+        <!--JQuery adds   ..... Added by elias <--- -->
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
       </head>
       <body>
     |} title root root root (get_script ()) root;
@@ -93,27 +96,27 @@ let check_html ~file xml =
   let rec iter =  function
     | PCData _ -> ()
     | Element (tagName, attributes, childNodes) ->
-      List.iter iter childNodes;
-      match tagName with
-      | "a" | "A" ->
-        List.iter (function
-            ("href", link) ->
-            begin
-              if link = "" then
-                Printf.eprintf "Empty Link in file %S\n%!" file
-              else
-                let link, _anchor = EzString.cut_at link '#' in
-                if link <> "" &&
-                   not (EzString.starts_with link ~prefix:"http") then
-                  let dir = Filename.dirname file in
-                  let linked_file = dir // link in
-                  if not (Sys.file_exists linked_file) then
-                    Printf.eprintf "File %s: link %s is dangling\n  %s does not exist\n%!"
-                      file link linked_file
+        List.iter iter childNodes;
+        match tagName with
+        | "a" | "A" ->
+            List.iter (function
+                  ("href", link) ->
+                    begin
+                      if link = "" then
+                        Printf.eprintf "Empty Link in file %S\n%!" file
+                      else
+                        let link, _anchor = EzString.cut_at link '#' in
+                        if link <> "" &&
+                           not (EzString.starts_with link ~prefix:"http") then
+                          let dir = Filename.dirname file in
+                          let linked_file = dir // link in
+                          if not (Sys.file_exists linked_file) then
+                            Printf.eprintf "File %s: link %s is dangling\n  %s does not exist\n%!"
+                              file link linked_file
 
-            end
-          | _ -> ()) attributes
-      | _ -> ()
+                    end
+                | _ -> ()) attributes
+        | _ -> ()
   in
   iter xml
 
@@ -122,33 +125,33 @@ let rec add_trailer list =
   | Element ("div", [ "id", "trailer" ], _ ) :: _ -> list
   | e :: list -> e :: add_trailer list
   | [] ->
-    HTML.CONS.[
-      div ~a:[ "id", "trailer" ]
-        [ hr ;
-          p [ s "Generated using ";
-            a ~a:[
-              "href", "https://github.com/OCamlPro/digodoc";
-              "target", "digodoc";
-            ]
-              [ s "digodoc" ];
-            s " at ";
-            a ~a:[
-              "href", "https://www.ocamlpro.com";
-              "target", "ocamlpro";
-            ]
-              [ s "OCamlPro" ];
+      HTML.CONS.[
+        div ~a:[ "id", "trailer" ]
+          [ hr ;
+            p [ s "Generated using ";
+                a ~a:[
+                  "href", "https://github.com/OCamlPro/digodoc";
+                  "target", "digodoc";
+                ]
+                  [ s "digodoc" ];
+                s " at ";
+                a ~a:[
+                  "href", "https://www.ocamlpro.com";
+                  "target", "ocamlpro";
+                ]
+                  [ s "OCamlPro" ];
+              ]
           ]
-        ]
-    ]
+      ]
 
 let insert_trailer xml =
   let rec iter xml =
     match xml with
     | PCData _ -> xml
     | Element ("div", [ "class", "content" ], childNodes) ->
-      Element ("div", [ "class", "content" ], add_trailer childNodes)
+        Element ("div", [ "class", "content" ], add_trailer childNodes)
     | Element (tagName, attributes, childNodes) ->
-      Element ( tagName, attributes, List.map iter childNodes )
+        Element ( tagName, attributes, List.map iter childNodes )
   in
   iter xml
 
@@ -158,22 +161,22 @@ let iter_html ?(check_links=false) ?(add_trailer=false) dir =
   (*  EzFile.make_select *)
   EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"*.html"
     ~f:(fun path ->
-      let file = dir // path in
-      match
-        match HTML.parse_file file with
-        | exception HTML.Error error ->
-          Printf.eprintf "%s: invalid html (%s)\n%!"
-            file (HTML.string_of_error error);
-          None
-        | xml -> Some xml
-      with
-      | None -> ()
-      | Some xml ->
-        if check_links then check_html ~file xml;
-        if add_trailer then
-          EzFile.write_file file
-            ( "<!DOCTYPE html>\n" ^ HTML.to_string ( insert_trailer xml ) )
-    ) dir;
+        let file = dir // path in
+        match
+          match HTML.parse_file file with
+          | exception HTML.Error error ->
+              Printf.eprintf "%s: invalid html (%s)\n%!"
+                file (HTML.string_of_error error);
+              None
+          | xml -> Some xml
+        with
+        | None -> ()
+        | Some xml ->
+            if check_links then check_html ~file xml;
+            if add_trailer then
+              EzFile.write_file file
+                ( "<!DOCTYPE html>\n" ^ HTML.to_string ( insert_trailer xml ) )
+      ) dir;
   Printf.eprintf "Scan finished.\n%!"
 
 let write_file file ~content =
@@ -196,34 +199,34 @@ let add_header_footer () =
           let rec brace () var = 
             match var with
             | "root" ->
-              let dirname = EzFile.dirname path in 
-              let path_list = 
-                if String.contains path '/'   
-                then 
-                  String.split_on_char '/' dirname 
-                else []
-              in
-              let s =
-                String.concat "/"
-                  (List.map (fun _s -> "..") 
-                    path_list)
-              in
-              ".." // if s = "" then s else s ^ "/"
+                let dirname = EzFile.dirname path in 
+                let path_list = 
+                  if String.contains path '/'   
+                  then 
+                    String.split_on_char '/' dirname 
+                  else []
+                in
+                let s =
+                  String.concat "/"
+                    (List.map (fun _s -> "..") 
+                       path_list)
+                in
+                ".." // if s = "" then s else s ^ "/"
             | "sources" -> 
-              if !sources 
-              then 
-                Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
-                (brace () "root")
-              else ""
+                if !sources 
+                then 
+                  Printf.sprintf {|<a id="sources-item" href="%ssources.html">Sources</a>|}
+                    (brace () "root")
+                else ""
             | "header_link" ->
-              if !with_header 
-              then {| | <a href="#header">To the top</a>|} 
-              else ""
+                if !with_header 
+                then {| | <a href="#header">To the top</a>|} 
+                else ""
             | "search" -> EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
             | _ -> 
-              Printf.kprintf failwith "Unknown var %S" var
+                Printf.kprintf failwith "Unknown var %S" var
           in
-        
+
           let html = EzFile.read_file file 
           and header = EZ_SUBST.string (file_content "header.html") ~brace ~ctxt:()
           and footer = EZ_SUBST.string (file_content "footer.html") ~brace ~ctxt:()
@@ -245,23 +248,23 @@ let adjust_upper_link () =
     EzFile.remove file;
     EzFile.write_file file html'
   in 
-    let html_dir = digodoc_html_dir in 
-    Array.iter (fun file ->
-        let path = html_dir // file in
-        let preffix,_ = EzString.cut_at file '.' in
-        match preffix with
-        | "MODULE" -> begin
+  let html_dir = digodoc_html_dir in 
+  Array.iter (fun file ->
+      let path = html_dir // file in
+      let preffix,_ = EzString.cut_at file '.' in
+      match preffix with
+      | "MODULE" -> begin
           Array.iter (fun modul ->
               let path = path // modul in 
               if EzFile.is_directory path then update_doc path "modules.html"
             ) 
             (EzFile.read_dir path)
         end
-        | "LIBRARY" -> update_doc path "libraries.html"
-        | "META" -> update_doc path "metas.html"
-        | _ -> update_doc path "packages.html"
-      )
-      (EzFile.read_dir html_dir)
+      | "LIBRARY" -> update_doc path "libraries.html"
+      | "META" -> update_doc path "metas.html"
+      | _ -> update_doc path "packages.html"
+    )
+    (EzFile.read_dir html_dir)
 
 
 
@@ -276,5 +279,5 @@ let adjust_docs () =
         let html' = Patchtml.change_link_highlight html in 
         EzFile.remove file;
         EzFile.write_file file html'
-    )
+      )
     html_dir
