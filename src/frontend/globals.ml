@@ -11,7 +11,8 @@
 (**************************************************************************)
 
 open Js_of_ocaml
-open Js 
+open Js
+open Data_types
 
 (** Module [Global] exposes global variables, aliases and helpful functions used or have potential 
     to be used by several modules. *)
@@ -32,19 +33,37 @@ let document = Html.document
 
 (** {1 Entry state} *)
 
-type entry_state = {
-  mutable last_id : int;
-  mutable starts_with : string;
-  mutable pattern: string;
-}
-(** Entry state type. Used by index pages and by pages with search input to store information about entries. *)
-
-let state = {
+type entry_state = Data_types.entry_info
+(** Entry state type. Used by index pages and by pages with search input to store information about entries.
+    Alias to [Data_types.entry_info] used by server. *)
+ 
+let entry_state = {
+  entry = PACK;
   last_id = 0;
   starts_with = ".";
   pattern = ""
 }
 (** Current entry state. *)
+
+(** {1 Pagination} *)
+
+type page_info = {
+  num : int; 
+  interval : int * int;
+  href : string 
+}
+(** Type that represents information about result page within search page. [num] is index of result page, 
+    [interval] gives an interval of ids of entries/elements listed on the page and [href] specifies 
+    the path to reach it. *)
+
+type pagination_info = {
+  active_ind : int;
+  pages : page_info list;
+  total_number: int
+}
+(** Inforamtion about result pages within search page. [active_ind] represents index of currently open result page,
+    [pages] is a list of all existing result pages and [total_number] gives a total number of entries/elements 
+    throughout all pages *)
 
 (** {1 Useful functions} *)
 
@@ -54,11 +73,17 @@ exception Web_app_error of string list
 
 let web_app_error ?(errors=[]) mess  =
   Web_app_error (mess::errors) 
-(** [web_app_error ~errors mess] creates {!Web_app_error} and adds [mess] error message 
+(** [web_app_error ~errors mess] creates [Web_app_error] and adds [mess] error message 
     to the list of error messages [errors]. *)
 
 let logs s = Firebug.console##log (js s)
 (** [logs s] prints [s] in console. *)
+
+let warn s = Firebug.console##warn (js s)
+(** [warn s] prints [s] in console as a warning. *)
+
+let err s = Firebug.console##error (js s)
+(** [err s] prints [s] in console as an error. *)
 
 let unoptdef (optdef : 'a optdef) : 'a  =
   Optdef.get 
@@ -101,7 +126,7 @@ let get_element_by_id (id:string) : Html.element t =
 
 let get_element_by_id_opt (id:string) : Html.element t opt = 
   document##getElementById (js id)
-(** [get_element_by_id_safe id] is the same as {!get_element_by_id} but encapsulates result in [opt].*)
+(** [get_element_by_id_safe id] is the same as [get_element_by_id] but encapsulates result in [opt].*)
 
 let open_url url =
   let _ = window##open_ url (js "_self") (Opt.return (js "")) in
@@ -110,7 +135,21 @@ let open_url url =
 
 let encode_query_val qval =
   Uri.pct_encode ~component:`Query_value qval
-(** [encode_query_val qval] encodes [qval] a segment of query string using module {!Uri} *)
+(** [encode_query_val qval] encodes a segment of query string [qval] using module [Uri] *)
+
+let decode_query_val qval =
+  Uri.pct_decode qval
+(** [decode_query_val qval] decodes a segment of query string [qval] using module [Uri] *)
+
+let invalid_input (input : string) =
+  let input = get_element_by_id input in 
+  input##.style##.backgroundColor := js "#FF2E40"
+(** Display input with id [input] as invalid *)
+
+let valid_input (input : string) =
+  let input = get_element_by_id input in 
+  input##.style##.backgroundColor := js "white"
+(** Display input with id [input] as valid *)
 
 (** {1 Global variables} *)
 
@@ -133,9 +172,6 @@ let reversed_path : string array =
 
 let filename : string = reversed_path.(0) 
 (** Name of current file. *)
-
-(* TOREMOVE : delete this cos pointless *)
-let search_ul : Html.uListElement t option ref = ref None
 
 let in_root_directory : bool = Array.length path == 1
 (** Says if current file is under root directory *)
@@ -171,17 +207,3 @@ let path_to_root : js_string t =
     path;
   js !root
 (** Path to the root directory from current file *)
-
-(* TOREMOVE : move it to query.ml *)
-type page_info = {
-  num : int; 
-  entries_interval : int * int;
-  href : string 
-}
-
-(* TOREMOVE : move it to query.ml *)
-type pagination_info = {
-  active_ind : int;
-  pages : page_info list;
-  entries_number: int
-}
