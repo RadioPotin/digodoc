@@ -66,9 +66,6 @@ let generate_page ~filename ~title ~is_index f =
         <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
         <script src="%sstatic/scripts/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
-        
-        <!--JQuery adds   ..... Added by elias <--- -->
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
       </head>
       <body>
     |} title root root root (get_script ()) root;

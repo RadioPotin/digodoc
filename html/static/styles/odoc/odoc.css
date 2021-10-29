@@ -1010,14 +1010,16 @@ input[type="checkbox"]:checked ~ input {
 
 /******************  Round corners for text inputs ******************************************/
 
-#ftextmodule {
+/*#ftextmodule {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   height: 20px;
-}
+}*/
+
 /***************************************************************/
 
 .newSearchbyPack {
+  display: none;
   background : white;
   box-sizing: content-box;
   cursor: pointer;
@@ -1064,10 +1066,64 @@ input[type="checkbox"]:checked ~ input {
   font-size: 16px;
   background: white;
   padding: 4px;
+  width: 120px;
+  max-width: 10vw;
+  outline: none;
+}
+
+/*****************************************************************/
+
+.newSearchbyModule {
+  display: none;
+  background : white;
+  box-sizing: content-box;
+  cursor: pointer;
+  transition: 0.1s all;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  margin-top: 0;
+  overflow: auto;
+}
+
+.newSearchbyModule > .tag {
+  background: #4aa987;
+  margin: 2px;
+  color: white;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  padding-left: 4px;
+  display: inline list-item;
+}
+
+.newSearchbyModule > .tag :hover {
+  content: 'x';
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+}
+
+.newSearchbyModule > .tag > .remove {
+  content: 'x';
+  color: white;
+  padding-left: 0px;
+  margin: 1ch;
+}
+
+.newSearchbyModule > .tag > .remove:before {
+  color: white;
+  content: 'x';
+  padding-left: 0px;
+}
+
+.newSearchbyModule > input[name="modinput"]{
+  border-radius: 8px 8px 8px 8px;
+  border-color: #874aa9;
+  border-width: 0px;
+  font-size: 16px;
+  background: white;
+  padding: 4px;
   max-width: 8vw;
   outline: none;
 }
-   
 /****************************************************************/  
 
 /*#ftextpackages {
