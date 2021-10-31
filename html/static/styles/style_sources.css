@@ -114,7 +114,7 @@
 
   /* Add a black background color to the top navigation */
   .topnav {
-      background-color: #659CD6;
+      background-color:  #659CD6;
       overflow: hidden;
       border-bottom: 1px solid grey;
   }
@@ -137,8 +137,9 @@
   }
 
   .container{
-    margin-left: 10px;
-    margin-right: 10px;
+    width: 60%;
+    margin-left: 20%;
+    margin-right: 20%;
   }
 
   /************** Tables, rows, cells ***************/
@@ -149,7 +150,8 @@
   }
 
   .file-name{
-    padding-left:15px;
+    padding-left:auto;
+    font-size: 15px;
   }
 
   .file-icon {
@@ -354,4 +356,17 @@
   color: green; 
   float: right; 
   font-size: 11px;
+}
+
+.centered-image {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+}
+
+.md-content {
+  margin-left: 30px;
+  margin-right: 10px;
+  overflow-x: auto;
+  overflow-y: auto;
 }

@@ -55,7 +55,7 @@ let htmlize filename content =
     let content = 
       Omd.of_string content |> Patchtml.handle_file |> Omd.to_html
     in 
-    Printf.bprintf b {|%s|} content;
+    Printf.bprintf b {|<div class="md-content">%s</div>|} content;
     Buffer.contents b
 
   | "jpeg" | "jpg" | "png" |"apng" | "gif" | "tiff" | "avif" | "svg" | "bmp" | "webp" ->
