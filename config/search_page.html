@@ -1,141 +1,139 @@
+<button id="update-filters" style="display: none;"><img src="static/imgs/filter.ico" /></button>
 
-<button id="update-filters"><img src="static/imgs/filter.ico"/>Update filters</button>
+<!-- Search by entry 1-->
+<div id="forms">
 
-<button type="button" class="collapsible-div">Search by entry</button>
+  <button type="button" class="collapsible-div">Search by entry</button>
 
+  <div class="form-div" style="display: block;">
+    <form id="entry-form">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="fpattern_entry">Search pattern:</label><br>
+              <input type="text" id="fpattern_entry" name="fpattern_entry" value=""><br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+              <label for="fpackages">Packages</label>
+            </td>
+            <td>
+              <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+              <label for="flibraries">Libraries</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+              <label for="fmodules">Modules</label><br>
+            </td>
+            <td>
+              <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+              <label for="fmetas">Metas</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fsources" name="fsources" value="Sources">
+              <label for="fsources">Sources</label><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="2">
+              <input type="submit" class="submitstyle" value="Search">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
 
-<div id="form-div">
-  <form id="entry-form">
-    <table>
-      <tbody>
-        <tr>
-          <td colspan="2">
-            <label for="fpattern">Search pattern:</label><br>
-            <input type="text" id="fpattern" name="fpattern" value=""><br>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
-            <label for="fpackages">Packages</label>
-          </td>
-          <td>
-            <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
-            <label for="flibraries">Libraries</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
-            <label for="fmodules">Modules</label><br>
-          </td>
-          <td>
-            <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
-            <label for="fmetas">Metas</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fsources" name="fsources" value="Sources">
-            <label for="fsources">Sources</label><br>
-          </td>
-          <td>
-            <input type="checkbox" id="fvals" name="fvals" value="Vals">
-            <label for="fvals">Values</label><br>
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align: center;" colspan="2">
-            <input type="submit" value="Search">
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </form>
+  <!-- Search by functions, types, classes, etc. -->
 
-  <button type="button" class="collapsible-div">Search by function name and types </button>
+  <button type="button" class="collapsible-div">Search by element</button>
 
-<div id="form-div">
-  <form id="element-form">
-    <table>
-      <tbody>
-        <tr>
-          <td colspan="2">
-            <label for="fpattern">Search pattern:</label>
-            <input type="text" id="fpattern" name="fpattern" value=""><br>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label class="switch">
-              <input type="checkbox" id="hideifchecked" checked onclick="myhider()">
-              <span class="slider round"></span>
-            </label>
-            <label>Pattern or <a style="color: green;">RegEx</a></label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fvalues" name="fvalues" value="Values">
-            <label for="fvalues">Values</label>
-          </td>
-          <td>
-            <input type="checkbox" id="fclass" name="fclass" value="Class">
-            <label for="fclass">Class</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="ftypes" name="ftypes" value="Types">
-            <label for="ftypes">Types</label><br>
-          </td>
-        </tr>
-        <tr id="tohide">
-          <td colspan="2">
-            <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
-            <label for="showpacksearch">in Packages</label>
-
-            <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
-              <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
-            </div>
-
-          </td>
-        </tr>
-        <tr id="tohide2">
-          <td colspan="2">
-            <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
-            <label for="showmodsearch">in Modules&nbsp;</label>
-
-            <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
-              <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
-            </div>
-
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align: center;" colspan="2">
-            <input type="submit" class="submitstyle" value="Search">
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </form>
-
+  <div class="form-div" style="display: block;">
+    <form id="element-form">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="fpattern_element">Search pattern:</label>
+              <input type="text" id="fpattern_element" name="fpattern_element" value=""><br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="hideifchecked" checked onclick="myhider()">
+                <span class="slider round"></span>
+              </label>
+              <label>Pattern or <a style="color: green;">RegEx</a></label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fvalues" name="fvalues" value="Values">
+              <label for="fvalues">Values</label>
+            </td>
+            <td>
+              <input type="checkbox" id="fclass" name="fclass" value="Class">
+              <label for="fclass">Class</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="ftypes" name="ftypes" value="Types">
+              <label for="ftypes">Types</label><br>
+            </td>
+          </tr>
+          <tr id="tohide">
+            <td colspan="2">
+              <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
+              <label for="showpacksearch">in Packages</label>
+              <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
+                <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
+              </div>
+            </td>
+          </tr>
+          <tr id="tohide2">
+            <td colspan="2">
+              <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
+              <label for="showmodsearch">in Modules&nbsp;</label>
+              <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
+                <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="2">
+              <input type="submit" class="submitstyle" value="Search">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
 </div>
+
 <div id="entries-nav">
   <table>
     <tbody>
-    <tr>
-      <td><a id="packages-results" style="display: none;">Packages</a></td>
-      <td><a id="libraries-results" style="display: none;">Libraries</a></td>
-      <td><a id="modules-results" style="display: none;">Modules</a></td>
-      <td><a id="metas-results" style="display: none;">Metas</a></td>
-      <td><a id="sources-results" style="display: none;">Sources</a></td>
-      <td><a id="vals-results" style="display: none;">Values</a></td>
-    </tr>
+      <tr>
+        <td><a id="packages-results" style="display: none;">Packages</a></td>
+        <td><a id="libraries-results" style="display: none;">Libraries</a></td>
+        <td><a id="modules-results" style="display: none;">Modules</a></td>
+        <td><a id="metas-results" style="display: none;">Metas</a></td>
+        <td><a id="sources-results" style="display: none;">Sources</a></td>
+        <td><a id="vals-results" style="display: none;">Values</a></td>
+      </tr>
     </tbody>
   </table>
-  </div>
+</div>
+
 <div id="result-div">
   <div id="page-info">
 
@@ -156,3 +154,257 @@
     </a>
   </nav>
 </div>
+
+<!-- Javascript functions and scripts used in the search page -->
+
+<script>
+  /******************* Only one collapsible at a time *******************************/
+  var coll = document.getElementsByClassName("collapsible-div");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function () {
+      for (j = 0; j < coll.length; j++) {
+        if (coll[j] != coll[i]) {
+          var nocontent = coll[j].nextElementSibling;
+          nocontent.style.display = "none";
+        }
+      }
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+</script>
+
+<script>
+  /**************** Show/Hide text input for package and modules search ***********/
+  function togglepack() {
+    var checker = document.getElementById("showpacksearch");
+    if (checker.checked) {
+      document.getElementById("nsbp").style.display = "block";
+    } else {
+      document.getElementById("nsbp").style.display = "none"
+    }
+  }
+
+  function togglemod() {
+    var checker = document.getElementById("showmodsearch");
+    if (checker.checked) {
+      document.getElementById("nsbm").style.display = "block";
+    } else {
+      document.getElementById("nsbm").style.display = "none"
+    }
+  }
+</script>
+
+<script>
+  /***************** package selection in search by function name and value ********************/
+  let filterpackages = ['']; /* List of packages to avoid repetitions (and to implement limited choice soon) */
+
+  /* Focus on input when clicking the newSearchbyPack div */
+  focusMethod1 = function focusinput() {
+    document.getElementById("ftextpackages").focus();
+  }
+
+  /* Add tag by pressing spacebar(keycode=32) and remove previous tag by pressing backspace (keycode=8) */
+  var packinput_ele = document.getElementById('ftextpackages');
+  packinput_ele.addEventListener('keydown', function (e) {
+    if (e.keyCode == 32) {
+      e.preventDefault();
+      var cur_value = document.querySelector('input[name="packinput"]');
+      var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
+        : "";
+      if (neat_value == '')
+        return false;
+
+      if (!filterpackages.includes(neat_value)) {
+        filterpackages.push(neat_value);
+        var mytag = document.createElement("span");
+        mytag.classList.add('tag');
+        mytag.innerText = neat_value;
+        var tagremove = document.createElement("span");
+        tagremove.classList.add('remove');
+        mytag.appendChild(tagremove);
+        var insertbeforethis = document.getElementById('ftextpackages');
+        var parent = document.getElementById('nsbp');
+        parent.insertBefore(mytag, insertbeforethis);
+        packinput_ele.value = '';
+      }
+      else {
+        var alltags = document.getElementsByClassName('tag');
+        for (var i = 0; i < alltags.length; i++) {
+          if (alltags[i].innerText == neat_value) {
+            packinput_ele.classList.add('animated bounce'); /* Not usefull for the moment*/
+            alert('Error : Tag already exists');
+          }
+        }
+      }
+    }
+    else if (e.keyCode == 8 && packinput_ele.value == '') {
+      var previous_tag = document.getElementById('ftextpackages').previousSibling;
+      var previous_tag_text = previous_tag.innerText;
+      filterpackages.remove(previous_tag_text);
+      var alltags = document.getElementsByClassName('tag');
+      for (var i = 0; i < alltags.length; i++) {
+        if (alltags[i].innerText.toLowerCase() == previous_tag_text.toLowerCase())
+          alltags[i].remove();
+      }
+      previous_tag[previous_tag.length - 1].remove;
+    }
+  })
+
+  /* equivalent to the jQuery .on() method with additional selector (childSelector) option  */
+  function delegateSelector(selector, event, childSelector, handler) {
+    var is = function (el, selector) {
+      return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
+    };
+    var elements = document.querySelectorAll(selector);
+    [].forEach.call(elements, function (el, i) {
+      el.addEventListener(event, function (e) {
+        if (is(e.target, childSelector)) {
+          handler(e);
+        }
+      });
+    });
+  }
+
+  /* Click on tags to remove them in newSearchbyPack */
+  delegateSelector('newSearchbyPack', 'click', 'tag', function(e) {
+    var tagtext = e.innerText.slice(0,-1);
+    filterpackages.remove(tagtext);
+    e.remove();
+  })
+
+  // array.remove()
+  Array.prototype.remove = function () {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+      what = a[--L];
+      while ((ax = this.indexOf(what)) !== -1) {
+        this.splice(ax, 1);
+      }
+    }
+    return this;
+  };
+
+  // Escaping
+  function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+</script>
+
+<script>
+  /****************** Hide/Show packages and module option slider (green switch) ************************/
+  function myhider() {
+    /* Hide ftextpackages and ftextmodules if slidebox is unchecked*/
+    var zechecker = document.getElementById("hideifchecked");
+    if (!zechecker.checked) {
+      document.getElementById("tohide").style.display = "none";
+      document.getElementById("tohide2").style.display = "none";
+    } else {
+      document.getElementById("tohide").style.display = "";
+      document.getElementById("tohide2").style.display = "";
+    }
+  }
+</script>
+
+<script>
+  /****************** module selection in search by function name and value ****************/
+  let filtermodules = ['']; /* List of modules to avoid repetitions (and to implement limited choice soon) */
+
+  /* Focus on input when clicking the newSearchbyModule div */
+  focusMethod2 = function focusinput2() {
+    document.getElementById("ftextmodules").focus();
+  }
+
+  /* Add tag by pressing spacebar(keycode=32) and remove previous tag by pressing backspace (keycode=8) */
+  var modinput_ele = document.getElementById('ftextmodules');
+  modinput_ele.addEventListener('keydown', function (e) {
+    if (e.keyCode == 32) {
+      e.preventDefault();
+      var cur_value = document.querySelector('input[name="modinput"]');
+      var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
+        : "";
+      if (neat_value == '')
+        return false;
+
+      if (!filterpackages.includes(neat_value)) {
+        filterpackages.push(neat_value);
+        var mytag = document.createElement("span");
+        mytag.classList.add('tag');
+        mytag.innerText = neat_value;
+        var tagremove = document.createElement("span");
+        tagremove.classList.add('remove');
+        mytag.appendChild(tagremove);
+        var insertbeforethis = document.getElementById('ftextmodules');
+        var parent = document.getElementById('nsbm');
+        parent.insertBefore(mytag, insertbeforethis);
+        modinput_ele.value = '';
+      }
+      else {
+        var alltags = document.getElementsByClassName('tag');
+        for (var i = 0; i < alltags.length; i++) {
+          if (alltags[i].innerText == neat_value) {
+            modinput_ele.classList.add('animated bounce'); /* Not usefull for the moment*/
+            alert('Error : Tag already exists');
+          }
+        }
+      }
+    }
+    else if (e.keyCode == 8 && modinput_ele.value == '') {
+      var previous_tag = document.getElementById('ftextmodules').previousSibling;
+      var previous_tag_text = previous_tag.innerText;
+      filterpackages.remove(previous_tag_text);
+      var alltags = document.getElementsByClassName('tag');
+      for (var i = 0; i < alltags.length; i++) {
+        if (alltags[i].innerText.toLowerCase() == previous_tag_text.toLowerCase())
+          alltags[i].remove();
+      }
+      previous_tag[previous_tag.length - 1].remove;
+    }
+  })
+
+  /* equivalent to the jQuery .on() method with additional selector (childSelector) option  */
+  function delegateSelector(selector, event, childSelector, handler) {
+    var is = function (el, selector) {
+      return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
+    };
+    var elements = document.querySelectorAll(selector);
+    [].forEach.call(elements, function (el, i) {
+      el.addEventListener(event, function (e) {
+        if (is(e.target, childSelector)) {
+          handler(e);
+        }
+      });
+    });
+  }
+
+  /* Click on tags to remove them in newSearchbyModule */
+  delegateSelector('newSearchbyModule', 'click', 'tag', function(e) {
+    var tagtext = e.innerText.slice(0,-1);
+    filterpackages.remove(tagtext);
+    e.remove();
+  })
+
+  // array.remove()
+  Array.prototype.remove = function () {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+      what = a[--L];
+      while ((ax = this.indexOf(what)) !== -1) {
+        this.splice(ax, 1);
+      }
+    }
+    return this;
+  };
+
+  // Escaping
+  function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+</script>

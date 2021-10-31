@@ -8,7 +8,7 @@ let edit_html ?header ?footer ~head_childs html =
   let body = html $ "body" in
   let opt_inserter f o id =
     Option.iter (fun e ->
-        f ( parse e $$ id ) ) o
+      f ( parse e $$ id ) ) o
   in
   ignore header;
   opt_inserter
@@ -20,71 +20,75 @@ let edit_html ?header ?footer ~head_childs html =
     footer
     "#footer";
   let head = html $ "head" in
-  List.iter (fun (id,child) -> 
-      opt_inserter
-        (iter (fun e -> append_child head e))
-        (Some child)
-        id)
+  List.iter (fun (id,child) ->
+    opt_inserter
+      (iter (fun e -> append_child head e))
+      (Some child)
+      id)
     head_childs;
   to_string html
 
-let change_link_highlight html = 
+let change_link_highlight html =
   let get_highlight_script scripts =
     let scripts = to_list scripts in
-    List.find (fun script -> 
-        match attribute "src" script with 
-        | Some attr ->
-          EzString.ends_with ~suffix:"highlight.pack.js" attr
-        | None -> false)
+    List.find (fun script ->
+      match attribute "src" script with
+      | Some attr ->
+        EzString.ends_with ~suffix:"highlight.pack.js" attr
+      | None -> false)
       scripts
   in
 
-    let html = parse html in
-    let scripts = (html $ "head") $$ "script" in
-    let script = get_highlight_script scripts in
-    let new_src = match attribute "src" script with
-      | Some attr -> 
-        let path_l = String.split_on_char '/' attr in
-        let new_path_l = ".." :: EzList.take ((List.length path_l)-1) path_l in
-        String.concat "/" new_path_l ^ "/static/scripts/highlight.pack.js"
-      | None -> assert false
-    in
-      set_attribute "src" new_src script;
-      to_string html
+  let html = parse html in
+  let scripts = (html $ "head") $$ "script" in
+  let script = get_highlight_script scripts in
+  let new_src = match attribute "src" script with
+    | Some attr ->
+      let path_l = String.split_on_char '/' attr in
+      let new_path_l = ".." :: EzList.take ((List.length path_l)-1) path_l in
+      String.concat "/" new_path_l ^ "/static/scripts/highlight.pack.js"
+    | None -> assert false
+  in
+  set_attribute "src" new_src script;
+  to_string html
 
-let change_link_to_upper_directory html upper = 
+let change_link_to_upper_directory html upper =
   let get_first_elt node =
-    Option.get @@ first @@ elements @@ children node 
-  in 
-    let html = parse html in
-    let body = html $ "body" in
-    let div = Option.get @@
-              element @@
-              Option.get @@
-              nth 2 @@
-              elements @@
-              children body 
-    in
-      let link = get_first_elt div |> get_first_elt |> get_first_elt in
-      let href = EzFile.dirname (Option.get @@ attribute "href" link) ^ "/" ^ upper in 
-      let new_href =
-        match upper with
-        | "modules.html" -> "../../" ^ href
-        | _ -> "../" ^ href
-      in 
-        if upper = "modules.html" 
-        then begin  
-          let next_link = next_siblings link |> nth 2 |> Option.get |> element |> Option.get  in
-          set_attribute "href" new_href next_link
-        end;
-        set_attribute "href" new_href link;
-        to_string html
-      
+    Option.get @@ first @@ elements @@ children node
+  in
+  let html = parse html in
+  let body = html $ "body" in
+  let div = Option.get @@
+    element @@
+    Option.get @@
+    nth 2 @@
+    elements @@
+    children body
+  in
+  let link = get_first_elt div |> get_first_elt |> get_first_elt in
+  let href = EzFile.dirname (Option.get @@ attribute "href" link) ^ "/" ^ upper in
+  let new_href =
+    match upper with
+    | "modules.html" -> "../../" ^ href
+    | _ -> "../" ^ href
+  in
+  if upper = "modules.html"
+  then begin
+    let next_link = next_siblings link |> nth 2 |> Option.get |> element |> Option.get  in
+    set_attribute "href" new_href next_link
+  end;
+  set_attribute "href" new_href link;
+  to_string html
+
 open Omd
 (* Keeps us from processing url links *)
 let is_url url =
   (String.length url >= 7 && String.equal (String.sub url 0 7) "http://")
   || (String.length url >= 8 && String.equal (String.sub url 0 8) "https://")
+
+(* Keeps us from processing mail addresses *)
+let is_mail mail =
+  (String.length mail >= 7 && String.equal (String.sub mail 0 7) "mailto:")
 
 (* Keeps us from processing anchors *)
 let is_anchor link =
@@ -99,7 +103,7 @@ let handle_link ~is_raw link =
   (* Escape through this branch if the link points to an http(s) address,
    * or is an anchor, or link is empty
    * *)
-  if is_url link || is_anchor link then
+  if is_url link || is_anchor link || is_mail link then
     link
 
   else
@@ -130,7 +134,7 @@ let handle_link ~is_raw link =
       match link with
       | [] -> []
       (* This handles the case when the target is under multiple subdirs like example/foo/bar
-       * Since we've established the depth of the path,
+       * Since we've established the depth of the pat,
        * we know when to get to the appending of "index.html" file,
        * hence having to preppend one last level ".." before doing so.
        * *)
@@ -178,6 +182,7 @@ let rec markdown_html_patch = function
     match tag with
     | "a" -> Element (tag, List.map (edit_attr ~is_raw:false) attrs, List.map markdown_html_patch children)
     | "img" -> Element (tag, List.map (edit_attr ~is_raw:true) attrs, List.map markdown_html_patch children)
+    | "source" -> Element (tag, List.map (edit_attr ~is_raw:true) attrs, List.map markdown_html_patch children)
     | _t -> Element (tag, attrs, List.map markdown_html_patch children)
 
 
@@ -192,8 +197,8 @@ let handle_html html =
   match msg with
   | EndOfTagExpected msg ->
     Format.eprintf {|!!Warning!!@.
-    Tag "%s" has no corresponding closing tag \
-    OR character '\' not found in non-container tag:@.%s@.|} msg html;
+    Tag "%s" has no corresponding closing tag
+    OR character '/' not found in non-container tag:@.%s@.|} msg html;
     html
   | _ -> Format.printf "Ez_html.Xml error (Patchtml.handle_html)";
     html
@@ -236,4 +241,4 @@ let handle_file doc  =
 
 (* This renders raw images in Source indexes *)
 let render_img img =
-  Format.sprintf "<img src=\"raw/%s\"/>" img
+  Format.sprintf {|<img src="raw/%s" class="centered-image"/>|} img

@@ -23,12 +23,12 @@
         --size-line: calc(var(--size-line-ratio) * var(--size-font));
         --size-half-line: calc(0.5 * var(--size-line)); }
 
-/* Reset a few things. */
+/* Reset a few things. */  /*Start working on form*/
 
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,
-a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,select,
+a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,select,  /*uncomment code if bad results*/
 small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,
-fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,
+fieldset,/*----->*/form/*<-----*/,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,
 article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,
 menu,nav,output,ruby,section,summary,time,mark,audio,video,button
 { margin: 0; padding: 0; border: 0; /* outline: 0; */
@@ -59,18 +59,24 @@ body {
   position: relative;
   max-width: 120ch;
   margin: 0 auto;
-  padding: calc(1.5 * var(--size-line));
+  /* padding: calc(1.5 * var(--size-line)); */         /*using pad-left and right instead of padding*/
+  padding-left: calc(7.8 * var(--size-line));
+  padding-right: calc(1.5 * var(--size-line));
   padding-top: calc(0.5 * var(--size-line)); }
 
 .content > * { max-width: 78ch; width: 75% }
+
 .toc
-{ position: absolute;
-  top: 0px; right: 0px;
-  width: 20%;
-  margin-left: var(--size-line);
-  margin-top: calc(3 * var(--size-line));
+{ position: /*absolute*/ fixed;
+  top: calc(0.5 * var(--size-line))/*0px*/;
+  left: -20px;
+  text-align: left;
+  width: 15%;
+  margin-left: 5% /*-200px*/;
+  margin-top: calc(3 * var(--size-line)) /*0px*/;
   margin-right: var(--size-line);
-  border-top: solid thin var(--color-rule); }
+  /*border-top: solid thin var(--color-rule);*/
+  border-right: solid thin var(--color-rule);}
 
 /* Horizontal rules. The way to do it is not so nice, e.g. for
    anchoring it makes huge blobs on heading linking. It would be
@@ -93,7 +99,9 @@ h1, h2, h3, h4, h5, h6
 
 h1 { font-size: var(--size-font-huge); }
 h2 { font-size: var(--size-font-big); }
-h3 { font-size: var(--size-font-large); }
+h3 
+{ margin-left: 20px;                  /* small slide to the right for name tags in index*/
+  font-size: var(--size-font-large); }
 
 h1, h2 { line-height: calc(1.5 * var(--size-line));
          padding-top: calc(0.75 * var(--size-line)); }
@@ -122,9 +130,12 @@ img { display: block;
 
 a { text-decoration:none; color: var(--color-link); }
 a:hover { box-shadow:0 1px 0 0 var(--color-link); }
-a.anchor:before { content: "#" }
+a.anchor:before { content: "\2192" }
 a.anchor:hover { box-shadow: none; text-decoration: underline; }
-*:hover > a.anchor { visibility: visible }
+*:hover > a.anchor { 
+  visibility: visible;
+  cursor: pointer;
+ }
 a.anchor
 { visibility: hidden; position: absolute;
   font-weight: normal;
@@ -136,11 +147,11 @@ a.anchor
  }
 
 a.digodoc-opam { color: green; }
-a.digodoc-lib { color: purple; }
+a.digodoc-lib { color: purple;}
 
 *:target /* Linked highlight */
 { background-color: var(--color-bg-highlight);
-  box-shadow: 0 0 0 3px var(--color-bg-highlight) }
+  border-radius: 5px;}
 
 .xref-unresolved { box-shadow:0 1px 0 0 var(--color-broken-link)}
 
@@ -176,17 +187,44 @@ dt + dt { padding-top: var(--size-line) } /* When there are no doc strings */
 .variant .doc, .record .doc { padding-left: 1ch; }
 
 /* Indent on wrap */
-td.field, td.constructor, dt.spec { padding-left: 4ch; text-indent: -4ch }
+td.field, td.constructor { padding-left: 4ch; text-indent: -4ch ;
+  padding: 0px;
+  margin-bottom: 0.7ch;
+  padding-left: 0;
+  text-indent: 20px;
+  border-radius: 5px;
+  /*border-top-left-radius: 0%;
+  border-bottom-left-radius: 0%;*/
+  background-color: #ddd6d6;}
+  
+  dt.spec { padding-left: 4ch; text-indent: -4ch ;
+    padding: 10px;
+    box-shadow: -6px 0px 0px var(--color-code-keyword);
+    margin-bottom: 0.7ch;
+    padding-left: 10px;
+    text-indent: 20px;
+    border-radius: 5px;
+    /*border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;*/
+    background-color: #ddd6d6;}
+
 td.field > a.anchor, td.constructor > a.anchor,
-dt.spec > a.anchor { padding-right: 0.5ch; padding-left: 2ch; }
+dt.spec > a.anchor { padding-right: 0.5ch; padding-left: 0ch; opacity: 1; margin-left: -40px; }
 
 /* But we don't do it for types for now because of variants and
    records. This makes :target highlight be off. And poses
    other problems (e.g. need to indent back the last ] or }.
    A better markup strategy should be found here. */
-dt.spec.type { padding-left: 0; text-indent: 0 }
+dt.spec.type {
+  margin-top: 1.5ch;
+  padding-left: 10px;
+  text-indent: 20px;
+  border-radius: 5px;
+  background-color: #ddd6d6;
+}
 dt.spec.type > a.anchor
-{ padding-left: 1ch; padding-right: 1ch; /* values from a.anchor */ }
+{ padding-left: 0ch; padding-right: 5ch;
+  visibility: hidden; /* values from a.anchor */ }
 
 /* ocamldoc tags we'd like a targeting class and more info here
    https://github.com/ocaml/odoc/issues/329 */
@@ -197,26 +235,47 @@ dd dd { display: inline-block; }
 
 /* Code and code highlighting */
 
-code, pre
+code
 { font-family: var(--font-mono), monospace;
   font-weight: 400;
   font-size: calc(1em * var(--size-font-mono-ratio));
-  color: var(--color-code-fg); }
+  color: #000000;
+  background-color: #ddd6d6;
+  border-radius: 5px;
+}
+
+pre {
+  font-family: var(--font-mono), monospace;
+  font-weight: 400;
+  font-size: calc(1em * var(--size-font-mono-ratio));
+  color: var(--color-code-fg);
+  border-left-width: 5px;
+  border-color: #659CD6;
+  border-radius: 0.25rem;
+}
 
 code span, pre span /* Allows to use spans to control breakpoints */
 { display: inline-block;
   text-indent: 0; /* That bit is important because of dt.spec's text-indent */ }
 
-pre code { font-size: inherit } /* don't apply transform twice... */
+pre code { font-size: inherit;
+  color: white;
+  background-color: #000000;
+  padding-left: 10px;} /* don't apply transform twice... */
+
 a code { color: inherit }
 h1 code, h2 code, h3 code, h4 code, h5 code, h6 code { text-transform: none; }
 
-pre { background: var(--color-code-block-bg);
+pre { /*background: var(--color-code-block-bg);*/
+      /*box-shadow: -6px 0px 0px var(--color-code-keyword);*/
       padding-left: 0.8ch; padding-right: 0.8ch;
       margin-left: -0.8ch; margin-right: -0.8ch;
       padding-top: 1ch; padding-bottom: 1ch;
       white-space: pre-wrap;
-      word-wrap: break-word; }
+      word-wrap: break-word;
+      text-indent: 0;
+      background-color: #000000;
+      color: white; }
 
 .keyword , .hljs-keyword { color : var(--color-code-keyword); }
 .hljs-type { color : var(--color-code-type-id); }
@@ -229,7 +288,16 @@ pre { background: var(--color-code-block-bg);
    Is there a better way ? */
 
 .modules, .packages { list-style-type: none; margin-left: -2ch; }
-.modules li, .packages li { padding-left: 2ch; text-indent: -2ch; }
+
+.modules li, .packages li 
+{ padding-left: 2ch;
+  text-indent: -2ch;
+  /*********/
+  /*text-align: right;*/
+  /*text-align-last: right; or end*/ 
+
+  }
+
 .modules li a.anchor, .packages li a.anchor
 { padding-right: 0.5ch; padding-left: 2ch; }
 
@@ -254,8 +322,14 @@ h1 nav { display: inline-block;
 { font-family: var(--font-headings);
   font-size: var(--size-font-large);
   text-transform: uppercase;
-  margin-right: 1ch;
-  display: inline-block; }
+  margin-right: 0.25ch;
+  display: inline-block;
+  /*flex-direction: row;
+  flex-wrap: wrap;*/
+  text-align: center;
+  /* white-space: nowrap;  */
+  align-items: stretch;
+}
 
 .by-tag ol { list-style-type: none; }
 .by-tag ol.tags li { margin-left: 1ch; display: inline-block }
@@ -275,7 +349,7 @@ h1 nav { display: inline-block;
 {
   .content { padding: var(--size-line); }
   .content > * { width: 100%; }
-  .toc { position: static;
+  .toc { position: /*static*/absolute;
          margin: 0; margin-top: var(--size-line);
          width: 100%; }
   pre { font-size: var(--size-font-tiny); }
@@ -286,7 +360,7 @@ h1 nav { display: inline-block;
  * { -webkit-print-color-adjust: exact; }
  .content nav:first-child { visibility: hidden }
  .content > * { width: 100%; }
- .toc { position: static; width: 100%;
+ .toc { position: /*static*/absolute; width: 100%;
         margin: 0; margin-top: var(--size-line); }
 
  /* odig.light with slight adjustments */
@@ -296,7 +370,7 @@ h1 nav { display: inline-block;
    --color-fg: black;
    --color-rule: #DADBDB;
 
-   --color-code-block-bg: #E8E8E8;
+   --color-code-block-bg: #ddd6d6;
    --color-code-fg: #16191D;
    --color-code-comment: #747679;
    --color-code-keyword: #874aa9;
@@ -337,8 +411,7 @@ input#search {
   border-radius: 20px 20px 20px 20px;
   border: 0px;
   font-size: 15px;
-  width:206px;   
-  height: 25px;
+  width:206px;
   outline: none;
 }
 
@@ -357,6 +430,7 @@ input#search {
 
 .topnav td {
   vertical-align: middle;
+  width: 35%;
 }
 
 .topnav a:hover {
@@ -401,7 +475,7 @@ input#search {
 
 .search-index {
   float: left;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-right:20px;
 }
 
@@ -626,14 +700,34 @@ i {
 
 #entries-nav {
   font-size: 16px;
+<<<<<<< HEAD
   background-color: white;
   border: 1px solid #c4c4c4;
   width: 660px;
+=======
+  background-color: #f6f8fa;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border: 1px solid #c4c4c4;
+}
+
+
+#entries-nav {
+  font-size: 16px;
+  background-color: #f6f8fa;
+  border: 1px solid #c4c4c4;
+  width : 660px;
+  max-width: 78ch;
+  /*width: 75%;*/
+>>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
 }
 
 #entries-nav table {
   margin-top: 0px;
   height: 37px;
+  width: 75%;
  }
 
 #entries-nav td {
@@ -655,24 +749,41 @@ i {
 }
 
 #entries-nav a.active-nav {
-  background-color: #FF8F99;
+  /*background-color: #FF8F99;*/
+  background-color: #659CD6;
   color: white;
   border:1px solid #c4c4c4;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 #entries-nav span {
   font-size: 11px;
 }
 
+<<<<<<< HEAD
 #message-result {
   font-size: larger;
   font-weight: bold;
   color : red;
+=======
+
+#entries-nav {
+  font-size: 16px;
+  background-color: white;
+  border: 1px solid #c4c4c4;
+  width : 100%;
+  max-width: 110ch; /*make search bar fit with the result entries located just under*/
+>>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
 }
 
 #entries-nav table {
   margin-top: 0px;
   height: 37px;
+  width: 100%;
+  max-width: 110ch;
  }
 
 #entries-nav td {
@@ -685,6 +796,10 @@ i {
   border:1px solid #c4c4c4;
   color: #659CD6;
   --color-link: none;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
  }
 
 #entries-nav a {
@@ -694,7 +809,8 @@ i {
 }
 
 #entries-nav a.active-nav {
-  background-color: #FF8F99;
+  /*background-color: #FF8F99;*/
+  background-color: #659CD6;
   color: white;
   border:1px solid #c4c4c4;
 }
@@ -702,16 +818,23 @@ i {
 
 #form-div {
   text-align: center;
-  width: 25%;
-  margin-bottom: 30px;
-  background-color: #e4dede;
-  border: 2px solid #c4c4c4;
+  margin-top: -15px;
+  width: 100%;
+  background-color: #659CD6;
+  margin-bottom: 10px;
+  border: 1px solid #c4c4c4;
   padding: 20px;
-  border-radius: 40px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  max-width: 110ch;
+  display: none;
+  overflow: hidden;
 }
 
 #search-form {
-  display: inline;
+  display: inline-block;
 }
 
 #search-form table {
@@ -724,7 +847,12 @@ i {
 }
 
 #fpattern {
-  width: 100%;
+  width: 400px;
+  height: 30px;
+  border-width: 0px;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  align-items: center;
 }
 
 #update-filters {
@@ -748,6 +876,7 @@ i {
 
 #update-filters img {
   height: 20px;
+<<<<<<< HEAD
   margin-bottom: 5px;
 }
 
@@ -768,4 +897,283 @@ a.val {
   color : #B57EDC
 }
 
+=======
+}
+
+#result-div {
+  max-width: 110ch;
+  width: 100%;
+}
+
+/****************** #New search forms *******************************************/
+
+.collapsible-div {
+  margin-top: 10px;
+  /* background-color: 659CD #4caf50; */
+  background: linear-gradient(#874aa9, 5%, #659CD6);
+  color: whitesmoke;
+  cursor: pointer;
+  padding: 20px;
+  width: 100%;
+  max-width: 110ch;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-align: left;
+  outline: none;
+  font-size: var(--size-font-mono-ratio);
+}
+
+.collapsible-div:active, .collapsible-div:hover {
+  background-color: #659CD6;
+  border-top-color: rgb(196, 196, 196);
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-right-color: rgb(196, 196, 196);
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-bottom-color: rgb(196, 196, 196);
+  border-bottom-style: solid;
+  border-bottom-width: 0px; /*no bottom after collapse*/
+  border-left-color: rgb(196, 196, 196);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+  border-image-source: none;
+  border-image-width: 1;
+}
+
+/* .collapsible-div:after {
+  content: "\002B";
+  font-weight: bold;
+  float: right;
+}
+
+.collapsible-div:active:after {
+  content: "\2212";
+} */
+
+ 
+.inner-collapsible-content {
+  /*padding: 0 18px;*/
+  display: none;
+  overflow: hidden;
+  transition: max-height 0.9s ease-out;
+  background-color: #f1f1f1;
+}
+
+/****************** Switch button Styling ****************/
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #659CD6;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/*******************  Hide input text until checked in Search by function name/type **************/
+
+input[type="checkbox"] ~ input {
+  visibility: hidden;
+  opacity: 0;
+}
+
+input[type="checkbox"]:checked ~ input {
+  transition: visibility 0s, opacity 0.4s linear;
+  visibility: visible;
+  opacity: 1;
+}
+
+/******************  Round corners for text inputs ******************************************/
+
+/*#ftextmodule {
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  height: 20px;
+}*/
+
+/***************************************************************/
+
+.newSearchbyPack {
+  display: none;
+  background : white;
+  box-sizing: content-box;
+  cursor: pointer;
+  transition: 0.1s all;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  margin-top: 0;
+  overflow: auto;
+}
+
+.newSearchbyPack > .tag {
+  background: #4aa987;
+  margin: 2px;
+  color: white;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  padding-left: 4px;
+  display: inline list-item;
+}
+
+.newSearchbyPack > .tag :hover {
+  content: 'x';
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+}
+
+.newSearchbyPack > .tag > .remove {
+  content: 'x';
+  color: white;
+  padding-left: 0px;
+  margin: 1ch;
+}
+
+.newSearchbyPack > .tag > .remove:before {
+  color: white;
+  content: 'x';
+  padding-left: 0px;
+}
+
+.newSearchbyPack > input[name="packinput"]{
+  border-radius: 8px 8px 8px 8px;
+  border-color: #874aa9;
+  border-width: 0px;
+  font-size: 16px;
+  background: white;
+  padding: 4px;
+  width: 120px;
+  max-width: 10vw;
+  outline: none;
+}
+
+/*****************************************************************/
+
+.newSearchbyModule {
+  display: none;
+  background : white;
+  box-sizing: content-box;
+  cursor: pointer;
+  transition: 0.1s all;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  margin-top: 0;
+  overflow: auto;
+}
+
+.newSearchbyModule > .tag {
+  background: #4aa987;
+  margin: 2px;
+  color: white;
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  padding-left: 4px;
+  display: inline list-item;
+}
+
+.newSearchbyModule > .tag :hover {
+  content: 'x';
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+}
+
+.newSearchbyModule > .tag > .remove {
+  content: 'x';
+  color: white;
+  padding-left: 0px;
+  margin: 1ch;
+}
+
+.newSearchbyModule > .tag > .remove:before {
+  color: white;
+  content: 'x';
+  padding-left: 0px;
+}
+
+.newSearchbyModule > input[name="modinput"]{
+  border-radius: 8px 8px 8px 8px;
+  border-color: #874aa9;
+  border-width: 0px;
+  font-size: 16px;
+  background: white;
+  padding: 4px;
+  max-width: 8vw;
+  outline: none;
+}
+/****************************************************************/  
+
+/*#ftextpackages {
+  border-radius: 8px 8px 8px 8px;
+  border-width: 0px;
+  height: 20px;
+}*/
+
+.submitstyle {
+  margin-top: 10px;
+  width: 100px;
+  height: 40px;
+}
+
+/******************************************************************************************/
+
+
+
+
+>>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
 
