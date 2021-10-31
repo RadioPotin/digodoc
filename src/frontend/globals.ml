@@ -36,11 +36,11 @@ let document = Html.document
 type entry_state = Data_types.entry_info
 (** Entry state type. Used by index pages and by pages with search input to store information about entries.
     Alias to [Data_types.entry_info] used by server. *)
- 
+
 let entry_state = {
   entry = PACK;
   last_id = 0;
-  starts_with = ".";
+  starts_with = "^.";
   pattern = ""
 }
 (** Current entry state. *)

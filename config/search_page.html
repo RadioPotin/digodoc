@@ -1,7 +1,11 @@
 
 <button id="update-filters"><img src="static/imgs/filter.ico"/>Update filters</button>
+
+<button type="button" class="collapsible-div">Search by entry</button>
+
+
 <div id="form-div">
-  <form id="search-form">
+  <form id="entry-form">
     <table>
       <tbody>
         <tr>
@@ -48,6 +52,75 @@
       </tbody>
     </table>
   </form>
+
+  <button type="button" class="collapsible-div">Search by function name and types </button>
+
+<div id="form-div">
+  <form id="element-form">
+    <table>
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <label for="fpattern">Search pattern:</label>
+            <input type="text" id="fpattern" name="fpattern" value=""><br>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="switch">
+              <input type="checkbox" id="hideifchecked" checked onclick="myhider()">
+              <span class="slider round"></span>
+            </label>
+            <label>Pattern or <a style="color: green;">RegEx</a></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="fvalues" name="fvalues" value="Values">
+            <label for="fvalues">Values</label>
+          </td>
+          <td>
+            <input type="checkbox" id="fclass" name="fclass" value="Class">
+            <label for="fclass">Class</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="ftypes" name="ftypes" value="Types">
+            <label for="ftypes">Types</label><br>
+          </td>
+        </tr>
+        <tr id="tohide">
+          <td colspan="2">
+            <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
+            <label for="showpacksearch">in Packages</label>
+
+            <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
+              <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
+            </div>
+
+          </td>
+        </tr>
+        <tr id="tohide2">
+          <td colspan="2">
+            <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
+            <label for="showmodsearch">in Modules&nbsp;</label>
+
+            <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
+              <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
+            </div>
+
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" colspan="2">
+            <input type="submit" class="submitstyle" value="Search">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
 </div>
 <div id="entries-nav">
   <table>

@@ -239,7 +239,7 @@ let print_index bb index entity_name =
   StringMap.iter (fun i r ->
     Printf.bprintf bb {|
      <div id="packages-set-%s" class="packages-set">
-      <h3 id="name-%s" style="display:none">
+      <h3 id="name-%s">
         <a href="#name-%s" aria-hidden="true" class="anchor">
         </a>%s
       </h3>
