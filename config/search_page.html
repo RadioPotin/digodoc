@@ -1,12 +1,12 @@
-<button id="update-filters" style="display: none;"><img src="static/imgs/filter.ico" /></button>
+<button id="update-filters" style="display: none;"><img src="static/imgs/filter.ico" />Update filters</button>
 
 <!-- Search by entry 1-->
-<div id="forms">
+<div id="forms" style="display: none;">
 
   <button type="button" class="collapsible-div">Search by entry</button>
 
   <div class="form-div" style="display: block;">
-    <form id="entry-form">
+    <form class="search-form" id="entry-form">
       <table>
         <tbody>
           <tr>
@@ -56,19 +56,19 @@
   <button type="button" class="collapsible-div">Search by element</button>
 
   <div class="form-div" style="display: block;">
-    <form id="element-form">
+    <form class="search-form" id="element-form">
       <table>
         <tbody>
           <tr>
             <td colspan="2">
               <label for="fpattern_element">Search pattern:</label>
-              <input type="text" id="fpattern_element" name="fpattern_element" value=""><br>
+              <input type="text" class="fpattern" id="fpattern_element" name="fpattern_element" value=""><br>
             </td>
           </tr>
           <tr>
             <td>
               <label class="switch">
-                <input type="checkbox" id="hideifchecked" checked onclick="myhider()">
+                <input type="checkbox" id="fregex" checked onclick="myhider()">
                 <span class="slider round"></span>
               </label>
               <label>Pattern or <a style="color: green;">RegEx</a></label>
@@ -76,12 +76,12 @@
           </tr>
           <tr>
             <td>
-              <input type="checkbox" id="fvalues" name="fvalues" value="Values">
-              <label for="fvalues">Values</label>
+              <input type="checkbox" id="fvals" name="fvals" value="Values">
+              <label for="fvals">Values</label>
             </td>
             <td>
-              <input type="checkbox" id="fclass" name="fclass" value="Class">
-              <label for="fclass">Class</label>
+              <input type="checkbox" id="fclasses" name="fclasses" value="Classes">
+              <label for="fclass">Classes</label>
             </td>
           </tr>
           <tr>
@@ -119,7 +119,7 @@
   </div>
 </div>
 
-<div id="entries-nav">
+<div id="entries-nav" style="display: none;">
   <table>
     <tbody>
       <tr>
@@ -129,12 +129,14 @@
         <td><a id="metas-results" style="display: none;">Metas</a></td>
         <td><a id="sources-results" style="display: none;">Sources</a></td>
         <td><a id="vals-results" style="display: none;">Values</a></td>
+        <td><a id="types-results" style="display: none;">Types</a></td>
+        <td><a id="classes-results" style="display: none;">Classes</a></td>
       </tr>
     </tbody>
   </table>
 </div>
 
-<div id="result-div">
+<div id="result-div" style="display: none;">
   <div id="page-info">
 
   </div>
@@ -302,7 +304,7 @@
   /****************** Hide/Show packages and module option slider (green switch) ************************/
   function myhider() {
     /* Hide ftextpackages and ftextmodules if slidebox is unchecked*/
-    var zechecker = document.getElementById("hideifchecked");
+    var zechecker = document.getElementById("fregex");
     if (!zechecker.checked) {
       document.getElementById("tohide").style.display = "none";
       document.getElementById("tohide2").style.display = "none";

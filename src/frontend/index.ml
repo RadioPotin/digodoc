@@ -201,7 +201,7 @@ let set_search_handler () =
     let re = search##.value in
     let input = re##trim in
     (* Encode pattern to make it possible to use it as path segement while making request to server *)
-    entry_state.pattern <- UtilsEncoding.PathSegment.encode @@ to_string input;
+    entry_state.pattern <- encode_path_segment @@ to_string input;
     entry_state.last_id <- 0;
     (* Update page *)
     Lwt.async update_page;

@@ -67,6 +67,15 @@ type pagination_info = {
 
 (** {1 Useful functions} *)
 
+let logs s = Firebug.console##log (js s)
+(** [logs s] prints [s] in console. *)
+
+let warn s = Firebug.console##warn (js s)
+(** [warn s] prints [s] in console as a warning. *)
+
+let err s = Firebug.console##error (js s)
+(** [err s] prints [s] in console as an error. *)
+
 exception Web_app_error of string list
 (** Raised by frontend functions while occuring an error. 
     Exception keeps all occured error messages in the list. *)
@@ -76,14 +85,9 @@ let web_app_error ?(errors=[]) mess  =
 (** [web_app_error ~errors mess] creates [Web_app_error] and adds [mess] error message 
     to the list of error messages [errors]. *)
 
-let logs s = Firebug.console##log (js s)
-(** [logs s] prints [s] in console. *)
-
-let warn s = Firebug.console##warn (js s)
-(** [warn s] prints [s] in console as a warning. *)
-
-let err s = Firebug.console##error (js s)
-(** [err s] prints [s] in console as an error. *)
+let print_web_app_error errors =
+  List.iter (fun error -> err error) errors
+(** Print web_app_errors in the console *)
 
 let unoptdef (optdef : 'a optdef) : 'a  =
   Optdef.get 
@@ -140,6 +144,9 @@ let encode_query_val qval =
 let decode_query_val qval =
   Uri.pct_decode qval
 (** [decode_query_val qval] decodes a segment of query string [qval] using module [Uri] *)
+
+let encode_path_segment = UtilsEncoding.PathSegment.encode
+(** Same as [UtilsEncoding.PathSegment.encode] *)
 
 let invalid_input (input : string) =
   let input = get_element_by_id input in 

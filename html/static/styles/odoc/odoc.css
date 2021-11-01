@@ -700,28 +700,14 @@ i {
 
 #entries-nav {
   font-size: 16px;
-<<<<<<< HEAD
   background-color: white;
-  border: 1px solid #c4c4c4;
-  width: 660px;
-=======
-  background-color: #f6f8fa;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   border: 1px solid #c4c4c4;
-}
-
-
-#entries-nav {
-  font-size: 16px;
-  background-color: #f6f8fa;
-  border: 1px solid #c4c4c4;
-  width : 660px;
-  max-width: 78ch;
-  /*width: 75%;*/
->>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
+  width : 100%;
+  max-width: 110ch;
 }
 
 #entries-nav table {
@@ -763,12 +749,11 @@ i {
   font-size: 11px;
 }
 
-<<<<<<< HEAD
 #message-result {
   font-size: larger;
   font-weight: bold;
   color : red;
-=======
+}
 
 #entries-nav {
   font-size: 16px;
@@ -776,7 +761,6 @@ i {
   border: 1px solid #c4c4c4;
   width : 100%;
   max-width: 110ch; /*make search bar fit with the result entries located just under*/
->>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
 }
 
 #entries-nav table {
@@ -816,7 +800,7 @@ i {
 }
 
 
-#form-div {
+.form-div {
   text-align: center;
   margin-top: -15px;
   width: 100%;
@@ -833,20 +817,20 @@ i {
   overflow: hidden;
 }
 
-#search-form {
+.search-form {
   display: inline-block;
 }
 
-#search-form table {
+.search-form table {
   display: block;
   margin: 0px;
 }
 
-#search-form td {
+.search-form td {
   text-align: left;
 }
 
-#fpattern {
+.fpattern {
   width: 400px;
   height: 30px;
   border-width: 0px;
@@ -867,7 +851,7 @@ i {
   background: none;
   opacity: .3;
   width: 100px;
-  margin-bottom: 25px;
+  margin-bottom: 50px;
 }
 
 #update-filters:hover {
@@ -876,7 +860,6 @@ i {
 
 #update-filters img {
   height: 20px;
-<<<<<<< HEAD
   margin-bottom: 5px;
 }
 
@@ -895,9 +878,6 @@ a.val {
 
 .type-annot {
   color : #B57EDC
-}
-
-=======
 }
 
 #result-div {
@@ -1175,5 +1155,4 @@ input[type="checkbox"]:checked ~ input {
 
 
 
->>>>>>> f29f738b54d230a0666dd481ae031a607b8e7548
 

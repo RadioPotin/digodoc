@@ -110,7 +110,7 @@ let state_of_args args =
             | "entry" -> state.entries <- EntrySet.add (entry_type_of_string elt) state.entries
             | "current" -> state.current_entry <- entry_type_of_string elt
             | "page" -> state.page <- int_of_string elt
-            | _ -> raise @@ web_app_error (Printf.sprintf "entry_state_of_args: key %s is not recognised" key)
+            | _ -> raise @@ web_app_error (Printf.sprintf "state_of_args: key %s is not recognised" key)
             )
             args;
         SearchEntry state
@@ -120,7 +120,7 @@ let state_of_args args =
               elements = ElementSet.empty; 
               current_element = VAL; 
               page = 1; 
-              regex = false;
+              regex = true;
               in_opams = StringSet.empty;
               in_mdls = StringSet.empty 
             } 
@@ -132,14 +132,15 @@ let state_of_args args =
             | "pattern" -> state.pattern <- decode_query_val elt
             | "element" -> state.elements <- ElementSet.add (element_type_of_string elt) state.elements
             | "current" -> state.current_element <- element_type_of_string elt
+            | "mode" -> (match elt with "text" -> state.regex <- false | _ -> state.regex <- true)
             | "page" -> state.page <- int_of_string elt
             | "opam" -> state.in_opams <- StringSet.add (decode_query_val elt) state.in_opams
             | "mdl" -> state.in_mdls <- StringSet.add (decode_query_val elt) state.in_mdls
-            | _ -> raise @@ web_app_error (Printf.sprintf "entry_state_of_args: key %s is not recognised" key)
+            | _ -> raise @@ web_app_error (Printf.sprintf "state_of_args: key %s is not recognised" key)
             )
             args;
         SearchElement state
-    | s -> raise @@ web_app_error (Printf.sprintf "entry_state_of_args: search type %s is not recognised" s)
+    | s -> raise @@ web_app_error (Printf.sprintf "state_of_args: search type %s is not recognised" s)
 (** [state_of_args args] constructs and returns search state from the arguments passed with query in URL.
     Raises [Web_app_error] if argument are invalid *)
 
@@ -157,14 +158,14 @@ let state_to_args state =
             page
     | SearchElement {pattern; elements; current_element; page; regex; in_opams; in_mdls} ->
         (* constructs query string from element state *)
-        Printf.sprintf "search=element&pattern=%s&%s&current=%s&page=%d&regex=%b&%s&%s"
+        Printf.sprintf "search=element&pattern=%s&%s&current=%s&page=%d&mode=%s&%s&%s"
             (encode_query_val pattern)
             (String.concat "&" 
                 @@ List.map (fun elt -> ("element=" ^ element_type_to_string elt)) 
                 @@ ElementSet.elements elements)
             (element_type_to_string current_element)
             page
-            regex
+            (if regex then "regex" else "text")
             (String.concat "&" 
                 @@ List.map (fun elt -> ("opam=" ^ elt)) 
                 @@ StringSet.elements in_opams)
@@ -191,9 +192,9 @@ let entry_state_to_entry_info {pattern; current_entry; page; _} =
     let open Data_types in
     {
         entry = current_entry;
-        pattern;
+        pattern = encode_path_segment pattern;
         last_id = (page - 1) * 50;
-        starts_with = "."
+        starts_with = "^."
     }
 (** Converts [entry_search_state] to [Data_types.entry_info] *)
 
@@ -201,12 +202,12 @@ let element_state_to_element_info {pattern; current_element; regex; page; in_opa
     let open Data_types in
     {
         element = current_element;
-        pattern;
+        pattern = encode_path_segment pattern;
         last_id = (page - 1) * 50;
         mode = if regex then Regex else Text;
         conditions = 
-            List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-            @ List.map (fun mdl -> In_mdl mdl)  (StringSet.elements in_mdls)
+            List.map (fun opam -> In_opam (encode_path_segment opam)) (StringSet.elements in_opams)
+            @ List.map (fun mdl -> In_mdl (encode_path_segment mdl))  (StringSet.elements in_mdls)
     }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
@@ -268,15 +269,15 @@ let update_entry_state () =
 let update_element_state () =
     (* Look up either checkbox is checked or not. If checked, add corresponding element to the state *)
     let handle_checkbox id state =
-        let entry =
+        let element =
             match id with
             | "fvals" -> VAL
             | _ -> raise @@
                     web_app_error (Printf.sprintf "update_element_state: can't find %s id" id)       
         in
             if to_bool @@ (get_input id)##.checked
-            then state.elements <- ElementSet.add entry state.elements
-            else state.elements <- ElementSet.remove entry state.elements
+            then (state.elements <- ElementSet.add element state.elements; logs ("elt="^element_type_to_string element))
+            else state.elements <- ElementSet.remove element state.elements
     in
         (* Init entry search state *)
         let element_state =  { 
@@ -284,17 +285,18 @@ let update_element_state () =
             elements = ElementSet.empty; 
             current_element = VAL; 
             page = 1;
-            regex = false;
+            regex = true;
             in_opams = StringSet.empty;
             in_mdls = StringSet.empty 
         } in 
         let pattern_input = get_input "fpattern_element" in
         let value = to_string pattern_input##.value##trim in
+        logs ("value="^value);
         element_state.pattern <- value;
         (* Handle checkboxes *)
         handle_checkbox "fvals" element_state;
         element_state.regex <- to_bool (get_input "fregex")##.checked;
-        (* TODO : get opams and mdls *)
+        (* TODO : get opams and mdls names from tags *)
         element_state.in_opams <- StringSet.empty;
         element_state.in_mdls <- StringSet.empty;
         match element_state.elements with
@@ -313,7 +315,8 @@ let update_form () =
         (get_input id)##.checked := bool true
     in
         match !search_state with
-        | Uninitialized -> assert false 
+        | Uninitialized -> 
+            raise @@ web_app_error "update_form: search is unitialised" 
         | SearchEntry state -> 
              (* update entry form *)
             (get_input "fpattern_entry")##.value := js state.pattern; 
@@ -325,8 +328,9 @@ let update_form () =
             ElementSet.iter (fun element ->  check_input @@ "f" ^ element_type_to_string element)
                 state.elements;
             if state.regex then check_input "fregex"
-            (* TODO: update form with in_opams and in_mdls *)
+            (* TODO: update tags lists with content from state.in_opams and state.in_mdls *)
 (** Looks for state in order to update corresponding form *)
+
 (*
 let toggle_pack () =
     let checker = get_input "showpacksearch" 
@@ -393,10 +397,10 @@ let set_handlers () =
     );
     (* Handler called when onclick event was generated by 'update filters' button *)
     update_button##.onclick := Html.handler (fun _ ->
-        let form = get_element_by_id "form-div" in
-        (* display form and hide update button *)
+        let form_div = get_element_by_id "forms" in
+        (* display forms and hide update button *)
         update_button##.style##.display := js "none";
-        form##.style##.display := js "";
+        form_div##.style##.display := js "";
         (* fills form from state *)
         update_form ();
         _false
@@ -432,12 +436,8 @@ let initialise_state () =
 (** Initialises state by looking up current URL arguments (query string) *)
 
 let uninitialized_page () =
-    let button = get_element_by_id "update-filters" 
-    and results = get_element_by_id "result-div" 
-    and entries_nav = get_element_by_id "entries-nav" in
-    button##.style##.display := js "none";
-    results##.style##.display := js "none";
-    entries_nav##.style##.display := js "none";
+    let forms = get_element_by_id "forms" in 
+    forms##.style##.display := js "";
     Lwt.return_unit
 (** Displays unitialized version of the page. *)
 
@@ -517,6 +517,12 @@ let insert_content info current current_number =
         Lwt.return_unit
     (* insert error message *)
     and insert_error err =
+        (* hide displayed previously elements *)
+        let update_button = get_element_by_id "update-filters"
+        and entries_nav = get_element_by_id "entries-nav" in
+        update_button##.style##.display := js "none";
+        entries_nav##.style##.display := js "none";
+        (* print error message *)
         begin 
             match err with
             | Invalid_regex -> 
@@ -593,25 +599,30 @@ let search_page () =
             link##setAttribute (js "href") (js href)
     in
     let current = get_current !search_state in 
-    let form = get_element_by_id "form-div" 
+    let update_button = get_element_by_id "update-filters"
+    and entries_nav = get_element_by_id "entries-nav"
+    and result_div = get_element_by_id "result-div"
     and result_nav = get_element_by_id @@ current ^ "-results" 
     and results = get_element_by_id "results-list" in
-    (* hide form, display results, set active nav *)
+    (* display results, entries bar, update button and set active nav *)
+    update_button##.style##.display := js "";
+    entries_nav##.style##.display := js "";
+    result_div##.style##.display := js "";
     results##.innerHTML := js "";
-    form##.style##.display := js "none";
     result_nav##.className := js "active-nav";
     let elts = get_elts_from_state !search_state
     and info = state_to_info !search_state
-    (* number of current entries *)
+    (* number of current entries/elements *)
     and current_number = ref "" in
-    Lwt.async (fun () ->
+    let%lwt () =
         (* for every entry/element type *)
         Lwt_list.iter_p (fun elt ->  
                 let nav_bar = get_element_by_id @@ elt ^ "-results" in
                 (* set the link to the navigation item that leads to search page for corresponding entry/element *)
-                link_to_elt (set_current !search_state elt) nav_bar;
+                let st = set_current !search_state elt in
+                link_to_elt st nav_bar;
                 Requests.send_generic_request
-                    ~request:(Requests.getNumber info)
+                    ~request:(Requests.getNumber (state_to_info st))
                     ~callback:(fun number ->
                         (* display entries/elements number associated to the navigation item *)
                         if elt = current then current_number:=number;
@@ -625,17 +636,19 @@ let search_page () =
                     ()
             )
             elts
-        );
-    (* insert page content *)
-    insert_content info current !current_number  
+    in
+        (* insert page content *)
+        insert_content info current !current_number  
 (** Constructs and displays entirely search page. *)
-
 
 let onload () =
     (* set handlers to page elements *)
+    logs "1";
     set_handlers ();
     (* initialise state from query string, if exists, else state stays uninitialized *)
+    logs "2";
     initialise_state ();
+    logs "3";
     match !search_state with
     | Uninitialized -> uninitialized_page ()
     | _ -> search_page ()

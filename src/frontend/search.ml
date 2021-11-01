@@ -59,7 +59,7 @@ let clear_search () =
 
 let update_search pattern =
     (* Encode pattern as path segment *)
-    let pattern = UtilsEncoding.PathSegment.encode pattern in 
+    let pattern = encode_path_segment pattern in 
     (* Sends request to get and display search results *)
     Lwt.async @@ 
         Requests.send_generic_request

@@ -27,7 +27,15 @@ let genericHandler handler =
         ~request:Requests.api_host
         ~callback:(fun _ ->
           (* call specific to page handler handler *)
-          let%lwt () = handler () in
+          let%lwt () = 
+            try
+              handler () 
+            with 
+              | Web_app_error errors -> 
+              (** print all occured errors *)
+                print_web_app_error errors;
+                Lwt.return_unit
+          in
           (* adjust footer *)
           Headfoot.footerHandler ();
           Lwt.return_unit
@@ -38,7 +46,7 @@ let genericHandler handler =
   )
 (** [genericHandler handler] is a generic onload handler used by all the pages. It determines some common behaviour,
     like initilisation of api host, header activation and footer adjustment. [handler] is a specific handler that is executed
-    in the common for all pages context. *)
+    in the common for all pages context. Catches and prints [Web_app_error] *)
 
 let main () =
   (* footer handler *)

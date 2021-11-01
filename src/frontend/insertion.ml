@@ -438,7 +438,7 @@ let insert_vals_search : vals_jsoo t -> unit  =
                 let vall = Html.createLi document in
                 set_attr vall "class" (js "package");
                 (* Append keyword 'val' *)
-                let vall_word = Html.createCode document in
+                let vall_word = Html.createSpan document in
                 set_attr vall_word "class" (js "keyword");
                 append_inner vall_word (js "val ");
                 Dom.appendChild vall vall_word;
@@ -451,7 +451,7 @@ let insert_vals_search : vals_jsoo t -> unit  =
                 Dom.appendChild vall vall_ident;
                 append_inner vall (js " : ");
                 (* Append val type *)
-                let vall_val = Html.createCode document in
+                let vall_val = Html.createSpan document in
                 set_attr vall_val "class" (js "type-annot");
                 append_inner vall_val elt##.value;
                 Dom.appendChild vall vall_val;
