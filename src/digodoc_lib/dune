@@ -4,7 +4,7 @@
   (name digodoc_lib)
   (public_name digodoc_lib)
   (wrapped true)
-  (libraries omd meta_file lwt htmlize ez_opam_file ez_html ez_file digodoc_common cohttp-lwt-unix cohttp-lwt lwt.unix)
+  (libraries omd meta_file lwt htmlize ez_opam_file ez_html ez_file digodoc_common cohttp-lwt-unix cohttp-lwt lwt.unix compiler-libs.common)
   
   
   )

@@ -10,6 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Module [Objects] contains all js objects converted from OCaml data structure or created by js_of_ocaml. *)
 
 type nonrec opam_entry = Data_types.opam_entry = {
   name : string; 
@@ -17,9 +18,11 @@ type nonrec opam_entry = Data_types.opam_entry = {
   version : string; 
   synopsis : string;
 } [@@deriving jsoo]
+(** Conversion from [Data_types.opam_entry] to js object *)
 
 type nonrec packages = opam_entry list 
 [@@deriving jsoo]
+(** Conversion from [Data_types.packages] to js object *)
 
 type nonrec lib_entry = Data_types.lib_entry = {
   name : string;
@@ -27,9 +30,11 @@ type nonrec lib_entry = Data_types.lib_entry = {
   opam : string;
   opampath: string; 
 } [@@deriving jsoo]
+(** Conversion from [Data_types.lib_entry] to js object *)
 
 type nonrec libraries = lib_entry list
 [@@deriving jsoo]
+(** Conversion from [Data_types.libraries] to js object *)
 
 type nonrec meta_entry = Data_types.meta_entry = {
   name : string ;
@@ -37,9 +42,11 @@ type nonrec meta_entry = Data_types.meta_entry = {
   opam : string ;
   opampath : string;
 } [@@deriving jsoo]
+(** Conversion from [Data_types.meta_entry] to js object *)
 
 type nonrec metas = meta_entry list
 [@@deriving jsoo]
+(** Conversion from [Data_types.metas] to js object *)
 
 type module_entry = Data_types.module_entry = {
   name : string;
@@ -48,8 +55,10 @@ type module_entry = Data_types.module_entry = {
   opampath : string;
   libs : (string * string) list;
 } [@@deriving jsoo]
+(** Conversion from [Data_types.module_entry] to js object *)
 
 type nonrec modules  = module_entry list [@@deriving jsoo]
+(** Conversion from [Data_types.modules] to js object *)
 
 type nonrec source_entry = Data_types.source_entry = {
   name : string;
@@ -57,8 +66,24 @@ type nonrec source_entry = Data_types.source_entry = {
   opam : string;
   opampath : string;
 } [@@deriving jsoo]
+(** Conversion from [Data_types.source_entry] to js object *)
 
 type nonrec sources = source_entry list [@@deriving jsoo]
+(** Conversion from [Data_types.sources] to js object *)
+
+type nonrec val_element = Data_types.val_element = {
+  ident : string;
+  value : string;
+  mdl : string;
+  mdlpath : string;
+  opam : string;
+  opampath : string;
+}
+[@@deriving jsoo]
+(** Conversion from [Data_types.val_element] to js object *)
+
+type nonrec vals = val_element list [@@deriving jsoo]
+(** Conversion from [Data_types.vals] to js object *)
 
 type nonrec search_result = Data_types.search_result = {
   packages : packages;
@@ -66,3 +91,4 @@ type nonrec search_result = Data_types.search_result = {
   modules : modules;
 }
 [@@deriving jsoo]
+(** Conversion from [Data_types.search_result] to js object *)

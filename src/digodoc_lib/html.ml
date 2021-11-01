@@ -238,30 +238,34 @@ let add_header_footer () =
       ) html_dir
 
 let adjust_upper_link () =
-  let update_doc path upper = 
-    let file = path // "index.html" in
+  let update_doc path ?(filename="index.html") upper = 
+    let file = path // filename in
     let html = EzFile.read_file file in
     let html' = Patchtml.change_link_to_upper_directory html upper in 
     EzFile.remove file;
     EzFile.write_file file html'
-  in 
-  let html_dir = digodoc_html_dir in 
-  Array.iter (fun file ->
-      let path = html_dir // file in
-      let preffix,_ = EzString.cut_at file '.' in
-      match preffix with
-      | "MODULE" -> begin
+  in  
+    let html_dir = digodoc_html_dir in 
+    Array.iter (fun file ->
+        let path = html_dir // file in
+        let preffix,_ = EzString.cut_at file '.' in
+        match preffix with
+        | "MODULE" -> begin
           Array.iter (fun modul ->
               let path = path // modul in 
               if EzFile.is_directory path then update_doc path "modules.html"
             ) 
             (EzFile.read_dir path)
         end
-      | "LIBRARY" -> update_doc path "libraries.html"
-      | "META" -> update_doc path "metas.html"
-      | _ -> update_doc path "packages.html"
-    )
-    (EzFile.read_dir html_dir)
+        | "LIBRARY" -> update_doc path "libraries.html"
+        | "META" -> update_doc path "metas.html"
+        | "PAGES" ->
+          if EzFile.exists (path // "index.html")
+          then update_doc path "packages.html"
+          else update_doc path "packages.html" ~filename:(EzFile.readdir path).(0)
+        | _ -> update_doc path "packages.html"
+      )
+      (EzFile.read_dir html_dir)
 
 
 

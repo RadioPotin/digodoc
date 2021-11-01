@@ -929,10 +929,14 @@ let generate_module_entries state =
 
   List.iter (fun ( _ , mdl ) ->
       let pkg = pkg_of_mdl mdl in
-      if StringSet.mem "cmi" mdl.mdl_exts then
-      Index.SAVE.save_module_entry
-        ( Globals.digodoc_html_dir // pkg // "ENTRY.MODULE." ^ mdl.mdl_name )
-        mdl ;
+      if StringSet.mem "cmi" mdl.mdl_exts then begin 
+        Index.SAVE.save_module_entry
+          ( Globals.digodoc_html_dir // pkg // "ENTRY.MODULE." ^ mdl.mdl_name )
+          mdl;
+        Index.SAVE.save_module_vals
+          ( Globals.digodoc_html_dir // pkg // "VALS.MODULE." ^ mdl.mdl_name )
+          mdl 
+      end
     ) state.ocaml_mdls ;
 
   ()
