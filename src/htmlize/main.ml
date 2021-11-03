@@ -57,7 +57,6 @@ let htmlize filename content =
     in 
     Printf.bprintf b {|<div class="md-content">%s</div>|} content;
     Buffer.contents b
-
   | "jpeg" | "jpg" | "png" |"apng" | "gif" | "tiff" | "avif" | "svg" | "bmp" | "webp" ->
     let content = Patchtml.render_img filename in
     Printf.bprintf b {|%s|} content;

@@ -1,126 +1,160 @@
-<button id="update-filters"><img src="static/imgs/filter.ico" /></button>
+<button id="update-filters" style="display: none;"><img src="static/imgs/filter.ico" />Update filters</button>
 
-<!-- Recherche par entrée 1-->
+<!-- Search by entry 1-->
+<div id="forms" style="display: none;">
+ 
+  <button type="button" class="collapsible-div">Search by entry</button>
 
-<button type="button" class="collapsible-div">Search by entry</button>
+  <div class="form-div" style="display: block;">
+    <form class="search-form" id="entry-form">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="fpattern_entry">Search pattern:</label><br>
+              <input type="text" id="fpattern_entry" name="fpattern_entry" value=""><br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
+              <label for="fpackages">Packages</label>
+            </td>
+            <td>
+              <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
+              <label for="flibraries">Libraries</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
+              <label for="fmodules">Modules</label><br>
+            </td>
+            <td>
+              <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
+              <label for="fmetas">Metas</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fsources" name="fsources" value="Sources">
+              <label for="fsources">Sources</label><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="2">
+              <input type="submit" class="submitstyle" value="Search">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
 
-<div id="form-div" style="display: block;">
-  <form id="search-form">
-    <table>
-      <tbody>
-        <tr>
-          <td colspan="2">
-            <label for="fpattern">Search pattern:</label><br>
-            <input type="text" id="fpattern" name="fpattern" value=""><br>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fpackages" name="fpackages" value="Packages">
-            <label for="fpackages">Packages</label>
-          </td>
-          <td>
-            <input type="checkbox" id="flibraries" name="flibraries" value="Libraries">
-            <label for="flibraries">Libraries</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fmodules" name="fmodules" value="Modules">
-            <label for="fmodules">Modules</label><br>
-          </td>
-          <td>
-            <input type="checkbox" id="fmetas" name="fmetas" value="Metas">
-            <label for="fmetas">Metas</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fsources" name="fsources" value="Sources">
-            <label for="fsources">Sources</label><br>
-          </td>
-          <td>
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align: center;" colspan="2">
-            <input type="submit" class="submitstyle" value="Search">
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </form>
+  <!-- Search by functions, types, classes, etc. -->
+
+  <button type="button" class="collapsible-div">Search by element</button>
+
+  <div class="form-div" style="display: block;">
+    <form class="search-form" id="element-form">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="2">
+              <label for="fpattern_element">Search pattern:</label>
+              <input type="text" class="fpattern" id="fpattern_element" name="fpattern_element" value=""><br>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="fregex" checked onclick="myhider()">
+                <span class="slider round"></span>
+              </label>
+              <label>Pattern or <a style="color: green;">RegEx</a></label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="fvals" name="fvals" value="Values">
+              <label for="fvals">Values</label>
+            </td>
+            <td>
+              <input type="checkbox" id="fclasses" name="fclasses" value="Classes">
+              <label for="fclass">Classes</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="ftypes" name="ftypes" value="Types">
+              <label for="ftypes">Types</label><br>
+            </td>
+          </tr>
+          <tr id="tohide">
+            <td colspan="2">
+              <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
+              <label for="showpacksearch">in Packages</label>
+              <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
+                <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
+              </div>
+            </td>
+          </tr>
+          <tr id="tohide2">
+            <td colspan="2">
+              <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
+              <label for="showmodsearch">in Modules&nbsp;</label>
+              <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
+                <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="2">
+              <input type="submit" class="submitstyle" value="Search">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
 </div>
 
-<!-- Recherche par fonction et types -->
+<div id="entries-nav" style="display: none;">
+  <table>
+    <tbody>
+      <tr>
+        <td><a id="packages-results" style="display: none;">Packages</a></td>
+        <td><a id="libraries-results" style="display: none;">Libraries</a></td>
+        <td><a id="modules-results" style="display: none;">Modules</a></td>
+        <td><a id="metas-results" style="display: none;">Metas</a></td>
+        <td><a id="sources-results" style="display: none;">Sources</a></td>
+        <td><a id="vals-results" style="display: none;">Values</a></td>
+        <td><a id="types-results" style="display: none;">Types</a></td>
+        <td><a id="classes-results" style="display: none;">Classes</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-<button type="button" class="collapsible-div">Search by function name and types </button>
+<div id="result-div" style="display: none;">
+  <div id="page-info">
 
-<div id="form-div">
-  <form id="search-form">
-    <table>
-      <tbody>
-        <tr>
-          <td colspan="2">
-            <label for="fpattern">Search pattern:</label>
-            <input type="text" id="fpattern" name="fpattern" value=""><br>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label class="switch">
-              <input type="checkbox" id="hideifchecked" checked onclick="myhider()">
-              <span class="slider round"></span>
-            </label>
-            <label>Pattern or <a style="color: green;">RegEx</a></label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="fvalues" name="fvalues" value="Values">
-            <label for="fvalues">Values</label>
-          </td>
-          <td>
-            <input type="checkbox" id="fclass" name="fclass" value="Class">
-            <label for="fclass">Class</label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="checkbox" id="ftypes" name="ftypes" value="Types">
-            <label for="ftypes">Types</label><br>
-          </td>
-        </tr>
-        <tr id="tohide">
-          <td colspan="2">
-            <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
-            <label for="showpacksearch">in Packages</label>
+  </div>
+  <div id="results">
+    <ol id="results-list">
 
-            <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
-              <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
-            </div>
-
-          </td>
-        </tr>
-        <tr id="tohide2">
-          <td colspan="2">
-            <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
-            <label for="showmodsearch">in Modules&nbsp;</label>
-
-            <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
-              <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
-            </div>
-
-          </td>
-        </tr>
-        <tr>
-          <td style="text-align: center;" colspan="2">
-            <input type="submit" class="submitstyle" value="Search">
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </form>
+    </ol>
+  </div>
+  <nav id="pagination-nav">
+    <a id="previous-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M14.5 19v-3h5v-3h-5v-3L9 14.5z"></path></svg>
+    </a>
+    <ol id="pages">
+    </ol>
+    <a id="next-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M15 19v-3h-5v-3h5v-3l5.5 4.5z"></path></svg>
+    </a>
+  </nav>
 </div>
 
 <!-- Javascript functions and scripts used in the search page -->
@@ -269,7 +303,7 @@
   /****************** Hide/Show packages and module option slider (green switch) ************************/
   function myhider() {
     /* Hide ftextpackages and ftextmodules if slidebox is unchecked*/
-    var zechecker = document.getElementById("hideifchecked");
+    var zechecker = document.getElementById("fregex");
     if (!zechecker.checked) {
       document.getElementById("tohide").style.display = "none";
       document.getElementById("tohide2").style.display = "none";
@@ -375,37 +409,3 @@
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 </script>
-
-<div id="entries-nav">
-  <table>
-    <tbody>
-    <tr>
-      <td><a id="packages-results" style="display: none;">Packages</a></td>
-      <td><a id="libraries-results" style="display: none;">Libraries</a></td>
-      <td><a id="modules-results" style="display: none;">Modules</a></td>
-      <td><a id="metas-results" style="display: none;">Metas</a></td>
-      <td><a id="sources-results" style="display: none;">Sources</a></td>
-    </tr>
-    </tbody>
-  </table>
-  </div>
-<div id="result-div">
-  <div id="page-info">
-
-  </div>
-  <div id="results">
-    <ol id="results-list">
-
-    </ol>
-  </div>
-  <nav id="pagination-nav">
-    <a id="previous-page" style="display: none;" href="">
-      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M14.5 19v-3h5v-3h-5v-3L9 14.5z"></path></svg>
-    </a>
-    <ol id="pages">
-    </ol>
-    <a id="next-page" style="display: none;" href="">
-      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M15 19v-3h-5v-3h5v-3l5.5 4.5z"></path></svg>
-    </a>
-  </nav>
-</div>
