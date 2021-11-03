@@ -412,6 +412,7 @@ input#search {
   border: 0px;
   font-size: 15px;
   width:206px;
+  height: 25px;
   outline: none;
 }
 
@@ -430,7 +431,7 @@ input#search {
 
 .topnav td {
   vertical-align: middle;
-  width: 35%;
+  /*width: 35%;*/    /*made input search misaligned in header*/
 }
 
 .topnav a:hover {
@@ -877,7 +878,6 @@ i {
 
 .collapsible-div {
   margin-top: 10px;
-  /* background-color: 659CD #4caf50; */
   background: linear-gradient(#874aa9, 5%, #659CD6);
   color: whitesmoke;
   cursor: pointer;
@@ -1027,7 +1027,6 @@ input[type="checkbox"]:checked ~ input {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   margin-top: 0;
-  overflow: auto;
 }
 
 .newSearchbyPack > .tag {
@@ -1067,8 +1066,29 @@ input[type="checkbox"]:checked ~ input {
   background: white;
   padding: 4px;
   width: 120px;
-  max-width: 10vw;
+  max-width: 15vw;
   outline: none;
+}
+
+.packsUl {
+    display: none;
+    list-style-type: none;
+    width: inherit;
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.packsUl > li {
+  font-size: 14px;
+  display: none;
+  width: inherit;
+}
+
+.packsUl > a {
+  font-size: 14px;
+  display: none;
+  width: inherit;
 }
 
 /*****************************************************************/
@@ -1082,7 +1102,8 @@ input[type="checkbox"]:checked ~ input {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   margin-top: 0;
-  overflow: auto;
+  /*max-width: 53ch*/
+  overflow-x: auto;
 }
 
 .newSearchbyModule > .tag {
@@ -1121,9 +1142,32 @@ input[type="checkbox"]:checked ~ input {
   font-size: 16px;
   background: white;
   padding: 4px;
-  max-width: 8vw;
+  width: 120px;
+  max-width: 15vw;
   outline: none;
 }
+
+.modsUl {
+  display: none;
+  list-style-type: none;
+  width: inherit;
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.modsUl > li {
+font-size: 14px;
+display: none;
+width: inherit;
+}
+
+.modsUl > a {
+font-size: 14px;
+display: none;
+width: inherit;
+}
+
 /****************************************************************/  
 
 /*#ftextpackages {

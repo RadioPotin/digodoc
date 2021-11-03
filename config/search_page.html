@@ -183,7 +183,6 @@
   var packinput_ele = document.getElementById('ftextpackages');
   packinput_ele.addEventListener('keydown', function (e) {
     if (e.keyCode == 32) {
-      e.preventDefault();
       var cur_value = document.querySelector('input[name="packinput"]');
       var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
         : "";
@@ -207,7 +206,7 @@
         var alltags = document.getElementsByClassName('tag');
         for (var i = 0; i < alltags.length; i++) {
           if (alltags[i].innerText == neat_value) {
-            packinput_ele.classList.add('animated bounce'); /* Not usefull for the moment*/
+            packinput_ele.classList.add('animated bounce'); /* Useless for the moment */
             alert('Error : Tag already exists');
           }
         }
@@ -294,7 +293,7 @@
   var modinput_ele = document.getElementById('ftextmodules');
   modinput_ele.addEventListener('keydown', function (e) {
     if (e.keyCode == 32) {
-      e.preventDefault();
+      //e.preventDefault();
       var cur_value = document.querySelector('input[name="modinput"]');
       var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
         : "";
@@ -318,7 +317,7 @@
         var alltags = document.getElementsByClassName('tag');
         for (var i = 0; i < alltags.length; i++) {
           if (alltags[i].innerText == neat_value) {
-            modinput_ele.classList.add('animated bounce'); /* Not usefull for the moment*/
+            modinput_ele.classList.add('animated bounce'); /*Useless for the moment */
             alert('Error : Tag already exists');
           }
         }
@@ -376,3 +375,37 @@
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 </script>
+
+<div id="entries-nav">
+  <table>
+    <tbody>
+    <tr>
+      <td><a id="packages-results" style="display: none;">Packages</a></td>
+      <td><a id="libraries-results" style="display: none;">Libraries</a></td>
+      <td><a id="modules-results" style="display: none;">Modules</a></td>
+      <td><a id="metas-results" style="display: none;">Metas</a></td>
+      <td><a id="sources-results" style="display: none;">Sources</a></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+<div id="result-div">
+  <div id="page-info">
+
+  </div>
+  <div id="results">
+    <ol id="results-list">
+
+    </ol>
+  </div>
+  <nav id="pagination-nav">
+    <a id="previous-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M14.5 19v-3h5v-3h-5v-3L9 14.5z"></path></svg>
+    </a>
+    <ol id="pages">
+    </ol>
+    <a id="next-page" style="display: none;" href="">
+      <svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><circle fill="#D6D6D5" cx="14.5" cy="14.5" r="14.5"></circle><path fill="#FFF" d="M15 19v-3h-5v-3h5v-3l5.5 4.5z"></path></svg>
+    </a>
+  </nav>
+</div>

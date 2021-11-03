@@ -23,20 +23,6 @@ type state_info = {
     mutable page : int
 }
 
-(**type state_funselement = {
-    mutable pattern : string;
-    mutable elt_entries : StringSet.t;
-    mutable current_eltentries : string;
-    mutable page : int;
-}
-
-type state_fullselt = {
-    mutable pattern : string;
-    mutable fullelt_entries : StringSet.t;
-    mutable current_fullelt_entries : string;
-    mutable page : int;
-}*)
-
 type search_state = 
     | Uninitialized
     | Search of state_info
