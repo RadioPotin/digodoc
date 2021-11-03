@@ -276,7 +276,7 @@ let update_element_state () =
                     web_app_error (Printf.sprintf "update_element_state: can't find %s id" id)       
         in
             if to_bool @@ (get_input id)##.checked
-            then (state.elements <- ElementSet.add element state.elements; logs ("elt="^element_type_to_string element))
+            then state.elements <- ElementSet.add element state.elements 
             else state.elements <- ElementSet.remove element state.elements
     in
         (* Init entry search state *)
@@ -291,7 +291,6 @@ let update_element_state () =
         } in 
         let pattern_input = get_input "fpattern_element" in
         let value = to_string pattern_input##.value##trim in
-        logs ("value="^value);
         element_state.pattern <- value;
         (* Handle checkboxes *)
         handle_checkbox "fvals" element_state;
@@ -643,12 +642,9 @@ let search_page () =
 
 let onload () =
     (* set handlers to page elements *)
-    logs "1";
     set_handlers ();
     (* initialise state from query string, if exists, else state stays uninitialized *)
-    logs "2";
     initialise_state ();
-    logs "3";
     match !search_state with
     | Uninitialized -> uninitialized_page ()
     | _ -> search_page ()

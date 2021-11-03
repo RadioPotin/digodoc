@@ -19,14 +19,14 @@ open Globals
 
 (** {1 Auxiliary} *)
 
-type 'res response = ('res, server_error) result
+type 'res response = ('res, server_error_type) result
 (** Polymorphic response type from search-api. *)
 
 let handle_error err =
     Lwt.return @@
     match err with
-    | EzReq_lwt_S.UnknownError _ -> Error Unknown
-    | EzReq_lwt_S.KnownError {error;_} ->
+    | EzReq_lwt_S.UnknownError _ ->  logs "Unknown";Error Unknown
+    | EzReq_lwt_S.KnownError {error;_} -> logs "Known";
         Error error
 (** Handler that converts [ez_api] error structure to [response] *)
 
@@ -91,6 +91,7 @@ end
 (** Module [Service] defines services exposed by front-end. *)
 
 let default_error_handler err =
+    logs "default_error_handler";
     begin 
         match err with
         | Invalid_regex -> warn "Invalid regex"
@@ -102,7 +103,7 @@ let default_error_handler err =
 let send_generic_request : 'res. 
         request:(unit -> 'res response Lwt.t) ->
         callback:('res -> unit Lwt.t) ->
-        ?error:(server_error ->  unit Lwt.t) ->
+        ?error:(server_error_type ->  unit Lwt.t) ->
         unit ->
         unit Lwt.t
     = fun
@@ -136,7 +137,7 @@ let api_host () =
     Should be called before other requests.
     Raises [api_host] when couldn't get data from 'info.json' files.   *)
 
-let getEntries entry_info () = 
+let getEntries entry_info () =
     get1 ~host:(get_api_host ()) Services.entries entry_info >>= function
         | Error err -> handle_error err
         | Ok entries -> handle_response entries

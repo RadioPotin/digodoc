@@ -145,7 +145,9 @@ let decode_query_val qval =
   Uri.pct_decode qval
 (** [decode_query_val qval] decodes a segment of query string [qval] using module [Uri] *)
 
-let encode_path_segment = UtilsEncoding.PathSegment.encode
+let encode_path_segment s= 
+  logs ("encode "^ s^" in " ^ (UtilsEncoding.PathSegment.encode s));
+  UtilsEncoding.PathSegment.encode s
 (** Same as [UtilsEncoding.PathSegment.encode] *)
 
 let invalid_input (input : string) =

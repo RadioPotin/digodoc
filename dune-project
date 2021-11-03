@@ -4,7 +4,7 @@
 (allow_approximate_merlin)
 (generate_opam_files false)
 (version 0.1.0)
-(formatting (enabled_for ocaml reason))
+(formatting (enabled_for ocamlformat ocaml reason))
 
 (package
  (name digodoc)
