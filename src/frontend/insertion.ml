@@ -82,7 +82,7 @@ let insert_libraries_index : libraries_jsoo t -> unit  =
                 (* Append library name *)
                 let lib_name = Html.createA document in
                 set_attr lib_name "class" (js "digodoc-lib");
-                set_attr lib_name "class" elt##.path;
+                set_attr lib_name "href" elt##.path;
                 let name = Html.createCode document in
                 append_inner name elt##.name;
                 Dom.appendChild lib_name name;
@@ -163,7 +163,7 @@ let insert_metas_index : metas_jsoo t -> unit  =
                 let meta_name = Html.createA document in
                 set_attr meta_name "href" elt##.path;
                 let name = Html.createCode document in
-                append_inner name elt##.name;
+                append_inner name elt##.namemeta;
                 Dom.appendChild meta_name name;
                 Dom.appendChild meta meta_name;
                 (* Append meta package *)
@@ -173,7 +173,7 @@ let insert_metas_index : metas_jsoo t -> unit  =
                 set_attr meta_opam "href" elt##.opampath;
                 append_inner meta_opam elt##.opam;
                 Dom.appendChild meta meta_opam;
-                let elt_first_letter = get_first_letter elt in
+                let elt_first_letter = (elt##.namemeta##charAt 0)##toLowerCase in
                 if not (!first_letter = elt_first_letter) then begin
                     first_letter := elt_first_letter;
                     display_header elt_first_letter;                
@@ -196,7 +196,7 @@ let insert_sources_index : sources_jsoo t -> unit  =
                 let src_name = Html.createA document in
                 set_attr src_name "href" elt##.path;
                 let name = Html.createCode document in
-                append_inner name elt##.name;
+                append_inner name elt##.namesrc;
                 Dom.appendChild src_name name;
                 Dom.appendChild src src_name;
                 (* Append source package *)
@@ -206,7 +206,7 @@ let insert_sources_index : sources_jsoo t -> unit  =
                 set_attr src_opam "href" elt##.opampath;
                 append_inner src_opam elt##.opam;
                 Dom.appendChild src src_opam;
-                let elt_first_letter = get_first_letter elt in
+                let elt_first_letter = (elt##.namesrc##charAt 0)##toLowerCase in
                 if not (!first_letter = elt_first_letter) then begin
                     first_letter := elt_first_letter;
                     display_header elt_first_letter;                
@@ -387,7 +387,7 @@ let insert_metas_search : metas_jsoo t -> unit  =
                 let meta_name = Html.createA document in
                 set_attr meta_name "href" elt##.path;
                 let name = Html.createCode document in
-                append_inner name elt##.name;
+                append_inner name elt##.namemeta;
                 Dom.appendChild meta_name name;
                 Dom.appendChild meta meta_name;
                 (* Append meta package *)
@@ -414,7 +414,7 @@ let insert_sources_search : sources_jsoo t -> unit  =
                 let src_name = Html.createA document in
                 set_attr src_name "href" elt##.path;
                 let name = Html.createCode document in
-                append_inner name elt##.name;
+                append_inner name elt##.namesrc;
                 Dom.appendChild src_name name;
                 Dom.appendChild src src_name;
                 (* Append source package *)
