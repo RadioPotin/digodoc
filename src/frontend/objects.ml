@@ -37,7 +37,7 @@ type nonrec libraries = lib_entry list
 (** Conversion from [Data_types.libraries] to js object *)
 
 type nonrec meta_entry = Data_types.meta_entry = {
-  name : string ;
+  namemeta : string ;
   path : string ;
   opam : string ;
   opampath : string;
@@ -61,7 +61,7 @@ type nonrec modules  = module_entry list [@@deriving jsoo]
 (** Conversion from [Data_types.modules] to js object *)
 
 type nonrec source_entry = Data_types.source_entry = {
-  name : string;
+  namesrc : string;
   path : string;
   opam : string;
   opampath : string;
