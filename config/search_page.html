@@ -68,7 +68,7 @@
           <tr>
             <td>
               <label class="switch">
-                <input type="checkbox" id="fregex" checked onclick="myhider()">
+                <input type="checkbox" id="fregex" checked>
                 <span class="slider round"></span>
               </label>
               <label>Pattern or <a style="color: green;">RegEx</a></label>
@@ -92,18 +92,18 @@
           </tr>
           <tr id="tohide">
             <td colspan="2">
-              <input type="checkbox" id="showpacksearch" value="Package" onclick="togglepack()">
+              <input type="checkbox" id="showpacksearch" value="Package">
               <label for="showpacksearch">in Packages</label>
-              <div id="nsbp" class="newSearchbyPack" onclick="focusMethod1()">
+              <div id="nsbp" class="newSearchbyPack">
                 <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
               </div>
             </td>
           </tr>
           <tr id="tohide2">
             <td colspan="2">
-              <input type="checkbox" id="showmodsearch" value="Module" onclick="togglemod()">
+              <input type="checkbox" id="showmodsearch" value="Module">
               <label for="showmodsearch">in Modules&nbsp;</label>
-              <div id="nsbm" class="newSearchbyModule" onclick="focusMethod2()">
+              <div id="nsbm" class="newSearchbyModule">
                 <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
               </div>
             </td>
@@ -373,7 +373,7 @@
   }
 </script>
 
-<script>
+<!-- <script>
   /**************** Show/Hide text input for package and modules search ***********/
   function togglepack() {
     var checker = document.getElementById("showpacksearch");
@@ -392,16 +392,16 @@
       document.getElementById("nsbm").style.display = "none"
     }
   }
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   /* Focus on input when clicking the newSearchbyPack div */
   focusMethod1 = function focusinput() {
     document.getElementById("ftextpackages").focus();
   }
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   /****************** Hide/Show packages and module option slider (green switch) ************************/
   function myhider() {
     /* Hide ftextpackages and ftextmodules if slidebox is unchecked*/
@@ -414,13 +414,13 @@
       document.getElementById("tohide2").style.display = "";
     }
   }
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   /* Focus on input when clicking the newSearchbyModule div */
   focusMethod2 = function focusinput2() {
     document.getElementById("ftextmodules").focus();
   }
-</script>
+</script> -->
 
 
