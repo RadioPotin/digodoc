@@ -64,7 +64,7 @@ body {
   padding-right: calc(1.5 * var(--size-line));
   padding-top: calc(0.5 * var(--size-line)); }
 
-.content > * { max-width: 78ch; width: 75% }
+.content > * { max-width: 90ch; width: 100% }
 
 .toc
 { position: /*absolute*/ fixed;
@@ -1039,6 +1039,9 @@ input[type="checkbox"]:checked ~ input {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   margin-top: 0;
+  width: 650px;
+  max-width: 100%;
+  word-break: keep-all;
 }
 
 .newSearchbyPack > .tag {
@@ -1087,8 +1090,8 @@ input[type="checkbox"]:checked ~ input {
     list-style-type: none;
     width: inherit;
     max-height: 350px;
-    overflow-y: auto;
-    z-index: 10;
+    /*overflow-y: auto;
+    z-index: 10;*/
 }
 
 .packsUl > li {
@@ -1114,8 +1117,9 @@ input[type="checkbox"]:checked ~ input {
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   margin-top: 0;
-  /*max-width: 53ch*/
-  overflow-x: auto;
+  width: 650px;
+  max-width: 100%;
+  word-break: keep-all;
 }
 
 .newSearchbyModule > .tag {

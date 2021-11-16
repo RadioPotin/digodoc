@@ -12,7 +12,7 @@
           <tr>
             <td colspan="2">
               <label for="fpattern_entry">Search pattern:</label><br>
-              <input type="text" id="fpattern_entry" name="fpattern_entry" value=""><br>
+              <input type="text" class="fpattern" id="fpattern_entry" name="fpattern_entry" value=""><br>
             </td>
           </tr>
           <tr>
@@ -157,14 +157,11 @@
   </nav>
 </div>
 
-<!-- Javascript functions and scripts used in the search page -->
-
 <script>
   /******************* Only one collapsible at a time *******************************/
   var coll = document.getElementsByClassName("collapsible-div");
-  var i;
 
-  for (i = 0; i < coll.length; i++) {
+  for (var i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function () {
       for (j = 0; j < coll.length; j++) {
         if (coll[j] != coll[i]) {
@@ -180,6 +177,199 @@
         content.style.display = "block";
       }
     });
+  }
+</script>
+
+<script>
+
+  var chosen_packs = [];
+
+  function generate_package_Tag(tag_name, preceding_elt, parent) {
+
+    /* Generate two spans : one for the tag having the package name + version
+    * as innerText and the other to remove the tag when clicked
+    */
+    let tag_to_insert = document.createElement("span");
+    tag_to_insert.classList.add('tag');
+    tag_to_insert.innerText = tag_name;
+    let tag_remove_btn = document.createElement("span");
+    tag_remove_btn.classList.add('remove');
+    tag_remove_btn.addEventListener("click", function () {
+      //chosen_packs.delete(this.parentElement.innerText);
+      //chosen_packs.splice(chosen_packs.indexOf(tag_name), 1);
+      this.parentElement.remove();
+      chosen_packs = chosen_packs.filter(e => e !== tag_name);
+    });
+    tag_to_insert.appendChild(tag_remove_btn);
+    parent.insertBefore(tag_to_insert, preceding_elt);
+  }
+
+  function previewpacks() {
+    var input, filter, ul, li, a, txtValue;
+    var packages_list = [];
+    var parent = document.getElementById('nsbp');
+
+    mylist = document.getElementById('packsUl');
+    mylist.querySelectorAll('*').forEach(n => n.remove());
+
+    input = document.getElementById("ftextpackages");
+    filter = input.value.toUpperCase();
+
+    if (filter != '') {
+      mylist.style.display = "block";
+    } else {
+      mylist.style.display = "none";
+    }
+
+    fetch('https://docs-api.ocaml.pro/packages/0+.+' + filter).then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(response.statusText);
+      }
+    })
+      .then(data => {
+        packages_list = data.map(({ name, version }) => name + ' ' + version);
+        for (var i = 0; i < 10 && i < packages_list.length; i++) {
+          let name = packages_list[i];
+          let li = document.createElement('li');
+          li.addEventListener("click", function () {
+            if (chosen_packs.includes(name)) {
+              alert('Error : package ' + name + ' already chosen,\nCheck for a different version');
+            } else {
+              generate_package_Tag(name, input, parent);
+              chosen_packs.push(name);
+              input.value = '';
+              mylist.style.display = "none";
+            }
+          });
+          li.style.display = "block";
+          let a = document.createElement('a');
+          a.setAttribute("href", "#");
+          let node = document.createTextNode(packages_list[i]);
+          a.appendChild(node);
+          li.appendChild(a);
+          mylist.appendChild(li);
+        }
+      })
+
+    ul = document.getElementById("packsUl");
+    li = ul.getElementsByTagName("li");
+    for (var i = 0; filter != '' && i < li.length; i++) {
+      a = li[i].getElementsByTagName("a")[0];
+      a.style.display = "block";
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+
+  function backspace_rm_pack(event) {
+    var input = document.getElementById("ftextpackages");
+    var e = event.keyCode;
+    if (e == 8 && input.value == '' ) {
+      var previoustag = input.previousSibling;
+      chosen_packs = chosen_packs.filter(e => e !== previoustag.innerText);
+      previoustag.remove();
+    }
+  }
+
+</script>
+
+<script>
+  var chosen_mods = [];
+
+  function generate_module_Tag(tag_name, preceding_elt, parent) {
+    /* Generate two spans : one for the tag having the module name + opam refs
+    * as innerText and the other to remove the tag when clicked
+    */
+    let tag_to_insert = document.createElement("span");
+    tag_to_insert.classList.add('tag');
+    tag_to_insert.innerText = tag_name;
+    let tag_remove_btn = document.createElement("span");
+    tag_remove_btn.classList.add('remove');
+    tag_remove_btn.addEventListener("click", function () {
+      this.parentElement.remove();
+      chosen_mods = chosen_mods.filter(e => e !== tag_name);
+    });
+    tag_to_insert.appendChild(tag_remove_btn);
+    parent.insertBefore(tag_to_insert, preceding_elt);
+  }
+
+  function previewmods() {
+    var input, filter, ul, li, a, txtValue;
+    var mods_list = [];
+    var parent = document.getElementById('nsbm');
+
+    mylist = document.getElementById('modsUl');
+    mylist.querySelectorAll('*').forEach(n => n.remove());
+
+    input = document.getElementById("ftextmodules");
+    filter = input.value.toUpperCase();
+
+    if (filter != '') {
+      mylist.style.display = "block";
+    } else {
+      mylist.style.display = "none";
+    }
+
+    fetch('https://docs-api.ocaml.pro/modules/0+.+' + filter).then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(response.statusText);
+      }
+    })
+      .then(data => {
+        mods_list = data.map(({ name, opam }) => name + ' || ' + opam);
+        for (var i = 0; i < 10 && i < mods_list.length; i++) {
+          let name = mods_list[i];
+          let li = document.createElement('li');
+          li.addEventListener("click", function () {
+            if (chosen_mods.includes(name)) {
+              alert('Error : module \n' + name + '\n already chosen,\nCheck for a different version');
+            } else {
+              generate_module_Tag(name, input, parent);
+              chosen_mods.push(name);
+              input.value = '';
+              mylist.style.display = "none";
+            }
+          });
+          li.style.display = "block";
+          let a = document.createElement('a');
+          a.setAttribute("href", "#");
+          let node = document.createTextNode(mods_list[i]);
+          a.appendChild(node);
+          li.appendChild(a);
+          mylist.appendChild(li);
+        }
+      })
+
+    ul = document.getElementById("modsUl");
+    li = ul.getElementsByTagName("li");
+    for (var i = 0; filter != '' && i < li.length; i++) {
+      a = li[i].getElementsByTagName("a")[0];
+      a.style.display = "block";
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+
+  function backspace_rm_mod(event) {
+    var input = document.getElementById("ftextmodules");
+    var e = event.keyCode;
+    if (e == 8 && input.value == '') {
+      var previoustag = input.previousSibling;
+      chosen_mods = chosen_mods.filter(e => e !== previoustag.innerText);
+      previoustag.remove();
+    }
   }
 </script>
 
@@ -205,97 +395,9 @@
 </script>
 
 <script>
-  /***************** package selection in search by function name and value ********************/
-  let filterpackages = ['']; /* List of packages to avoid repetitions (and to implement limited choice soon) */
-
   /* Focus on input when clicking the newSearchbyPack div */
   focusMethod1 = function focusinput() {
     document.getElementById("ftextpackages").focus();
-  }
-
-  /* Add tag by pressing spacebar(keycode=32) and remove previous tag by pressing backspace (keycode=8) */
-  var packinput_ele = document.getElementById('ftextpackages');
-  packinput_ele.addEventListener('keydown', function (e) {
-    if (e.keyCode == 32) {
-      var cur_value = document.querySelector('input[name="packinput"]');
-      var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
-        : "";
-      if (neat_value == '')
-        return false;
-
-      if (!filterpackages.includes(neat_value)) {
-        filterpackages.push(neat_value);
-        var mytag = document.createElement("span");
-        mytag.classList.add('tag');
-        mytag.innerText = neat_value;
-        var tagremove = document.createElement("span");
-        tagremove.classList.add('remove');
-        mytag.appendChild(tagremove);
-        var insertbeforethis = document.getElementById('ftextpackages');
-        var parent = document.getElementById('nsbp');
-        parent.insertBefore(mytag, insertbeforethis);
-        packinput_ele.value = '';
-      }
-      else {
-        var alltags = document.getElementsByClassName('tag');
-        for (var i = 0; i < alltags.length; i++) {
-          if (alltags[i].innerText == neat_value) {
-            packinput_ele.classList.add('animated bounce'); /* Useless for the moment */
-            alert('Error : Tag already exists');
-          }
-        }
-      }
-    }
-    else if (e.keyCode == 8 && packinput_ele.value == '') {
-      var previous_tag = document.getElementById('ftextpackages').previousSibling;
-      var previous_tag_text = previous_tag.innerText;
-      filterpackages.remove(previous_tag_text);
-      var alltags = document.getElementsByClassName('tag');
-      for (var i = 0; i < alltags.length; i++) {
-        if (alltags[i].innerText.toLowerCase() == previous_tag_text.toLowerCase())
-          alltags[i].remove();
-      }
-      previous_tag[previous_tag.length - 1].remove;
-    }
-  })
-
-  /* equivalent to the jQuery .on() method with additional selector (childSelector) option  */
-  function delegateSelector(selector, event, childSelector, handler) {
-    var is = function (el, selector) {
-      return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
-    };
-    var elements = document.querySelectorAll(selector);
-    [].forEach.call(elements, function (el, i) {
-      el.addEventListener(event, function (e) {
-        if (is(e.target, childSelector)) {
-          handler(e);
-        }
-      });
-    });
-  }
-
-  /* Click on tags to remove them in newSearchbyPack */
-  delegateSelector('newSearchbyPack', 'click', 'tag', function(e) {
-    var tagtext = e.innerText.slice(0,-1);
-    filterpackages.remove(tagtext);
-    e.remove();
-  })
-
-  // array.remove()
-  Array.prototype.remove = function () {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-      what = a[--L];
-      while ((ax = this.indexOf(what)) !== -1) {
-        this.splice(ax, 1);
-      }
-    }
-    return this;
-  };
-
-  // Escaping
-  function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 </script>
 
@@ -315,97 +417,10 @@
 </script>
 
 <script>
-  /****************** module selection in search by function name and value ****************/
-  let filtermodules = ['']; /* List of modules to avoid repetitions (and to implement limited choice soon) */
-
   /* Focus on input when clicking the newSearchbyModule div */
   focusMethod2 = function focusinput2() {
     document.getElementById("ftextmodules").focus();
   }
-
-  /* Add tag by pressing spacebar(keycode=32) and remove previous tag by pressing backspace (keycode=8) */
-  var modinput_ele = document.getElementById('ftextmodules');
-  modinput_ele.addEventListener('keydown', function (e) {
-    if (e.keyCode == 32) {
-      //e.preventDefault();
-      var cur_value = document.querySelector('input[name="modinput"]');
-      var neat_value = cur_value ? cur_value.value.replace(/ /g, '').replace(/[^a-z0-9\s]/gi, '').replace(/[_\s]/g, '-').toLowerCase()
-        : "";
-      if (neat_value == '')
-        return false;
-
-      if (!filterpackages.includes(neat_value)) {
-        filterpackages.push(neat_value);
-        var mytag = document.createElement("span");
-        mytag.classList.add('tag');
-        mytag.innerText = neat_value;
-        var tagremove = document.createElement("span");
-        tagremove.classList.add('remove');
-        mytag.appendChild(tagremove);
-        var insertbeforethis = document.getElementById('ftextmodules');
-        var parent = document.getElementById('nsbm');
-        parent.insertBefore(mytag, insertbeforethis);
-        modinput_ele.value = '';
-      }
-      else {
-        var alltags = document.getElementsByClassName('tag');
-        for (var i = 0; i < alltags.length; i++) {
-          if (alltags[i].innerText == neat_value) {
-            modinput_ele.classList.add('animated bounce'); /*Useless for the moment */
-            alert('Error : Tag already exists');
-          }
-        }
-      }
-    }
-    else if (e.keyCode == 8 && modinput_ele.value == '') {
-      var previous_tag = document.getElementById('ftextmodules').previousSibling;
-      var previous_tag_text = previous_tag.innerText;
-      filterpackages.remove(previous_tag_text);
-      var alltags = document.getElementsByClassName('tag');
-      for (var i = 0; i < alltags.length; i++) {
-        if (alltags[i].innerText.toLowerCase() == previous_tag_text.toLowerCase())
-          alltags[i].remove();
-      }
-      previous_tag[previous_tag.length - 1].remove;
-    }
-  })
-
-  /* equivalent to the jQuery .on() method with additional selector (childSelector) option  */
-  function delegateSelector(selector, event, childSelector, handler) {
-    var is = function (el, selector) {
-      return (el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector);
-    };
-    var elements = document.querySelectorAll(selector);
-    [].forEach.call(elements, function (el, i) {
-      el.addEventListener(event, function (e) {
-        if (is(e.target, childSelector)) {
-          handler(e);
-        }
-      });
-    });
-  }
-
-  /* Click on tags to remove them in newSearchbyModule */
-  delegateSelector('newSearchbyModule', 'click', 'tag', function(e) {
-    var tagtext = e.innerText.slice(0,-1);
-    filterpackages.remove(tagtext);
-    e.remove();
-  })
-
-  // array.remove()
-  Array.prototype.remove = function () {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-      what = a[--L];
-      while ((ax = this.indexOf(what)) !== -1) {
-        this.splice(ax, 1);
-      }
-    }
-    return this;
-  };
-
-  // Escaping
-  function htmlEntities(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
 </script>
+
+
