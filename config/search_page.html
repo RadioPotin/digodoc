@@ -2,10 +2,10 @@
 
 <!-- Search by entry 1-->
 <div id="forms" style="display: none;">
- 
-  <button type="button" class="collapsible-div">Search by entry</button>
 
-  <div class="form-div" style="display: block;">
+  <button type="button" id="col_entry" class="collapsible-div">Search by entry</button>
+
+  <div id="entry-search-content" class="form-div" style="display: block;">
     <form class="search-form" id="entry-form">
       <table>
         <tbody>
@@ -53,9 +53,10 @@
 
   <!-- Search by functions, types, classes, etc. -->
 
-  <button type="button" class="collapsible-div">Search by element</button>
+  <button type="button" id="col_funcs" class="collapsible-div">Search by element</button>
 
-  <div class="form-div" style="display: block;">
+  <div id="element-search-content" class="form-div">
+    <!--style="display: block;"-->
     <form class="search-form" id="element-form">
       <table>
         <tbody>
@@ -95,7 +96,10 @@
               <input type="checkbox" id="showpacksearch" value="Package">
               <label for="showpacksearch">in Packages</label>
               <div id="nsbp" class="newSearchbyPack">
-                <input type="text" id="ftextpackages" name="packinput" value="" placeholder="" size="1"><br>
+                <input type="text" id="ftextpackages" name="packinput" value="" placeholder="Search in ..." size="1"
+                  onkeyup="previewpacks()" onkeydown="backspace_rm_pack(event)">
+                <ul id="packsUl" class="packsUl"></ul>
+                <br>
               </div>
             </td>
           </tr>
@@ -104,7 +108,10 @@
               <input type="checkbox" id="showmodsearch" value="Module">
               <label for="showmodsearch">in Modules&nbsp;</label>
               <div id="nsbm" class="newSearchbyModule">
-                <input type="text" id="ftextmodules" name="modinput" value="" placeholder="" size="1"><br>
+                <input type="text" id="ftextmodules" name="modinput" value="" placeholder="Search in ..." size="1"
+                  onkeyup="previewmods()" onkeydown="backspace_rm_mod(event)">
+                <ul id="modsUl" class="modsUl"></ul>
+                <br>
               </div>
             </td>
           </tr>
@@ -157,28 +164,21 @@
   </nav>
 </div>
 
-<script>
-  /******************* Only one collapsible at a time *******************************/
-  var coll = document.getElementsByClassName("collapsible-div");
-
-  for (var i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function () {
-      for (j = 0; j < coll.length; j++) {
-        if (coll[j] != coll[i]) {
-          var nocontent = coll[j].nextElementSibling;
-          nocontent.style.display = "none";
-        }
-      }
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-      } else {
-        content.style.display = "block";
-      }
-    });
+<!-- <script>
+  function toggle_element_form () {
+    var element_button = document.getElementById("col_funcs");
+    var entry_button = document.getElementById("col_entry");
+    entry_button.nextElementSibling.style.display = "none";
+    element_button.nextElementSibling.style.display = "block";
   }
-</script>
+
+  function toggle_entry_form () {
+    var element_button = document.getElementById("col_funcs");
+    var entry_button = document.getElementById("col_entry");
+    element_button.nextElementSibling.style.display = "none";
+    entry_button.nextElementSibling.style.display = "block";
+  }
+</script> -->
 
 <script>
 

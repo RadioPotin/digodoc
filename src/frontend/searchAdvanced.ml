@@ -375,6 +375,8 @@ let set_handlers () =
   let focus_packages_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in 
   let focus_mods_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbm" in 
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
+  let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
+  let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
 
   (*let form_buttons = 
       List.map (fun button -> 
@@ -415,7 +417,7 @@ let set_handlers () =
       _false
     );
 
-  (* Show / Hide package and module checkbox in element-form when slider is checkec / unchecked *)
+  (*Show / Hide package and module checkbox in element-form when slider is checkec / unchecked *)
   slider_show_hide##.onchange := Html.handler (fun _ ->
       let tr_tohide = unopt @@ Html.CoerceTo.tr @@ get_element_by_id "tohide" in 
       let tr_tohide2 = unopt @@ Html.CoerceTo.tr @@ get_element_by_id "tohide2" in 
@@ -428,6 +430,24 @@ let set_handlers () =
         tr_tohide##.style##.display := js "";
         tr_tohide2##.style##.display := js ""
       end;
+      _false
+    );
+
+  (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
+  toggle_entry_form##.onclick := Html.handler (fun _ ->
+      let hide_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "element-search-content" in 
+      let show_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "entry-search-content" in 
+      hide_this##.style##.display := js "none";
+      show_this##.style##.display := js "block";
+      _false
+    );
+
+  (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
+  toggle_element_form##.onclick := Html.handler (fun _ ->
+      let show_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "element-search-content" in 
+      let hide_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "entry-search-content" in 
+      hide_this##.style##.display := js "none";
+      show_this##.style##.display := js "block";
       _false
     );
 
