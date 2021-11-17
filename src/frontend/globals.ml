@@ -145,20 +145,27 @@ let decode_query_val qval =
   Uri.pct_decode qval
 (** [decode_query_val qval] decodes a segment of query string [qval] using module [Uri] *)
 
-let encode_path_segment s= 
-  logs ("encode "^ s^" in " ^ (UtilsEncoding.PathSegment.encode s));
-  UtilsEncoding.PathSegment.encode s
-(** Same as [UtilsEncoding.PathSegment.encode] *)
-
 let invalid_input (input : string) =
   let input = get_element_by_id input in 
-  input##.style##.backgroundColor := js "#FF2E40"
+  input##.style##.backgroundColor := js "#FF5F6D"
 (** Display input with id [input] as invalid *)
 
 let valid_input (input : string) =
   let input = get_element_by_id input in 
   input##.style##.backgroundColor := js "white"
 (** Display input with id [input] as valid *)
+
+let append_page (elt :Html.element t)  =
+  let body = document##.body in
+  let eltAfter = get_element_by_id_opt "footer" in
+  Dom.insertBefore body elt eltAfter
+(** Appends an element at the end of the page just before the footer *) 
+
+let append_content (elt :Html.element t)  =
+  let content_div = unopt @@ 
+    (document##getElementsByClassName (js "content"))##item 0 in
+  Dom.appendChild content_div elt
+(** Appends an element at the end of the content div *) 
 
 (** {1 Global variables} *)
 

@@ -25,9 +25,8 @@ type 'res response = ('res, server_error_type) result
 let handle_error err =
     Lwt.return @@
     match err with
-    | EzReq_lwt_S.UnknownError _ ->  logs "Unknown";Error Unknown
-    | EzReq_lwt_S.KnownError {error;_} -> logs "Known";
-        Error error
+    | EzReq_lwt_S.UnknownError _ ->  Error Unknown
+    | EzReq_lwt_S.KnownError {error;_} -> Error error
 (** Handler that converts [ez_api] error structure to [response] *)
 
 let handle_response (resp:'res) : 'res response Lwt.t = 
@@ -78,11 +77,20 @@ module Service = struct
 
     open EzAPI
 
+    let info_encoding =
+        let open Json_encoding in
+        conv
+            (fun {www_apis} -> www_apis)
+            (fun www_apis -> {www_apis}) @@
+            obj1
+                (req "apis" (list string))
+    (** Encoding for 'info.json' file *)
+
     let info : (www_server_info, exn, no_security) service0 =
     service
       ~name:"info"
       ~descr:"Server info"
-      ~output: Encoding.info_encoding
+      ~output: info_encoding
       Path.(root // "info.json" )
     (** Service [info] allows to get search-api info from 'info.json' file, 
         that lists all the URLs that could be used to communicate with search-api. 
@@ -91,11 +99,10 @@ end
 (** Module [Service] defines services exposed by front-end. *)
 
 let default_error_handler err =
-    logs "default_error_handler";
     begin 
         match err with
-        | Invalid_regex -> warn "Invalid regex"
-        | Unknown -> warn "Unknown error"
+        | Invalid_regex -> warn "Search-api : Invalid regex"
+        | Unknown -> warn "Search-api : Unknown error"
     end;
     Lwt.return_unit
 (** Default error handler *)

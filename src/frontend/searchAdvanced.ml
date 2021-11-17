@@ -192,7 +192,7 @@ let entry_state_to_entry_info {pattern; current_entry; page; _} =
     let open Data_types in
     {
         entry = current_entry;
-        pattern = encode_path_segment pattern;
+        pattern = pattern;
         last_id = (page - 1) * 50;
         starts_with = "^."
     }
@@ -202,12 +202,12 @@ let element_state_to_element_info {pattern; current_element; regex; page; in_opa
     let open Data_types in
     {
         element = current_element;
-        pattern = encode_path_segment pattern;
+        pattern = pattern;
         last_id = (page - 1) * 50;
         mode = if regex then Regex else Text;
         conditions = 
-            List.map (fun opam -> In_opam (encode_path_segment opam)) (StringSet.elements in_opams)
-            @ List.map (fun mdl -> In_mdl (encode_path_segment mdl))  (StringSet.elements in_mdls)
+            List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
+            @ List.map (fun mdl -> In_mdl mdl)  (StringSet.elements in_mdls)
     }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
@@ -494,40 +494,42 @@ let pagination_info state total_number =
     and total number of entries/element that will be listed throughout all the pages. 
     Raises [Web_app_error] if current state is uninitialized. *)
 
-let write_message message =
-    let result_div = get_element_by_id "result-div" in 
-    result_div##.innerHTML := js "";
-    let mess = Html.createSpan document in
-    mess##setAttribute (js "id") (js "message-result");
-    mess##.innerHTML := js message;
-    Dom.appendChild result_div mess
-(** Displays [message] on the search page instead of displaying search results. *)
-
 let insert_content info current current_number = 
     (* insert pagination nav *)
     let insert_pagination () =
         let number = int_of_string current_number in
         let pages_info = pagination_info !search_state number in
         Insertion.insert_pagination pages_info;
-        Lwt.return_unit
+    (* display results, entries bar, update button and set active nav *)
+    and display_content () =
+        let update_button = get_element_by_id "update-filters"
+        and entries_nav = get_element_by_id "entries-nav"
+        and result_div = get_element_by_id "result-div"
+        and result_nav = get_element_by_id @@ current ^ "-results" 
+        and results = get_element_by_id "results-list" in
+        update_button##.style##.display := js "";
+        entries_nav##.style##.display := js "";
+        result_div##.style##.display := js "";
+        results##.innerHTML := js "";
+        result_nav##.className := js "active-nav";
     (* insert message about empty search results *)
-    and insert_message () =
-        write_message ("No " ^ current ^ " found.");
-        Lwt.return_unit
-    (* insert error message *)
-    and insert_error err =
-        (* hide displayed previously elements *)
+    and display_empty_message () =
         let update_button = get_element_by_id "update-filters"
         and entries_nav = get_element_by_id "entries-nav" in
-        update_button##.style##.display := js "none";
-        entries_nav##.style##.display := js "none";
+        update_button##.style##.display := js "";
+        entries_nav##.style##.display := js "";
+        Insertion.write_message ("No " ^ current ^ " found.");
+    (* insert error message *)
+    and display_error err =
+        let update_button = get_element_by_id "update-filters" in
+        update_button##.style##.display := js "";
         (* print error message *)
         begin 
             match err with
             | Invalid_regex -> 
-                write_message ("Invalid regex " ^ pattern_from_info info ^ ".")
+                Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
             | Unknown ->
-                write_message ("Server error occured, please try again later.")
+                Insertion.write_warning ("Server error occured, please try again later.")
         end;
         Lwt.return_unit
     in
@@ -538,15 +540,17 @@ let insert_content info current current_number =
             ~callback:(fun entries ->
                 if not @@ empty_entries entries 
                 then begin
+                    display_content ();
                     (* insert entries in search page *)
                     Insertion.insert_entries_search entries;
-                    insert_pagination ()
+                    insert_pagination ();
                 end
                 else begin
-                    insert_message ()
-                end
+                    display_empty_message ()
+                end;
+                Lwt.return_unit
                 )
-            ~error:insert_error
+            ~error:display_error
             ()
     | Element element_info ->
         Requests.send_generic_request
@@ -554,15 +558,17 @@ let insert_content info current current_number =
             ~callback:(fun elements ->
                 if not @@ empty_elements elements
                 then begin
+                    display_content ();
                     (* insert elements in search page *)
                     Insertion.insert_elements_search elements;
                     insert_pagination ()
                 end
                 else begin
-                    insert_message ()
-                 end
+                    display_empty_message ()
+                end;
+                Lwt.return_unit
                 )
-            ~error:insert_error
+            ~error:display_error
             ()
 (** Inserts content of the search page (search results and pagination nav bar). 
     Empty results and server side errors generate specific to them message on the page. *)
@@ -598,17 +604,6 @@ let search_page () =
             link##setAttribute (js "href") (js href)
     in
     let current = get_current !search_state in 
-    let update_button = get_element_by_id "update-filters"
-    and entries_nav = get_element_by_id "entries-nav"
-    and result_div = get_element_by_id "result-div"
-    and result_nav = get_element_by_id @@ current ^ "-results" 
-    and results = get_element_by_id "results-list" in
-    (* display results, entries bar, update button and set active nav *)
-    update_button##.style##.display := js "";
-    entries_nav##.style##.display := js "";
-    result_div##.style##.display := js "";
-    results##.innerHTML := js "";
-    result_nav##.className := js "active-nav";
     let elts = get_elts_from_state !search_state
     and info = state_to_info !search_state
     (* number of current entries/elements *)

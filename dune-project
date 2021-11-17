@@ -94,7 +94,7 @@
  (description "\n\n\n\nThe Digodoc library scans opam switches and builds maps of them. It is used to build documentation websites, such as https://docs.ocaml.pro\n")
  (depends
    (ocaml (>= 4.10.0))
-   (search-api ( >= ~dev ))
+   (digodoc-search-api ( >= ~dev ))
    (js_of_ocaml ( >= 3.0 ))
    (ppx_deriving_jsoo ( >= 0.1 ))
    (js_of_ocaml-ppx ( >= 3.0 ))

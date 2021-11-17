@@ -110,13 +110,17 @@ let clear_page () =
   done
 (** Clear index page by removing all entries line and headers *)
 
+let update_entries_indicator number =
+  let indicator =  get_element_by_id "item-number" 
+  and entry = Utils.entry_type_to_string entry_state.entry in
+  indicator##.innerHTML := js (number ^ " " ^ entry)
+(** Updates entries indicator with the number specified in argument. *)  
+      
 let update_entries_number () = 
   Requests.send_generic_request
       ~request:(Requests.getNumber @@ Entry entry_state)
       ~callback:(fun number ->
-        let indicator =  get_element_by_id "item-number" 
-        and entry = Utils.entry_type_to_string entry_state.entry in
-        indicator##.innerHTML := js (number ^ " " ^ entry);
+        update_entries_indicator number;
         Lwt.return_unit
       )
       ()
@@ -150,6 +154,9 @@ let update_page () =
           invalid_input "search"
         | _ -> ()
       end;
+      (* Set entries indicator to 0 *)
+      update_entries_indicator "0";
+      Headfoot.footerHandler ();
       Lwt.return_unit
     )
     ()
