@@ -749,7 +749,40 @@ i {
   font-size: 11px;
 }
 
-#message-result {
+.message {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.warning {
+  border: 1px solid red;
+  min-width: 200px;
+  width: 300px;
+  overflow: scroll;
+}
+
+.warning table {
+  width: 100%;
+  height: 100%;
+}
+
+td.warning-img {
+  width: 50px;
+  vertical-align: middle;
+}
+
+td.warning-img img {
+  height: 30px;
+  margin: auto;
+}
+
+td.warning-msg {
+  text-align: center;
+  vertical-align: middle;
+}
+
+td.warning-msg span {
+
   font-size: larger;
   font-weight: bold;
   color : red;
@@ -851,7 +884,7 @@ i {
   background: none;
   opacity: .3;
   width: 100px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 #update-filters:hover {

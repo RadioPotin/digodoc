@@ -37,7 +37,7 @@ gen-version = "version.ml"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 js_of_ocaml = ">=3.0"
-search-api = ">=~dev"
+digodoc-search-api = ">=~dev"
 ez_api = ">=0.1.0"
 
 # package tools dependencies
