@@ -147,7 +147,7 @@ let api_host () =
 let getEntries entry_info () =
     get1 ~host:(get_api_host ()) Services.entries entry_info >>= function
         | Error err -> handle_error err
-        | Ok entries -> handle_response entries
+        | Ok entries -> (match entries with Lib _ -> logs "request Lib" | Src _ -> logs "request Src"| _ -> ());  handle_response entries
 (** [getEntries entry_info ()] sends request [Services.entries] to search-api with [entry_info] passed 
     as argument of type [Data_types.entry_info]. Server returns 50 first entries that respect constraints 
     mentioned in [entry_info]. *)
