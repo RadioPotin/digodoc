@@ -210,7 +210,7 @@
     var parent = document.getElementById('nsbp');
 
     mylist = document.getElementById('packsUl');
-    mylist.querySelectorAll('*').forEach(n => n.remove());
+    //mylist.querySelectorAll('*').forEach(n => n.remove());
 
     input = document.getElementById("ftextpackages");
     filter = input.value.toUpperCase();
@@ -267,15 +267,15 @@
     }
   }
 
-  function backspace_rm_pack(event) {
-    var input = document.getElementById("ftextpackages");
-    var e = event.keyCode;
-    if (e == 8 && input.value == '' ) {
-      var previoustag = input.previousSibling;
-      chosen_packs = chosen_packs.filter(e => e !== previoustag.innerText);
-      previoustag.remove();
-    }
-  }
+  // function backspace_rm_pack(event) {
+  //   var input = document.getElementById("ftextpackages");
+  //   var e = event.keyCode;
+  //   if (e == 8 && input.value == '' ) {
+  //     var previoustag = input.previousSibling;
+  //     chosen_packs = chosen_packs.filter(e => e !== previoustag.innerText);
+  //     previoustag.remove();
+  //   }
+  // }
 
 </script>
 

@@ -16,6 +16,10 @@ open Globals
 open Data_types
 open Utils
 
+
+(**Trying stuff Elias *)
+
+
 (** Module [SearchAdvanced] defines behaviour for search pages (search.html).
     Search page is constructed dynamically by sending requests to API server. Page could have two states : 
     Initialised with entry/element form or unitialized. If page is opened without arguments (query string) 
@@ -364,6 +368,39 @@ let handle_tag () =
     )
 *)
 
+(* let remove_last_tag_pack () =
+   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
+   let cur_input_value = pack_tag_handling##.value##trim in
+   if cur_input_value = js ""
+   then begin
+    let rm_pack_name_version =  pack_tag_handling##.previousSibling in
+    let tmp = Html.CoerceTo.element @@ rm_pack_name_version in
+    let rm_value = List.hd (String.split_on_char '<' rm_pack_name_version##.innerHTML) in
+    get_element_state.in_opams = StringSet.remove rm_value rm_pack_name_version;
+    pack_tag_handling##previousSibling##remove;
+   end; *)
+
+
+(**Intermediate functions *)
+
+(*Request to get packages *)
+let previewpacks pattern =
+  let pattern = encode_path_segment pattern in
+  Lwt.async @@ 
+  Requests.send_generic_request
+    ~request:(Requests.search pattern)
+    ~callback:(fun _ -> Lwt.return_unit)
+    ~error:(fun err ->
+        logs "ya done F up";
+        begin
+          match err with
+          | Unknown -> logs "Somethin went wrong, error";
+          | _ -> warn "Work on this"
+        end;
+        Lwt.return_unit;
+        )
+
+
 let set_handlers () =
   let entry_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "entry-form" in
   let element_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "element-form" in
@@ -377,6 +414,7 @@ let set_handlers () =
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
+  let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
 
   (*let form_buttons = 
       List.map (fun button -> 
@@ -387,7 +425,7 @@ let set_handlers () =
 
   (*Hide / Show package input in element-form to specify packages in which search will be performed*)
   pack_checkbox##.onchange := Html.handler (fun _ ->
-      let pack_to_hide = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in 
+      let pack_to_hide = get_element_by_id "nsbp" in 
       if pack_checkbox##.checked = _true
       then pack_to_hide##.style##.display := js "block"
       else pack_to_hide##.style##.display := js "none";
@@ -396,7 +434,7 @@ let set_handlers () =
 
   (*Hide / Show module input in element-form to specify modules in which search will be performed*)
   mod_checkbox##.onchange := Html.handler (fun _ ->
-      let mod_to_hide = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbm" in 
+      let mod_to_hide = get_element_by_id "nsbm" in 
       if mod_checkbox##.checked = _true
       then mod_to_hide##.style##.display := js "block"
       else mod_to_hide##.style##.display := js "none";
@@ -417,10 +455,10 @@ let set_handlers () =
       _false
     );
 
-  (*Show / Hide package and module checkbox in element-form when slider is checkec / unchecked *)
+  (*Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
   slider_show_hide##.onchange := Html.handler (fun _ ->
-      let tr_tohide = unopt @@ Html.CoerceTo.tr @@ get_element_by_id "tohide" in 
-      let tr_tohide2 = unopt @@ Html.CoerceTo.tr @@ get_element_by_id "tohide2" in 
+      let tr_tohide = get_element_by_id "tohide" in 
+      let tr_tohide2 = get_element_by_id "tohide2" in 
       if slider_show_hide##.checked = _false
       then begin
         tr_tohide##.style##.display := js "none";
@@ -435,8 +473,8 @@ let set_handlers () =
 
   (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
   toggle_entry_form##.onclick := Html.handler (fun _ ->
-      let hide_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "element-search-content" in 
-      let show_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "entry-search-content" in 
+      let hide_this = get_element_by_id "element-search-content" in 
+      let show_this = get_element_by_id "entry-search-content" in 
       hide_this##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
@@ -444,12 +482,76 @@ let set_handlers () =
 
   (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
   toggle_element_form##.onclick := Html.handler (fun _ ->
-      let show_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "element-search-content" in 
-      let hide_this = unopt @@ Html.CoerceTo.div @@ get_element_by_id "entry-search-content" in 
+      let show_this = get_element_by_id "element-search-content" in 
+      let hide_this = get_element_by_id "entry-search-content" in 
       hide_this##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
     );
+
+  (*WORK ON THIS *)
+
+  (*Remove and delete selected tag when pressing backspace in input having id=ftextpackages *)
+  (* pack_tag_handling##.onkeydown := Html.handler (fun kbevent ->
+      let cur_input_value = pack_tag_handling##.value##trim in
+      let what_key = kbevent##.keyCode in
+      if (cur_input_value = js "")
+      then begin
+        match what_key with
+        | Dom_html.Keyboard_code.Backspace ->
+            let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
+            let rm_value = to_string rm_pack_name_version##.innerText in
+            let parent = unopt @@ rm_pack_name_version##.parentNode in
+            let element_state = get_element_state() in
+            element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
+            Dom.removeChild parent rm_pack_name_version;
+        | _ -> ();
+      end;
+      (* then 
+         begin
+          let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
+          let rm_value = to_string rm_pack_name_version##.innerText in
+          let parent = unopt @@ rm_pack_name_version##.parentNode in
+          let element_state = get_element_state() in
+          element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
+          Dom.removeChild parent rm_pack_name_version;
+         end; *)
+      _false
+     ); *)
+
+
+
+
+  (*Remove and delete selected tag when pressing backspace in input having id=ftextpackages *)
+  pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
+      let cur_input_value = pack_tag_handling##.value##trim in
+      begin
+        match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
+        | Some "Backspace" -> (*Done*)
+            logs @@ to_string @@ cur_input_value;
+            if (cur_input_value = js "" && to_bool @@ pack_tag_handling##hasChildNodes)
+            then begin
+              let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
+              let rm_value = to_string rm_pack_name_version##.innerText in
+              let element_state = get_element_state() in
+              element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
+              let parent = unopt @@ rm_pack_name_version##.parentNode in
+              Dom.removeChild parent rm_pack_name_version;
+            end;
+        | _ -> (**Keep doing stuff here ... previewpacks ... *)
+            logs @@ ("currently typing : " ^ (to_string @@ cur_input_value) ^ "\nto be used for request");
+      end;
+      _false
+    );
+
+  (* pack_tag_handling##.onkeydown := Html.handler (fun kbe ->
+      if (kbe##.keyCode = 8 && pack_tag_handling##.value##trim = '')
+      then begin
+        let previous_tag = pack_tag_handling##previousSibling in
+
+      end;
+      _false
+     ); *)
 
   (* Handler called when onsubmit event was generated by entry form *)
   entry_form##.onsubmit := Html.handler (fun _ ->
