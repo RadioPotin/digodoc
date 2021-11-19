@@ -18,7 +18,7 @@ open Utils
 
 
 (**Trying stuff Elias *)
-
+open Objects
 
 (** Module [SearchAdvanced] defines behaviour for search pages (search.html).
     Search page is constructed dynamically by sending requests to API server. Page could have two states : 
@@ -334,71 +334,86 @@ let update_form () =
 (* TODO: update tags lists with content from state.in_opams and state.in_mdls *)
 (** Looks for state in order to update corresponding form *)
 
-(*
-let toggle_pack () =
-    let checker = get_input "showpacksearch" 
-    and div = (get_element_by_id "nsbp") in
-    checker##.onclick := Html.handler (fun _ -> 
-        if checker##.checked = _true
-        then div##.style##.display := js "block"
-        else div##.style##.display := js "none";
-        _false
-    )
-
-let toggle_mod () =
-    let checker = get_input "showmodsearch" 
-    and div = (get_element_by_id "nsbm") in
-    checker##.onclick := Html.handler (fun _ -> 
-        if checker##.checked = _true
-        then div##.style##.display := js "block"
-        else div##.style##.display := js "none";
-        _false
-    )
-
-let handle_tag () =
-    let packinput_elt = get_input "ftextpackages" in
-    packinput_elt##.onkeydown := Html.handler (fun kbe ->
-        if kbe##.keyCode = 32 
-        then begin
-            let cur_value = document##querySelector (js {|input[name="packinput"]|}) in
-
-        end
-        else  ();
-        _false 
-    )
-*)
-
-(* let remove_last_tag_pack () =
-   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-   let cur_input_value = pack_tag_handling##.value##trim in
-   if cur_input_value = js ""
-   then begin
-    let rm_pack_name_version =  pack_tag_handling##.previousSibling in
-    let tmp = Html.CoerceTo.element @@ rm_pack_name_version in
-    let rm_value = List.hd (String.split_on_char '<' rm_pack_name_version##.innerHTML) in
-    get_element_state.in_opams = StringSet.remove rm_value rm_pack_name_version;
-    pack_tag_handling##previousSibling##remove;
-   end; *)
-
 
 (**Intermediate functions *)
 
+let set_attr elt attr value =
+  elt##setAttribute (js attr) value
+
+let append_inner elt str =
+  elt##.innerHTML := concat elt##.innerHTML str
+
+let insert_packsUl_li : packages_jsoo t -> unit  = 
+  fun (packages : packages_jsoo t) ->
+  let packsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "packsUl" in
+  let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
+  let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
+  let element_state = get_element_state() in
+  foreach 
+    (fun i elt ->
+       if i < 10
+       then begin
+         let pack_li = Html.createLi document in
+         let name_version = (to_string @@ elt##.name) ^ " " ^ (to_string @@ elt##.version) in
+         let _ = Dom.addEventListener pack_li Html.Event.click (Dom.handler (fun _ ->
+             if (StringSet.mem name_version element_state.in_opams)
+             then warn ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version")
+             else begin
+               element_state.in_opams <- StringSet.add name_version element_state.in_opams;
+               let sp1 = Html.createSpan document in
+               set_attr sp1 "class" (js ("tag"));
+               sp1##.innerText := js name_version;
+               let sp2 = Html.createSpan document in
+               set_attr sp2 "class" (js ("remove"));
+               let _ = Dom.addEventListener sp2 Html.Event.click (Dom.handler (fun _ ->
+                   element_state.in_opams <- StringSet.remove name_version element_state.in_opams;
+                   Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+                   _false) ) _false in
+               Dom.appendChild sp1 sp2;
+               Dom.insertBefore parent sp1 (Opt.return input);
+             end;
+             input##.value := js "";
+             packsUl##.style##.display := js "none";
+             _false) ) _false in (**bool might be needed *)
+         pack_li##.style##.display := js "block";
+         let a_li = Html.createA document in
+         set_attr a_li "href" (js ("#"));
+         a_li##.innerText := js  name_version;
+         Dom.appendChild pack_li a_li;
+         Dom.appendChild packsUl pack_li;
+       end;
+    )
+    packages
+
+
 (*Request to get packages *)
 let previewpacks pattern =
-  let pattern = encode_path_segment pattern in
+  let entry_info = {
+    entry = PACK;
+    last_id = 0;
+    starts_with = "^.";
+    pattern;
+  } in
   Lwt.async @@ 
   Requests.send_generic_request
-    ~request:(Requests.search pattern)
-    ~callback:(fun _ -> Lwt.return_unit)
+    ~request:(Requests.getEntries entry_info)
+    ~callback:(fun pack_entries ->
+        begin
+          match pack_entries with
+          | Opam packages -> insert_packsUl_li (Objects.packages_to_jsoo packages)
+          | _ -> raise @@ web_app_error "Received is not a package"
+        end;
+        Lwt.return_unit
+      )
     ~error:(fun err ->
-        logs "ya done F up";
+        logs "Error in previewpacks, request and/or callback failed";
         begin
           match err with
-          | Unknown -> logs "Somethin went wrong, error";
+          | Unknown -> logs "Something went wrong, Fix it now !";
           | _ -> warn "Work on this"
         end;
         Lwt.return_unit;
-        )
+      )
 
 
 let set_handlers () =
@@ -415,13 +430,6 @@ let set_handlers () =
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-
-  (*let form_buttons = 
-      List.map (fun button -> 
-          unopt @@ Html.CoerceTo.button button) 
-          @@ Dom.list_of_nodeList 
-          @@ document##getElementsByClassName (js "collapsible-div") 
-    in*)
 
   (*Hide / Show package input in element-form to specify packages in which search will be performed*)
   pack_checkbox##.onchange := Html.handler (fun _ ->
@@ -492,44 +500,13 @@ let set_handlers () =
   (*WORK ON THIS *)
 
   (*Remove and delete selected tag when pressing backspace in input having id=ftextpackages *)
-  (* pack_tag_handling##.onkeydown := Html.handler (fun kbevent ->
-      let cur_input_value = pack_tag_handling##.value##trim in
-      let what_key = kbevent##.keyCode in
-      if (cur_input_value = js "")
-      then begin
-        match what_key with
-        | Dom_html.Keyboard_code.Backspace ->
-            let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
-            let rm_value = to_string rm_pack_name_version##.innerText in
-            let parent = unopt @@ rm_pack_name_version##.parentNode in
-            let element_state = get_element_state() in
-            element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
-            Dom.removeChild parent rm_pack_name_version;
-        | _ -> ();
-      end;
-      (* then 
-         begin
-          let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
-          let rm_value = to_string rm_pack_name_version##.innerText in
-          let parent = unopt @@ rm_pack_name_version##.parentNode in
-          let element_state = get_element_state() in
-          element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
-          Dom.removeChild parent rm_pack_name_version;
-         end; *)
-      _false
-     ); *)
-
-
-
-
-  (*Remove and delete selected tag when pressing backspace in input having id=ftextpackages *)
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
       begin
         match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
         | Some "Backspace" -> (*Done*)
-            logs @@ to_string @@ cur_input_value;
-            if (cur_input_value = js "" && to_bool @@ pack_tag_handling##hasChildNodes)
+            (* logs @@ "cur_value --->" ^ (to_string @@ cur_input_value); *)
+            if (cur_input_value = js "" && (to_bool @@ (unopt @@ pack_tag_handling##.parentNode)##hasChildNodes)) (*&& StringSet.is_empty element_state.in_opams*)
             then begin
               let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
               let rm_value = to_string rm_pack_name_version##.innerText in
@@ -537,21 +514,20 @@ let set_handlers () =
               element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
               let parent = unopt @@ rm_pack_name_version##.parentNode in
               Dom.removeChild parent rm_pack_name_version;
+              (* logs @@ "Done"; *)
             end;
         | _ -> (**Keep doing stuff here ... previewpacks ... *)
             logs @@ ("currently typing : " ^ (to_string @@ cur_input_value) ^ "\nto be used for request");
+            let packsUl = get_element_by_id "packsUl" in
+            if cur_input_value = js ""
+            then packsUl##.style##.display := js "block"
+            else packsUl##.style##.display := js "none";
+            previewpacks @@ to_string cur_input_value;
+            (*Calling function to deal with tags and display li s with package name and version to choose from *)
+            (* previewpacks (to_string @@ cur_input_value); *)
       end;
       _false
     );
-
-  (* pack_tag_handling##.onkeydown := Html.handler (fun kbe ->
-      if (kbe##.keyCode = 8 && pack_tag_handling##.value##trim = '')
-      then begin
-        let previous_tag = pack_tag_handling##previousSibling in
-
-      end;
-      _false
-     ); *)
 
   (* Handler called when onsubmit event was generated by entry form *)
   entry_form##.onsubmit := Html.handler (fun _ ->
