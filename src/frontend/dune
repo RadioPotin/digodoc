@@ -5,7 +5,7 @@
  (wrapped false)
  (modules headfoot search searchAdvanced index requests globals insertion objects)
  (preprocess (pps js_of_ocaml-ppx ppx_deriving_jsoo lwt_ppx))
- (libraries js_of_ocaml-lwt search-api.data_common search-api.api_services ez_api ez_api.ixhr_lwt ))
+ (libraries js_of_ocaml-lwt digodoc-search-api.data_common digodoc-search-api.services ez_api ez_api.ixhr_lwt ))
 
 (executable
  (name main)

@@ -46,9 +46,7 @@ let initialise () =
     let ul = Html.createUl document in
     ul##.id := js "search-result-ul";
     Dom.appendChild search_div ul;
-    let body = document##.body in
-    let eltAfter = get_element_by_id_opt "footer" in
-    Dom.insertBefore body search_div eltAfter;
+    append_page search_div;
     Lwt.return_unit
 (** Creates a zone on the page where search results will be displayed *)
 
@@ -58,8 +56,6 @@ let clear_search () =
 (** Removes all results from list *)
 
 let update_search pattern =
-    (* Encode pattern as path segment *)
-    let pattern = encode_path_segment pattern in 
     (* Sends request to get and display search results *)
     Lwt.async @@ 
         Requests.send_generic_request
