@@ -39,6 +39,39 @@ let get_first_letter elt =
     (elt##.name##charAt 0)##toLowerCase
 (** [get_first_letter elt] returns the first letter of an entry/element [elt]. *)
 
+let write_message message =
+    let msg_div = Html.createDiv document in
+    let msg = Html.createSpan document in
+    set_attr msg "class" (js "message");
+    append_inner msg (js message);
+    Dom.appendChild msg_div msg;
+    append_content msg_div
+(** Displays message at the bottom of the page. *)
+
+let write_warning warn =
+    (* Create structure *)
+    let warning_div = Html.createDiv document 
+    and table = Html.createTable document 
+    and tr = Html.createTr document 
+    and td_image = Html.createTd document 
+    and td_mess = Html.createTd document  in
+    let img_src = concat path_to_root (js "static/imgs/warning.png") in
+    let img = Html.createImg document in
+    set_attr img "src" img_src;
+    set_attr td_image "class" (js "warning-img");
+    Dom.appendChild td_image img;
+    let mess = Html.createSpan document in
+    set_attr td_mess "class" (js "warning-msg");
+    append_inner mess (js warn);
+    set_attr warning_div "class" (js "warning");
+    Dom.appendChild td_mess mess;
+    Dom.appendChild tr td_image;
+    Dom.appendChild tr td_mess;
+    Dom.appendChild table tr;
+    Dom.appendChild warning_div table;
+    append_content warning_div
+(** Displays warning at the bottom of the page. *)
+
 let insert_packages_index : packages_jsoo t -> unit  = 
     fun (packages : packages_jsoo t) ->
         let first_letter : js_string t ref = ref (js "") in
@@ -284,6 +317,8 @@ let insert_search_result : search_result_jsoo t -> unit =
                 result##.modules
 (** [insert_search_result search_res] fills search list with entries in [res]. 
     [search_res] should be converted to js object from [Data_types.search_result] type. *)
+
+(** {1 Search page} *)
 
 let insert_packages_search : packages_jsoo t -> unit  = 
     fun (packages : packages_jsoo t) -> 
@@ -547,3 +582,4 @@ let insert_elements_search elements =
     match elements with
     | Val vals -> insert_vals_search (Objects.vals_to_jsoo vals)
 (** Calls specific to [elements] insertion function for search page *)
+
