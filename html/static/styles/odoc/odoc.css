@@ -1077,30 +1077,30 @@ input[type="checkbox"]:checked ~ input {
   word-break: keep-all;
 }
 
-.newSearchbyPack > .tag {
+.newSearchbyPack > ul > li > .tag {
   background: #4aa987;
   margin: 2px;
   color: white;
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
   padding-left: 4px;
-  display: inline list-item;
+  /* display: inline /*list-item;*/
 }
 
-.newSearchbyPack > .tag :hover {
+.newSearchbyPack > ul > li > .tag :hover {
   content: 'x';
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
 }
 
-.newSearchbyPack > .tag > .remove {
+.newSearchbyPack > ul > li > .tag > .remove {
   content: 'x';
   color: white;
   padding-left: 0px;
   margin: 1ch;
 }
 
-.newSearchbyPack > .tag > .remove:before {
+.newSearchbyPack > ul > li > .tag > .remove:before {
   color: white;
   content: 'x';
   padding-left: 0px;
@@ -1116,6 +1116,10 @@ input[type="checkbox"]:checked ~ input {
   width: 120px;
   max-width: 15vw;
   outline: none;
+}
+
+#tag_container {
+  list-style-type: none;
 }
 
 .packsUl {

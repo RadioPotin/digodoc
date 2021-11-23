@@ -338,9 +338,6 @@ let update_form () =
 
 (**Intermediate functions *)
 
-let set_attr elt attr value =
-  elt##setAttribute (js attr) value
-
 (* let append_inner elt str =
    elt##.innerHTML := concat elt##.innerHTML str *)
 
@@ -397,30 +394,49 @@ let set_attr elt attr value =
 (* set_attr sp1 "class" (js ("tag")); *)
 (* set_attr sp2 "class" (js ("remove")); *)
 
+(* let get_chosen_tags container_name =
+   let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id container_name in
+   tag_container##.childNods; *)
+
 (* Work using DOM only *)
 let insert_packsUl_li : packages_jsoo t -> unit  = 
   fun (packages : packages_jsoo t) ->
   let packsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "packsUl" in
-  let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
+  (* let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in *)
   let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "tag_container" in
+  (* Start by removing all children from packsUl and replace them with result of new request *)
+  let clean_lis = packsUl##.childNodes in
+  for i = 0 to clean_lis##.length - 1
+  do
+    let li_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (clean_lis##item i) in 
+    Dom.removeChild packsUl li_i;
+  done;
+
+  let cur_tags = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then
+    begin
+      let chosen_tags = tag_container##.childNodes in
+      for i = 0 to chosen_tags##.length - 1
+      do
+        let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
+        cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+      done
+    end;
+  logs "printing selected tags  ----> ";
+  StringSet.iter (fun e -> logs e) !cur_tags;
+
   foreach
     (fun i elt ->
        let pack_li = Html.createLi document in
        let name_version = to_string (concat (concat elt##.name (js " ")) elt##.version) in
        pack_li##.onclick := Html.handler (fun _ ->
-           (* Training with dom handling *)
-           let selected_tags = packsUl##.childNodes in
-           for i = 0 to selected_tags##.length 
-           do
-             logs (string_of_int i);
-             let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (selected_tags##item i) in 
-             logs (to_string tag_i##.innerHTML);
-           done;
-
-           if false
-           then warn ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version")
+           if (StringSet.mem name_version !cur_tags)
+           then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
            else 
              begin
+               cur_tags := StringSet.add name_version !cur_tags;
                let sp1 = Html.createSpan document in
                let sp2 = Html.createSpan document in
                sp1##.classList##add (js "tag"); 
@@ -428,31 +444,36 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
                sp2##.classList##add (js "remove");
                logs "------> an li element has been clicked <-----";
                sp2##.onclick := Html.handler (fun _ ->
-
+                   cur_tags := StringSet.remove name_version !cur_tags;
                    Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
                    _false
                  );
+               let tag_container_li = Html.createLi document in
                Dom.appendChild sp1 sp2;
-               Dom.insertBefore parent sp1 (Opt.return input);
+               Dom.appendChild tag_container_li sp1;
+               Dom.appendChild tag_container tag_container_li;
              end;
            input##.value := js "";
            packsUl##.style##.display := js "none";
            _false
          );
        let a_li = Html.createA document in
-       set_attr a_li "href" (js ("#"));
+       Insertion.set_attr a_li "href" (js ("#"));
        a_li##.innerText := js  name_version;
        Dom.appendChild pack_li a_li;
        if i < 10
        then pack_li##.style##.display := js "block"
        else pack_li##.style##.display := js "none";
        Dom.appendChild packsUl pack_li;
-       (* logs "i got till insert_packsUl_li 2"; *)
+       Headfoot.footerHandler();
     )
     packages
 
 
+
+
 (*Request to get packages *)
+
 let previewpacks pattern =
   let entry_info = {
     entry = PACK;
@@ -569,21 +590,21 @@ let set_handlers () =
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
       let packsUl = get_element_by_id "packsUl" in
+      let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "tag_container" in
       begin
         match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
         | Some "Backspace" ->
-            let element_state = get_element_state() in
-            if (cur_input_value = js "" && (not (StringSet.is_empty element_state.in_opams)))
+            if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then 
               begin
-                let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
-                let rm_value = to_string rm_pack_name_version##.innerText in
-                let parent = unopt @@ rm_pack_name_version##.parentNode in
-                element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
-                Dom.removeChild parent rm_pack_name_version;
+                let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
+                Dom.removeChild tag_container rm_pack_name_version;
               end;
             (* Beware of spaces in html file, ##.parentNode ##.innerText and ##.previousSibling cause 
                Fatal error: exception Globals.Web_app_error(_) when spaces exists between elements *)
+        | Some "Escape" -> 
+            packsUl##.style##.display := js "none";
+            (*remove all children instead of just hiding ---> TODO later *)
         | _ ->
             logs @@ ("currently typing :: " ^ (to_string @@ cur_input_value) ^ " :: to be used for request");
             logs ("sending a request to get packages having -->" ^ to_string cur_input_value);
