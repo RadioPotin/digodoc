@@ -394,7 +394,10 @@ let set_attr elt attr value =
     )
     packages *)
 
+(* set_attr sp1 "class" (js ("tag")); *)
+(* set_attr sp2 "class" (js ("remove")); *)
 
+(* Work using DOM only *)
 let insert_packsUl_li : packages_jsoo t -> unit  = 
   fun (packages : packages_jsoo t) ->
   let packsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "packsUl" in
@@ -405,23 +408,27 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
        let pack_li = Html.createLi document in
        let name_version = to_string (concat (concat elt##.name (js " ")) elt##.version) in
        pack_li##.onclick := Html.handler (fun _ ->
-           logs "clicked on an li & trying to get boolean value ->";
-           let element_state = get_element_state() in
-           if (StringSet.mem name_version element_state.in_opams)
+           (* Training with dom handling *)
+           let selected_tags = packsUl##.childNodes in
+           for i = 0 to selected_tags##.length 
+           do
+             logs (string_of_int i);
+             let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (selected_tags##item i) in 
+             logs (to_string tag_i##.innerHTML);
+           done;
+
+           if false
            then warn ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version")
            else 
              begin
-               element_state.in_opams <- StringSet.add name_version element_state.in_opams;
                let sp1 = Html.createSpan document in
                let sp2 = Html.createSpan document in
                sp1##.classList##add (js "tag"); 
-               (* set_attr sp1 "class" (js ("tag")); *)
                sp1##.innerText := js name_version;
-               (* set_attr sp2 "class" (js ("remove")); *)
                sp2##.classList##add (js "remove");
                logs "------> an li element has been clicked <-----";
                sp2##.onclick := Html.handler (fun _ ->
-                   element_state.in_opams <- StringSet.remove name_version element_state.in_opams;
+
                    Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
                    _false
                  );
