@@ -553,7 +553,7 @@ let set_handlers () =
   (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
 
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
-      let cur_input_value = pack_tag_handling##.value##trim in
+      let cur_input_value = pack_tag_handling##.value in
       let packsUl = get_element_by_id "packsUl" in
 
       let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
@@ -634,26 +634,6 @@ let set_handlers () =
       _false
     )
 
-(*toggle_pack ();
-  toggle_mod ()
-  List.iter (fun button_i ->
-        button_i##.onclick := Html.handler (fun _ ->
-            List.iter (fun (button_j:#Dom.node t) -> 
-                    if (button_i <> button_j) then begin
-                        let nocontent = element_to_button @@
-                                        unopt @@ 
-                                        Html.CoerceTo.element @@ 
-                                        button_j##.nextSibling 
-                        in
-                        nocontent##.style##.display := js "none"
-                    end
-                ) 
-                form_buttons;
-
-            _false
-        )   
-    )
-    form_buttons*)
 (** Sets handlers to forms and buttons from search page. Submit event handler of a form redirect to the 
     page with corresponding to search state results. Click event of a button 'update filters' shows filled 
     form within result page that allows to update search request. *)
