@@ -1122,6 +1122,10 @@ input[type="checkbox"]:checked ~ input {
   list-style-type: none;
 }
 
+#mod_tag_container {
+  list-style-type: none;
+}
+
 .packsUl {
     display: none;
     list-style-type: none;
@@ -1159,7 +1163,7 @@ input[type="checkbox"]:checked ~ input {
   word-break: keep-all;
 }
 
-.newSearchbyModule > .tag {
+.newSearchbyModule > ul > li > .tag {
   background: #4aa987;
   margin: 2px;
   color: white;
@@ -1169,20 +1173,20 @@ input[type="checkbox"]:checked ~ input {
   display: inline list-item;
 }
 
-.newSearchbyModule > .tag :hover {
+.newSearchbyModule > ul > li > .tag :hover {
   content: 'x';
   border-radius: 8px 8px 8px 8px;
   border-width: 0px;
 }
 
-.newSearchbyModule > .tag > .remove {
+.newSearchbyModule > ul > li > .tag > .remove {
   content: 'x';
   color: white;
   padding-left: 0px;
   margin: 1ch;
 }
 
-.newSearchbyModule > .tag > .remove:before {
+.newSearchbyModule > ul > li > .tag > .remove:before {
   color: white;
   content: 'x';
   padding-left: 0px;

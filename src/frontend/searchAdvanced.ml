@@ -405,6 +405,77 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
     packages
 (** preview packages propositions from which to choose *)
 
+let insert_modsUl_li : modules_jsoo t -> unit  = 
+  fun (modules : modules_jsoo t) ->
+  let modsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "modsUl" in
+  (* let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in *)
+  let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+  (* Start by removing all children from packsUl and replace them with result of new request *)
+  let clean_lis = modsUl##.childNodes in
+  for i = 0 to clean_lis##.length - 1
+  do
+    let li_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (clean_lis##item i) in 
+    Dom.removeChild modsUl li_i;
+  done;
+
+  let cur_tags = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then
+    begin
+      let chosen_tags = tag_container##.childNodes in
+      for i = 0 to chosen_tags##.length - 1
+      do
+        let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
+        cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+      done
+    end;
+  logs "printing selected tags  ----> ";
+  StringSet.iter (fun e -> logs e) !cur_tags;
+
+  foreach
+    (fun i elt ->
+       let pack_li = Html.createLi document in
+       let name_version = to_string (concat (concat elt##.name (js " ")) elt##.opam) in
+       pack_li##.onclick := Html.handler (fun _ ->
+           if (StringSet.mem name_version !cur_tags)
+           then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
+           else 
+             begin
+               cur_tags := StringSet.add name_version !cur_tags;
+               let sp1 = Html.createSpan document in
+               let sp2 = Html.createSpan document in
+               sp1##.classList##add (js "tag"); 
+               sp1##.innerText := js name_version;
+               sp2##.classList##add (js "remove");
+               logs "------> an li element has been clicked <-----";
+               sp2##.onclick := Html.handler (fun _ ->
+                   cur_tags := StringSet.remove name_version !cur_tags;
+                   Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+                   _false
+                 );
+               let tag_container_li = Html.createLi document in
+               Dom.appendChild sp1 sp2;
+               Dom.appendChild tag_container_li sp1;
+               Dom.appendChild tag_container tag_container_li;
+             end;
+           input##.value := js "";
+           modsUl##.style##.display := js "none";
+           _false
+         );
+       let a_li = Html.createA document in
+       Insertion.set_attr a_li "href" (js ("#"));
+       a_li##.innerText := js  name_version;
+       Dom.appendChild pack_li a_li;
+       if i < 10
+       then pack_li##.style##.display := js "block"
+       else pack_li##.style##.display := js "none";
+       Dom.appendChild modsUl pack_li;
+       Headfoot.footerHandler();
+    )
+    modules
+(** preview modules propositions from which to choose *)
+
 
 let previewpacks pattern =
   let entry_info = {
@@ -440,7 +511,7 @@ let previewpacks pattern =
 (** Request to get packages *)
 
 let previewmods pattern =
-  let entry_info = {
+  let entry_mod_info = {
     entry = MOD;
     last_id = 0;
     starts_with = "^.";
@@ -448,13 +519,13 @@ let previewmods pattern =
   } in
   Lwt.async @@
   Requests.send_generic_request
-    ~request:(Requests.getEntries entry_info)
+    ~request:(Requests.getEntries entry_mod_info)
     ~callback:(fun mod_entries ->
         if not @@ Utils.empty_entries mod_entries
         then
           begin
             match mod_entries with
-            | Opam modules ->
+            | Mdl modules ->
                 insert_modsUl_li (Objects.modules_to_jsoo modules);
             | _ -> raise @@ web_app_error "Received object is not a package"
           end;
@@ -485,6 +556,7 @@ let set_handlers () =
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
+  let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
 
   pack_checkbox##.onchange := Html.handler (fun _ ->
       let pack_to_hide = get_element_by_id "nsbp" in 
@@ -553,7 +625,7 @@ let set_handlers () =
   (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
 
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
-      let cur_input_value = pack_tag_handling##.value in
+      let cur_input_value = pack_tag_handling##.value##trim in
       let packsUl = get_element_by_id "packsUl" in
 
       let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
@@ -595,6 +667,55 @@ let set_handlers () =
             else 
               begin 
                 packsUl##.style##.display := js "block";
+              end;
+      end;
+      _false
+    );
+  (**Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
+
+  mod_tag_handling##.onkeyup := Html.handler (fun kbevent ->
+      let cur_input_value = mod_tag_handling##.value##trim in
+      let modsUl = get_element_by_id "modsUl" in
+
+      let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+      begin
+        match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
+        | Some "Backspace" ->
+            if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
+            then 
+              begin
+                let cur_tags = ref StringSet.empty in
+                if to_bool tag_container##hasChildNodes
+                then
+                  begin
+                    let chosen_tags = tag_container##.childNodes in
+                    for i = 0 to chosen_tags##.length - 1
+                    do
+                      let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
+                      cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+                    done
+                  end;
+                let rm_mod_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
+                cur_tags := StringSet.remove (to_string rm_mod_name_version##.innerText) !cur_tags;
+                Dom.removeChild tag_container rm_mod_name_version;
+              end;
+            (* Beware of spaces in html file, ##.parentNode ##.innerText and ##.previousSibling cause 
+               Fatal error: exception Globals.Web_app_error(_) when spaces exists between elements *)
+        | Some "Escape" -> 
+            modsUl##.style##.display := js "none";
+            (*TODO later ---> remove all children instead of just hiding *)
+        | _ ->
+            logs @@ ("currently typing :: " ^ (to_string @@ cur_input_value) ^ " :: to be used for request");
+            logs ("sending a request to get packages having -->" ^ to_string cur_input_value);
+            if (not (cur_input_value = js ""))
+            then 
+              begin
+                modsUl##.style##.display := js "block";
+                previewmods @@ to_string cur_input_value;
+              end
+            else 
+              begin 
+                modsUl##.style##.display := js "block";
               end;
       end;
       _false
