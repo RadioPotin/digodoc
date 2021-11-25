@@ -299,9 +299,32 @@ let update_element_state () =
   (* Handle checkboxes *)
   handle_checkbox "fvals" element_state;
   element_state.regex <- to_bool (get_input "fregex")##.checked;
-  (* TODO : get opams and mdls names from tags *)
   element_state.in_opams <- StringSet.empty;
-  element_state.in_mdls <- StringSet.empty;
+  element_state.in_mdls <- StringSet.empty; 
+  (* TODO : get opams and mdls names from tags *)
+  (* let pack_tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
+  let mod_tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+  
+  if to_bool pack_tag_container##hasChildNodes
+  then begin
+    let pack_tags = pack_tag_container##.childNodes in
+    for i = 0 to pack_tags##.length - 1 
+    do
+      let pack_tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (pack_tags##item i) in
+      element_state.in_opams <- StringSet.add (to_string pack_tag_i##.innerText) element_state.in_opams;
+    done
+  end;
+
+if to_bool mod_tag_container##hasChildNodes
+  then begin
+    let mod_tags = mod_tag_container##.childNodes in
+    for i = 0 to mod_tags##.length - 1 
+    do
+      let mod_tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (mod_tags##item i) in
+       element_state.in_mdls  <- StringSet.add (to_string mod_tag_i##.innerText) element_state.in_mdls;
+    done
+  end; *)
+
   match element_state.elements with
   | set when ElementSet.is_empty set -> false
   | set -> 
@@ -635,7 +658,7 @@ let set_handlers () =
             if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then 
               begin
-                let cur_tags = ref StringSet.empty in
+                let cur_pack_tags = ref StringSet.empty in
                 if to_bool tag_container##hasChildNodes
                 then
                   begin
@@ -643,18 +666,15 @@ let set_handlers () =
                     for i = 0 to chosen_tags##.length - 1
                     do
                       let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
-                      cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+                      cur_pack_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_pack_tags;
                     done
                   end;
                 let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
-                cur_tags := StringSet.remove (to_string rm_pack_name_version##.innerText) !cur_tags;
+                cur_pack_tags := StringSet.remove (to_string rm_pack_name_version##.innerText) !cur_pack_tags;
                 Dom.removeChild tag_container rm_pack_name_version;
               end;
-            (* Beware of spaces in html file, ##.parentNode ##.innerText and ##.previousSibling cause 
-               Fatal error: exception Globals.Web_app_error(_) when spaces exists between elements *)
         | Some "Escape" -> 
             packsUl##.style##.display := js "none";
-            (*TODO later ---> remove all children instead of just hiding *)
         | _ ->
             logs @@ ("currently typing :: " ^ (to_string @@ cur_input_value) ^ " :: to be used for request");
             logs ("sending a request to get packages having -->" ^ to_string cur_input_value);
@@ -662,7 +682,7 @@ let set_handlers () =
             then 
               begin
                 packsUl##.style##.display := js "block";
-                previewpacks @@ to_string cur_input_value;
+                previewpacks @@ (to_string cur_input_value);
               end
             else 
               begin 
@@ -699,11 +719,8 @@ let set_handlers () =
                 cur_tags := StringSet.remove (to_string rm_mod_name_version##.innerText) !cur_tags;
                 Dom.removeChild tag_container rm_mod_name_version;
               end;
-            (* Beware of spaces in html file, ##.parentNode ##.innerText and ##.previousSibling cause 
-               Fatal error: exception Globals.Web_app_error(_) when spaces exists between elements *)
         | Some "Escape" -> 
             modsUl##.style##.display := js "none";
-            (*TODO later ---> remove all children instead of just hiding *)
         | _ ->
             logs @@ ("currently typing :: " ^ (to_string @@ cur_input_value) ^ " :: to be used for request");
             logs ("sending a request to get packages having -->" ^ to_string cur_input_value);

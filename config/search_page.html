@@ -96,7 +96,7 @@
               <input type="checkbox" id="showpacksearch" value="Package">
               <label for="showpacksearch">in Packages</label>
               <div id="nsbp" class="newSearchbyPack">
-                <ul id="tag_container"></ul>
+                <ul id="pack_tag_container"></ul>
                 <input type="text" id="ftextpackages" name="packinput" value="" placeholder="Search in ..." size="1">
                 <ul id="packsUl" class="packsUl"></ul>
                 <br>
@@ -108,6 +108,7 @@
               <input type="checkbox" id="showmodsearch" value="Module">
               <label for="showmodsearch">in Modules&nbsp;</label>
               <div id="nsbm" class="newSearchbyModule">
+                <ul id="mod_tag_container"></ul>
                 <input type="text" id="ftextmodules" name="modinput" value="" placeholder="Search in ..." size="1">
                 <ul id="modsUl" class="modsUl"></ul>
                 <br>
@@ -179,7 +180,7 @@
   }
 </script> -->
 
-<script>
+<!-- <script>
 
   var chosen_packs = []; 
 
@@ -276,9 +277,9 @@
   //   }
   // }
 
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   var chosen_mods = [];
 
   function generate_module_Tag(tag_name, preceding_elt, parent) {
@@ -370,7 +371,7 @@
       previoustag.remove();
     }
   }
-</script>
+</script> -->
 
 <!-- <script>
   /**************** Show/Hide text input for package and modules search ***********/

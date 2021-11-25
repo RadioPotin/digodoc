@@ -1241,7 +1241,32 @@ width: inherit;
 
 /******************************************************************************************/
 
+.container {
+  width: 100%;
+  text-align: center;
+}
 
+.contained-left {
+  float: left;
+  /* width: 100px; */
+  /* height: 20px; */
+}
 
+.contained-right {
+  float: right;
+  /* width: 100px; */
+  /* height: 20px; */
+}
 
+#localsearch {
+  text-align: center;
+  border-radius: 20px;
+  border: 0px;
+  width:auto;
+  height: 35px;
+  outline: thick outset #659CD6 ;
+}
 
+nav > a {
+  width: 3%;
+}
