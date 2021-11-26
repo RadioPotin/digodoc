@@ -318,6 +318,10 @@ h1 nav { display: inline-block;
 
 /* Package list page */
 
+.by-name nav {
+  text-align: center;
+}
+
 .by-name nav a
 { font-family: var(--font-headings);
   font-size: var(--size-font-large);
@@ -329,6 +333,7 @@ h1 nav { display: inline-block;
   text-align: center;
   /* white-space: nowrap;  */
   align-items: stretch;
+  width: 4%;
 }
 
 .by-tag ol { list-style-type: none; }
@@ -1265,8 +1270,4 @@ width: inherit;
   width:auto;
   height: 35px;
   outline: thick outset #659CD6 ;
-}
-
-nav > a {
-  width: 3%;
 }

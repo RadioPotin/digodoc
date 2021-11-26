@@ -223,7 +223,7 @@ let print_index bb index entity_name =
     ) index;
 
   Printf.bprintf bb {|
-    <!--<h4 id="item-number">%d %s</h4>-->
+    <h4 id="item-number">%d %s</h4>
     <div id="by-name" class="by-name">
       <nav>
 |} !n entity_name;
@@ -500,14 +500,15 @@ let generate () =
     <li><a href="https://ocaml.org/manual/">OCaml Manual</a></li>
     <li><a href="docs/LIBRARY.stdlib@ocaml-base-compiler.%s/Stdlib/index.html#modules">Stdlib Modules</a></li>
   </ul>
-  </nav><h2>Index</h2>
+  </nav>
+  </header>
+  <h2>Index</h2>
 <div class="container">
 <div class="contained-left">
 <h4 id="item-number" class=""> (get n) modules</h4>
 </div>
 <div class="contained-right">
-<br>
-<input id="localsearch" placeholder="Search in ...">
+<input id="localsearch" placeholder="Search in ..." autocomplete="off">
 </div>
 </div>  
 <br>
