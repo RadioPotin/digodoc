@@ -50,6 +50,7 @@ let check_file state ~objinfo opam_package file =
   let dirname = Filename.dirname file in
   let basename = Filename.basename file in
   let dir = Directory.get state dirname in
+  let path = file in
   if basename = "META" || dirname = "metas" then
     let filename, meta_name =
       if dirname = "metas"
@@ -84,8 +85,8 @@ let check_file state ~objinfo opam_package file =
     | "cmti" ->
         let ( _mdl : ocaml_mdl)  =
           Module.find_or_create state ~objinfo
-            ~mdl_basename:basename ~mdl_ext:ext
-            ~mdl_opam:opam_package ~mdl_dir:dir
+            ~mdl_basename:basename ~mdl_ext:("." ^ ext)
+            ~mdl_opam:opam_package ~mdl_path:path
         in
         ()
 
@@ -168,10 +169,10 @@ let compute ~opam_switch_prefix ?(objinfo=false) () =
   List.iter (fun (opam_name, opam_files) ->
       (* KEEPDIR *)
       (*
-        let opam_files = 
+        let opam_files =
         List.filter
          (fun (file,_) -> not (EzString.starts_with file ~prefix:"keep-dir")) opam_files
-      in 
+      in
        *)
       (* create the opam_package *)
       let opam_package = Opam.create state opam_name opam_files in
@@ -214,9 +215,9 @@ let compute ~opam_switch_prefix ?(objinfo=false) () =
   StringMap.iter (fun _n opam ->
       StringMap.iter (fun _n opam_mdl ->
           if StringMap.is_empty opam_mdl.mdl_libs &&
-               StringSet.exists (fun s ->
+               StringMap.exists (fun s _path ->
                    s = "cmt" || s = "cmti" || s = "cmi"
-                 ) opam_mdl.mdl_exts
+                 ) opam_mdl.mdl_path
           then
             let libs =
               StringMap.fold (fun _n lib libs ->

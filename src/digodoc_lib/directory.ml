@@ -25,7 +25,6 @@ let get state dir_name =
       dir_name = dir_name ;
       dir_meta = None ;
       dir_libs = StringMap.empty ;
-      dir_mdls = StringMap.empty ;
     } in
     state.directories <- StringMap.add dir_name dir state.directories;
     dir

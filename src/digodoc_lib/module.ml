@@ -20,13 +20,15 @@ let long_name ~mdl_name ~mdl_opam =
   mdl_opam.opam_name ^ "::" ^ mdl_name
 
 let file mdl ~ext =
-  mdl.mdl_dir.dir_name // ( mdl.mdl_basename ^ ext )
+  let name_n_ext = mdl.mdl_basename ^ ext in
+  let path = StringMap.find ext mdl.mdl_path in
+  path // name_n_ext
 
 let find state ~mdl_name ~mdl_opam =
   let long_name = long_name ~mdl_name ~mdl_opam in
   Hashtbl.find state.ocaml_mdls_by_name long_name
 
-let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
+let find_or_create ~mdl_ext ~mdl_path ~mdl_basename state ~mdl_opam ~objinfo =
   let mdl_name = String.capitalize mdl_basename in
   let mdl =
     match find state ~mdl_name ~mdl_opam with
@@ -35,9 +37,8 @@ let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
           mdl_name ;
           mdl_longname = mdl_opam.opam_name ^ "::" ^ mdl_name;
           mdl_basename ;
-          mdl_dir ;
           mdl_opam ;
-          mdl_exts = StringSet.empty;
+          mdl_path = StringMap.empty;
           mdl_libs = StringMap.empty;
           mdl_metas = StringMap.empty;
           mdl_intf = None;
@@ -49,16 +50,15 @@ let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
           ( long_name ~mdl_name ~mdl_opam ) mdl;
         Hashtbl.add state.ocaml_mdls_by_name mdl_name mdl ;
         state.ocaml_mdls <- ( mdl_name, mdl ) :: state.ocaml_mdls;
-        mdl_dir.dir_mdls <- StringMap.add mdl.mdl_name mdl mdl_dir.dir_mdls;
         mdl_opam.opam_mdls <-
           StringMap.add mdl_name mdl mdl_opam.opam_mdls ;
         mdl
     | mdl -> mdl
   in
-  mdl.mdl_exts <- StringSet.add mdl_ext mdl.mdl_exts ;
+  mdl.mdl_path <- StringMap.add mdl_ext mdl_path mdl.mdl_path ;
 
   (* Extract cmi/cmt info *)
-    begin 
+    begin
     match mdl_ext with
     | "cmt" | "cmti" | "cmi" -> begin
       match Cmt_format.read (state.opam_switch_prefix // file mdl ~ext:("." ^ mdl_ext)) with
@@ -95,5 +95,6 @@ let find_or_create ~mdl_ext ~mdl_dir ~mdl_basename state ~mdl_opam ~objinfo =
   mdl
 
 let file m ext =
-  (* TODO: check that this extension exists for this mdlule *)
-  Filename.concat m.mdl_dir.dir_name m.mdl_basename ^ "." ^ ext
+  let name_n_ext = m.mdl_basename ^ ext in
+  let path = StringMap.find ext m.mdl_path in
+  path // name_n_ext

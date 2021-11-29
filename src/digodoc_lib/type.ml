@@ -83,7 +83,6 @@ and directory = {
   dir_name : string ;
   mutable dir_meta : meta_package option ;
   mutable dir_libs : ocaml_lib StringMap.t ; (* NAME -> ocaml_lib *)
-  mutable dir_mdls : ocaml_mdl StringMap.t ; (* NAME -> ocaml_mdl *)
 }
 
 and ocaml_lib = {
@@ -107,10 +106,9 @@ and ocaml_mdl = {
   mdl_name : string ; (* Capitalized *)
   mdl_longname : string ;
   mdl_opam : opam_package ;
-  mdl_dir : directory ;
 
   mutable mdl_basename : string ;
-  mutable mdl_exts : StringSet.t ;
+  mutable mdl_path : string StringMap.t ;
   mutable mdl_libs : ocaml_lib StringMap.t ; (* OPAM::NAME -> ocaml_lib *)
 
   (* meta_packages where this module appears EXPLICITLY *)
@@ -120,7 +118,7 @@ and ocaml_mdl = {
   mutable mdl_impl : comp_unit option ;
 
   mutable mdl_cmi_info : Cmi_format.cmi_infos option;
-  mutable mdl_cmt_info : Cmt_format.cmt_infos option 
+  mutable mdl_cmt_info : Cmt_format.cmt_infos option
 }
 
 and state = {
