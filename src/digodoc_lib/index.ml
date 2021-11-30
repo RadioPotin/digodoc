@@ -223,7 +223,7 @@ let print_index bb index entity_name =
     ) index;
 
   Printf.bprintf bb {|
-    <h4 id="item-number">%d %s</h4>
+    <!--<h4 id="item-number">%d %s</h4>-->
     <div id="by-name" class="by-name">
       <nav>
 |} !n entity_name;
@@ -505,7 +505,7 @@ let generate () =
   <h2>Index</h2>
 <div class="container">
 <div class="contained-left">
-<h4 id="item-number" class=""> (get n) modules</h4>
+<h4 id="item-number" class=""></h4>
 </div>
 <div class="contained-right">
 <input id="localsearch" placeholder="Search in ..." autocomplete="off">

@@ -29,13 +29,13 @@ let genericHandler handler =
                 (* call specific to page handler handler *)
                 let%lwt _ = Lwt.catch handler
                     (fun error -> begin 
-                          match error with
-                          | Web_app_error errors -> 
-                              (** print all occured errors *)
-                              print_web_app_error errors
-                          | _ -> err "Undefined error"
-                        end;
-                        Lwt.return_unit
+                         match error with
+                         | Web_app_error errors -> 
+                             (** print all occured errors *)
+                             print_web_app_error errors
+                         | _ -> err "Undefined error"
+                       end;
+                       Lwt.return_unit
                     ) in
 
                 (* adjust footer *)
@@ -57,16 +57,22 @@ let main () =
         Headfoot.footerHandler ();
         _false
       )
+  in
   (* search page specific handler that regroups two specific handlers *)
-  and searchPageHandler = (fun () ->
+  let searchPageHandler = (fun () ->
       let%lwt () = Search.onload () in
       SearchAdvanced.onload ()
+    )
+  in
+  let indexHandler = (fun () ->
+      let%lwt () = Search.onload () in
+      Index.onload ()
     )
   in 
   (* footer handler when resized *)
   window##.onresize := footHandler;
   if is_index_page 
-  then window##.onload := genericHandler Index.onload
+  then window##.onload := genericHandler indexHandler
   else if is_search_page
   then window##.onload := genericHandler searchPageHandler
   else window##.onload := genericHandler Search.onload

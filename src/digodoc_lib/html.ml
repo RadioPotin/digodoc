@@ -45,7 +45,7 @@ let generate_page ~filename ~title ~is_index f =
         else ""
     | "search" -> 
         if is_index 
-        then file_content "search_index.html"
+        then EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
         else EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
     | _ ->
         Printf.kprintf failwith "Unknown var %S" var

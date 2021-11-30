@@ -270,6 +270,23 @@ let update_entry_state () =
     corresponding to them entry to the set of entries in the current state. Function returns [true]
     if at least 1 checkbox is checked (search is made through at least 1 entry type) else returns [false]. *)
 
+let getTags id =
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id id in
+  let cur_sset = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then begin
+    let tags = tag_container##.childNodes in
+    for i = 0 to tags##.length - 1
+    do
+      let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (tags##item i) in
+      cur_sset := StringSet.add (to_string tag_i##.innerText) !cur_sset;
+    done
+  end;
+  logs "printing what I got ";
+  StringSet.iter (fun e -> logs e) !cur_sset;
+  !cur_sset
+(** Retrieves the chosen modules / packages in which search will be done *)
+
 let update_element_state () =
   (* Look up either checkbox is checked or not. If checked, add corresponding element to the state *)
   let handle_checkbox id state =
@@ -302,29 +319,8 @@ let update_element_state () =
   element_state.in_opams <- StringSet.empty;
   element_state.in_mdls <- StringSet.empty; 
   (* TODO : get opams and mdls names from tags *)
-
-  let pack_tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
-  let mod_tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
-
-  if to_bool pack_tag_container##hasChildNodes
-  then begin
-    let pack_tags = pack_tag_container##.childNodes in
-    for i = 0 to pack_tags##.length - 1 
-    do
-      let pack_tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (pack_tags##item i) in
-      element_state.in_opams <- StringSet.add (to_string pack_tag_i##.innerText) element_state.in_opams;
-    done
-  end;
-
-  if to_bool mod_tag_container##hasChildNodes
-  then begin
-    let mod_tags = mod_tag_container##.childNodes in
-    for i = 0 to mod_tags##.length - 1 
-    do
-      let mod_tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (mod_tags##item i) in
-      element_state.in_mdls  <- StringSet.add (to_string mod_tag_i##.innerText) element_state.in_mdls;
-    done
-  end;
+  element_state.in_opams <- getTags "pack_tag_container" ;
+  element_state.in_mdls <- getTags "mod_tag_container" ;
 
   match element_state.elements with
   | set when ElementSet.is_empty set -> false
@@ -365,12 +361,7 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
   let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
   (* Start by removing all children from packsUl and replace them with result of new request 
      packsUl##.innerHTML = "";*)
-  let clean_lis = packsUl##.childNodes in
-  for i = 0 to clean_lis##.length - 1
-  do
-    let li_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (clean_lis##item i) in 
-    Dom.removeChild packsUl li_i;
-  done;
+  packsUl##.innerHTML := js "";
 
   let cur_tags = ref StringSet.empty in
   if to_bool tag_container##hasChildNodes
@@ -412,6 +403,7 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
                end;
              input##.value := js "";
              packsUl##.style##.display := js "none";
+             Headfoot.footerHandler();
              _false
            );
          let a_li = Html.createA document in
@@ -483,6 +475,7 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
                end;
              input##.value := js "";
              modsUl##.style##.display := js "none";
+             Headfoot.footerHandler();
              _false
            );
          let a_li = Html.createA document in
@@ -575,6 +568,7 @@ let set_handlers () =
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
+  let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
   let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
 
@@ -627,22 +621,37 @@ let set_handlers () =
   (**Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
 
   toggle_entry_form##.onclick := Html.handler (fun _ ->
-      let hide_this = get_element_by_id "element-search-content" in 
+      let hide_elem_search = get_element_by_id "element-search-content" in
+      let hide_fulltext_search = get_element_by_id "fulltext-content" in
       let show_this = get_element_by_id "entry-search-content" in 
-      hide_this##.style##.display := js "none";
+      hide_elem_search##.style##.display := js "none";
+      hide_fulltext_search##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
     );
   (**Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
 
   toggle_element_form##.onclick := Html.handler (fun _ ->
-      let show_this = get_element_by_id "element-search-content" in 
-      let hide_this = get_element_by_id "entry-search-content" in 
-      hide_this##.style##.display := js "none";
+      let show_this = get_element_by_id "element-search-content" in
+      let hide_entry_search = get_element_by_id "entry-search-content" in
+      let hide_fulltext_search = get_element_by_id "fulltext-content" in
+      hide_entry_search##.style##.display := js "none";
+      hide_fulltext_search##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
     );
   (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
+
+  toggle_fulltext_form##.onclick := Html.handler (fun _ ->
+      let show_this = get_element_by_id "fulltext-content" in
+      let hide_entry_search = get_element_by_id "entry-search-content" in
+      let hide_elem_search = get_element_by_id "element-search-content" in
+      show_this##.style##.display := js "block";
+      hide_elem_search##.style##.display := js "none";
+      hide_entry_search##.style##.display := js "none";
+      _false
+    );
+  (**Show fulltext-form's div when button having id="col_fulltext" is clicked and hide the two other forms *)
 
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
@@ -657,10 +666,12 @@ let set_handlers () =
               packsUl##.style##.display := js "none";
               let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
               Dom.removeChild tag_container rm_pack_name_version;
+              Headfoot.footerHandler();
             end;
 
         | Some "Escape" -> 
             packsUl##.style##.display := js "none";
+            Headfoot.footerHandler();
 
         | _ ->
             if (not (cur_input_value = js ""))
@@ -688,10 +699,12 @@ let set_handlers () =
               then
                 let rm_mod_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
                 Dom.removeChild tag_container rm_mod_name_version;
+                Headfoot.footerHandler();
             end;
 
         | Some "Escape" -> 
             modsUl##.style##.display := js "none";
+            Headfoot.footerHandler();
 
         | _ ->
             if (not (cur_input_value = js ""))
