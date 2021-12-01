@@ -20,12 +20,13 @@ jobs:
           path: ~/.opam
           key: v1-Linux-digodoc-4.10.0-${{ hashFiles('*.opam') }}
       
-      - run: opam pin https://github.com/OCamlPro/digodoc-search-api.git
-
       - name: setup-ocaml
         uses: avsm/setup-ocaml@v2
         with:
           ocaml-compiler: 4.10.0
+        
+      - run: opam pin https://github.com/OCamlPro/digodoc-search-api.git
+
       - name: setup-doc
         run: |
           sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme libgeoip-dev
