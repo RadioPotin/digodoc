@@ -191,12 +191,12 @@ let main () =
               if StringMap.mem "mli" m.mdl_path then
                 Unix.execvp "less" [| "less";
                                       opam_switch_prefix //
-                                      ( Module.file m "mli") |]
+                                      ( Module.file m ~ext:"mli") |]
               else
               if StringMap.mem "ml" m.mdl_path then
                 Unix.execvp "less" [| "less";
                                       opam_switch_prefix //
-                                      ( Module.file m "ml") |]
+                                      ( Module.file m ~ext:"ml") |]
           | list ->
               Printf.printf "Found %d occurrences of %S:\n%!"
                 ( List.length list) mdl;

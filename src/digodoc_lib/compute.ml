@@ -50,7 +50,8 @@ let check_file state ~objinfo opam_package file =
   let dirname = Filename.dirname file in
   let basename = Filename.basename file in
   let dir = Directory.get state dirname in
-  let path = file in
+  let path = file
+  in
   if basename = "META" || dirname = "metas" then
     let filename, meta_name =
       if dirname = "metas"
@@ -65,7 +66,7 @@ let check_file state ~objinfo opam_package file =
       Meta.create state ~meta_name ~meta_file
         ~meta_opam:opam_package ~meta_dir:dir in
     ()
-  else
+      else
     (* TODO: register all interesting files, i.e. .cmxa, .cmx, .cmi,
        .cmti, .cmt, .mli, .ml *)
     let basename, ext = EzString.rcut_at basename '.' in
@@ -85,7 +86,7 @@ let check_file state ~objinfo opam_package file =
     | "cmti" ->
         let ( _mdl : ocaml_mdl)  =
           Module.find_or_create state ~objinfo
-            ~mdl_basename:basename ~mdl_ext:("." ^ ext)
+            ~mdl_basename:basename ~mdl_ext:ext
             ~mdl_opam:opam_package ~mdl_path:path
         in
         ()

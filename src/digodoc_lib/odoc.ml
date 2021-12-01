@@ -137,8 +137,7 @@ let call_odoc ~continue_on_error state mdl ~pkgs ext =
       "odoc" ; "compile" ;
       "--pkg" ; pkg ;
       "-o" ; odoc_target ;
-      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path //
-      mdl.mdl_basename ^ ext ]
+      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path ]
       @ includes
     in
     try
@@ -171,8 +170,7 @@ let call_odoc_compile ~continue_on_error state mdl ~pkgs ext =
       "odoc" ; "compile" ;
       "--pkg" ; pkg ;
       "-o" ; odoc_target ;
-      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path //
-      mdl.mdl_basename ^ ext ]
+      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path ]
       @ includes
     in
     try
@@ -1114,13 +1112,13 @@ let generate ~state ~continue_on_error  =
         let pkgs = Hashtbl.find deps_of_pkg pkg in
         let pkgs = StringSet.to_list !pkgs in
         if StringMap.mem "cmti" mdl.mdl_path then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmti"
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmti"
         else
         if StringMap.mem "cmt" mdl.mdl_path then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmt"
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmt"
         else
         if StringMap.mem "cmi" mdl.mdl_path then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmi"
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmi"
       );
 
     iter_modules_with_cmi state (fun _state mdl ->

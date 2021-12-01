@@ -20,9 +20,9 @@ let long_name ~mdl_name ~mdl_opam =
   mdl_opam.opam_name ^ "::" ^ mdl_name
 
 let file mdl ~ext =
-  let name_n_ext = mdl.mdl_basename ^ ext in
+  let _name_n_ext = mdl.mdl_basename ^ "." ^ ext in
   let path = StringMap.find ext mdl.mdl_path in
-  path // name_n_ext
+  path
 
 let find state ~mdl_name ~mdl_opam =
   let long_name = long_name ~mdl_name ~mdl_opam in
@@ -61,7 +61,7 @@ let find_or_create ~mdl_ext ~mdl_path ~mdl_basename state ~mdl_opam ~objinfo =
     begin
     match mdl_ext with
     | "cmt" | "cmti" | "cmi" -> begin
-      match Cmt_format.read (state.opam_switch_prefix // file mdl ~ext:("." ^ mdl_ext)) with
+      match Cmt_format.read (state.opam_switch_prefix // file mdl ~ext:(mdl_ext)) with
       | Some cmi, _ when mdl.mdl_cmi_info = None -> mdl.mdl_cmi_info <- Some cmi
       | _, Some cmt when mdl.mdl_cmt_info = None -> mdl.mdl_cmt_info <- Some cmt
       | _ -> ()
@@ -73,7 +73,7 @@ let find_or_create ~mdl_ext ~mdl_path ~mdl_basename state ~mdl_opam ~objinfo =
      one. Otherwise, it means two opam packages have added different
      files for this mdlule *)
   if objinfo && mdl_ext = "cmx" then begin
-    match Objinfo.read state (file mdl ~ext:".cmx") with
+    match Objinfo.read state (file mdl ~ext:mdl_ext) with
     | [] | _ :: _ :: _ -> (* TODO: warning *) ()
     | [ unit ] ->
         mdl.mdl_impl <- Some unit ;
@@ -83,7 +83,7 @@ let find_or_create ~mdl_ext ~mdl_path ~mdl_basename state ~mdl_opam ~objinfo =
             Hashtbl.add state.ocaml_mdls_by_cmx_crc crc mdl
   end;
   if objinfo && mdl_ext = "cmi" then begin
-    match Objinfo.read state (file mdl ~ext:".cmi") with
+    match Objinfo.read state (file mdl ~ext:mdl_ext) with
     | [] | _ :: _ :: _ -> (* TODO: warning *) ()
     | [ unit ] ->
         mdl.mdl_intf <- Some unit;
@@ -93,8 +93,3 @@ let find_or_create ~mdl_ext ~mdl_path ~mdl_basename state ~mdl_opam ~objinfo =
             Hashtbl.add state.ocaml_mdls_by_cmi_crc crc mdl
   end;
   mdl
-
-let file m ext =
-  let name_n_ext = m.mdl_basename ^ ext in
-  let path = StringMap.find ext m.mdl_path in
-  path // name_n_ext
