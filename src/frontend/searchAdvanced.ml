@@ -21,10 +21,10 @@ open Utils
 open Objects
 
 (** Module [SearchAdvanced] defines behaviour for search pages (search.html).
-    Search page is constructed dynamically by sending requests to API server. Page could have two states : 
-    Initialised with entry/element form or unitialized. If page is opened without arguments (query string) 
+    Search page is constructed dynamically by sending requests to API server. Page could have two states :
+    Initialised with entry/element form or unitialized. If page is opened without arguments (query string)
     it is considered as uninitialized and it displays two forms (for entries and for elements). Submiting form
-    opens initialised search page in the same window. Initialised page displays: 
+    opens initialised search page in the same window. Initialised page displays:
     1) Button 'update filters' that allows to update search filters
     2) Information about current page (range of ids on the page)
     3) Entry/element navigation bar.
@@ -43,7 +43,7 @@ end
 
 module OrderedElement = struct
   type t = Data_types.element_type
-  let compare VAL VAL = 0 
+  let compare VAL VAL = 0
 end
 (** Ordered entry (element?) type *)
 
@@ -75,7 +75,7 @@ type element_search_state = {
 }
 (** State for element search *)
 
-type search_state = 
+type search_state =
   | Uninitialized
   | SearchEntry of entry_search_state
   | SearchElement of element_search_state
@@ -100,11 +100,11 @@ let state_of_args args =
   (* Match type of search *)
   match List.assoc "search" args with
   | "entry" ->
-      let state = { 
+      let state = {
         pattern = "";
         entries = EntrySet.empty;
         current_entry = PACK;
-        page = 1 } 
+        page = 1 }
       in
       (* construct the entry state *)
       List.iter (fun (key,elt) ->
@@ -119,15 +119,15 @@ let state_of_args args =
         args;
       SearchEntry state
   | "element" ->
-      let state = { 
+      let state = {
         pattern = "";
-        elements = ElementSet.empty; 
-        current_element = VAL; 
-        page = 1; 
+        elements = ElementSet.empty;
+        current_element = VAL;
+        page = 1;
         regex = true;
         in_opams = StringSet.empty;
-        in_mdls = StringSet.empty 
-      } 
+        in_mdls = StringSet.empty
+      }
       in
       (* construct the element state *)
       List.iter (fun (key,elt) ->
@@ -155,8 +155,8 @@ let state_to_args state =
       (* constructs query string from entry state *)
       Printf.sprintf "search=entry&pattern=%s&%s&current=%s&page=%d"
         (encode_query_val pattern)
-        (String.concat "&" 
-         @@ List.map (fun elt -> ("entry=" ^ entry_type_to_string elt)) 
+        (String.concat "&"
+         @@ List.map (fun elt -> ("entry=" ^ entry_type_to_string elt))
          @@ EntrySet.elements entries)
         (entry_type_to_string current_entry)
         page
@@ -164,17 +164,17 @@ let state_to_args state =
       (* constructs query string from element state *)
       Printf.sprintf "search=element&pattern=%s&%s&current=%s&page=%d&mode=%s&%s&%s"
         (encode_query_val pattern)
-        (String.concat "&" 
-         @@ List.map (fun elt -> ("element=" ^ element_type_to_string elt)) 
+        (String.concat "&"
+         @@ List.map (fun elt -> ("element=" ^ element_type_to_string elt))
          @@ ElementSet.elements elements)
         (element_type_to_string current_element)
         page
         (if regex then "regex" else "text")
-        (String.concat "&" 
-         @@ List.map (fun elt -> ("opam=" ^ elt)) 
+        (String.concat "&"
+         @@ List.map (fun elt -> ("opam=" ^ elt))
          @@ StringSet.elements in_opams)
-        (String.concat "&" 
-         @@ List.map (fun elt -> ("mdl=" ^ elt)) 
+        (String.concat "&"
+         @@ List.map (fun elt -> ("mdl=" ^ elt))
          @@ StringSet.elements in_mdls)
 (** [state_to_args state] constructs query string from search state [state] *)
 
@@ -189,7 +189,7 @@ let get_element_state () =
   match !search_state with
   | SearchElement state -> state
   | _ -> raise @@ web_app_error "get_element_state_info: current state isn't an element state"
-(** Get element state from search state. Raises [Web_app_error] if current state isn't an element state 
+(** Get element state from search state. Raises [Web_app_error] if current state isn't an element state
     Raises [Web_app_error] if current state isn't an element state *)
 
 let entry_state_to_entry_info {pattern; current_entry; page; _} =
@@ -209,7 +209,7 @@ let element_state_to_element_info {pattern; current_element; regex; page; in_opa
         pattern = pattern;
         last_id = (page - 1) * 50;
         mode = if regex then Regex else Text;
-        conditions = 
+        conditions =
             List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
             @ List.map (fun mdl -> In_mdl mdl)  (StringSet.elements in_mdls)
     }
@@ -237,19 +237,19 @@ let update_entry_state () =
       | "fmetas" -> META
       | "fsources" -> SRC
       | _ -> raise @@
-          web_app_error (Printf.sprintf "update_state_entry: can't find %s id" id)       
+          web_app_error (Printf.sprintf "update_state_entry: can't find %s id" id)
     in
     if to_bool @@ (get_input id)##.checked
     then state.entries <- EntrySet.add entry state.entries
     else state.entries <- EntrySet.remove entry state.entries
   in
   (* Init entry search state *)
-  let entry_state = { 
+  let entry_state = {
     pattern = "";
     entries = EntrySet.empty;
-    current_entry = PACK; 
-    page = 1 
-  } in 
+    current_entry = PACK;
+    page = 1
+  } in
   let pattern_input = get_input "fpattern_entry" in
   let value = to_string pattern_input##.value##trim in
   entry_state.pattern <- value;
@@ -261,12 +261,12 @@ let update_entry_state () =
   handle_checkbox "fsources" entry_state;
   match entry_state.entries with
   | set when EntrySet.is_empty set -> false
-  | set -> 
+  | set ->
       (* Set current entry to the least entry checked *)
       entry_state.current_entry <- get_first_entry set;
       search_state := SearchEntry entry_state;
       true
-(** Looks for entry form in order to update search state. Checked checkboxes are handled to add 
+(** Looks for entry form in order to update search state. Checked checkboxes are handled to add
     corresponding to them entry to the set of entries in the current state. Function returns [true]
     if at least 1 checkbox is checked (search is made through at least 1 entry type) else returns [false]. *)
 
@@ -277,22 +277,22 @@ let update_element_state () =
       match id with
       | "fvals" -> VAL
       | _ -> raise @@
-          web_app_error (Printf.sprintf "update_element_state: can't find %s id" id)       
+          web_app_error (Printf.sprintf "update_element_state: can't find %s id" id)
     in
     if to_bool @@ (get_input id)##.checked
-    then state.elements <- ElementSet.add element state.elements 
+    then state.elements <- ElementSet.add element state.elements
     else state.elements <- ElementSet.remove element state.elements
   in
   (* Init entry search state *)
-  let element_state =  { 
-    pattern = ""; 
-    elements = ElementSet.empty; 
-    current_element = VAL; 
+  let element_state =  {
+    pattern = "";
+    elements = ElementSet.empty;
+    current_element = VAL;
     page = 1;
     regex = true;
     in_opams = StringSet.empty;
-    in_mdls = StringSet.empty 
-  } in 
+    in_mdls = StringSet.empty
+  } in
   let pattern_input = get_input "fpattern_element" in
   let value = to_string pattern_input##.value##trim in
   element_state.pattern <- value;
@@ -304,12 +304,12 @@ let update_element_state () =
   element_state.in_mdls <- StringSet.empty;
   match element_state.elements with
   | set when ElementSet.is_empty set -> false
-  | set -> 
+  | set ->
       (* Set current entry to the least entry checked *)
       element_state.current_element <- get_first_element set;
       search_state := SearchElement element_state;
       true
-(** Looks for element form in order to update search state. Checked checkboxes are handled to add 
+(** Looks for element form in order to update search state. Checked checkboxes are handled to add
     corresponding to them element to the set of elements in the current state. Function returns [true]
     if at least 1 checkbox is checked (search is made through at least 1 element type) else returns [false]. *)
 
@@ -318,16 +318,16 @@ let update_form () =
     (get_input id)##.checked := bool true
   in
   match !search_state with
-  | Uninitialized -> 
-      raise @@ web_app_error "update_form: search is unitialised" 
-  | SearchEntry state -> 
+  | Uninitialized ->
+      raise @@ web_app_error "update_form: search is unitialised"
+  | SearchEntry state ->
       (* update entry form *)
-      (get_input "fpattern_entry")##.value := js state.pattern; 
+      (get_input "fpattern_entry")##.value := js state.pattern;
       EntrySet.iter (fun entry -> check_input @@ "f" ^ entry_type_to_string entry)
         state.entries
   | SearchElement state ->
       (* update element form *)
-      (get_input "fpattern_element")##.value := js state.pattern; 
+      (get_input "fpattern_element")##.value := js state.pattern;
       ElementSet.iter (fun element ->  check_input @@ "f" ^ element_type_to_string element)
         state.elements;
       if state.regex then check_input "fregex"
@@ -343,13 +343,13 @@ let set_attr elt attr value =
 let append_inner elt str =
   elt##.innerHTML := concat elt##.innerHTML str
 
-let insert_packsUl_li : packages_jsoo t -> unit  = 
+let insert_packsUl_li : packages_jsoo t -> unit  =
   fun (packages : packages_jsoo t) ->
   let packsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "packsUl" in
   let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
   let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
   let element_state = get_element_state() in
-  foreach 
+  foreach
     (fun i elt ->
        if i < 10
        then begin
@@ -394,7 +394,7 @@ let previewpacks pattern =
     starts_with = "^.";
     pattern;
   } in
-  Lwt.async @@ 
+  Lwt.async @@
   Requests.send_generic_request
     ~request:(Requests.getEntries entry_info)
     ~callback:(fun pack_entries ->
@@ -424,8 +424,8 @@ let set_handlers () =
   (*Currently working on some elements *)
   let pack_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showpacksearch" in
   let mod_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showmodsearch" in
-  let focus_packages_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in 
-  let focus_mods_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbm" in 
+  let focus_packages_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
+  let focus_mods_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbm" in
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
@@ -433,7 +433,7 @@ let set_handlers () =
 
   (*Hide / Show package input in element-form to specify packages in which search will be performed*)
   pack_checkbox##.onchange := Html.handler (fun _ ->
-      let pack_to_hide = get_element_by_id "nsbp" in 
+      let pack_to_hide = get_element_by_id "nsbp" in
       if pack_checkbox##.checked = _true
       then pack_to_hide##.style##.display := js "block"
       else pack_to_hide##.style##.display := js "none";
@@ -442,7 +442,7 @@ let set_handlers () =
 
   (*Hide / Show module input in element-form to specify modules in which search will be performed*)
   mod_checkbox##.onchange := Html.handler (fun _ ->
-      let mod_to_hide = get_element_by_id "nsbm" in 
+      let mod_to_hide = get_element_by_id "nsbm" in
       if mod_checkbox##.checked = _true
       then mod_to_hide##.style##.display := js "block"
       else mod_to_hide##.style##.display := js "none";
@@ -451,22 +451,22 @@ let set_handlers () =
 
   (*Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
   focus_packages_input##.onclick := Html.handler (fun _ ->
-      let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in 
+      let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
       focus_to_packinput##focus;
       _false
     );
 
   (*Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
   focus_mods_input##.onclick := Html.handler (fun _ ->
-      let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in 
+      let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
       focus_to_modinput##focus;
       _false
     );
 
   (*Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
   slider_show_hide##.onchange := Html.handler (fun _ ->
-      let tr_tohide = get_element_by_id "tohide" in 
-      let tr_tohide2 = get_element_by_id "tohide2" in 
+      let tr_tohide = get_element_by_id "tohide" in
+      let tr_tohide2 = get_element_by_id "tohide2" in
       if slider_show_hide##.checked = _false
       then begin
         tr_tohide##.style##.display := js "none";
@@ -481,8 +481,8 @@ let set_handlers () =
 
   (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
   toggle_entry_form##.onclick := Html.handler (fun _ ->
-      let hide_this = get_element_by_id "element-search-content" in 
-      let show_this = get_element_by_id "entry-search-content" in 
+      let hide_this = get_element_by_id "element-search-content" in
+      let show_this = get_element_by_id "entry-search-content" in
       hide_this##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
@@ -490,8 +490,8 @@ let set_handlers () =
 
   (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
   toggle_element_form##.onclick := Html.handler (fun _ ->
-      let show_this = get_element_by_id "element-search-content" in 
-      let hide_this = get_element_by_id "entry-search-content" in 
+      let show_this = get_element_by_id "element-search-content" in
+      let hide_this = get_element_by_id "entry-search-content" in
       hide_this##.style##.display := js "none";
       show_this##.style##.display := js "block";
       _false
@@ -532,7 +532,7 @@ let set_handlers () =
   (* Handler called when onsubmit event was generated by entry form *)
   entry_form##.onsubmit := Html.handler (fun _ ->
       (* if state was updated (at least 1 entry checkbox is checked) then redirect to the corresponding search page *)
-      if update_entry_state () 
+      if update_entry_state ()
       then begin
         (* redirect to the page *)
         open_url @@ js @@ "search.html?" ^ state_to_args !search_state
@@ -542,7 +542,7 @@ let set_handlers () =
   (* Handler called when onsubmit event was generated by element form *)
   element_form##.onsubmit := Html.handler (fun _ ->
       (* if state was updated (at least 1 element checkbox is checked) then redirect to the corresponding search page *)
-      if update_element_state () 
+      if update_element_state ()
       then begin
         (* redirect to the page *)
         open_url @@ js @@ "search.html?" ^ state_to_args !search_state
@@ -564,34 +564,34 @@ let set_handlers () =
   toggle_mod ()
   List.iter (fun button_i ->
         button_i##.onclick := Html.handler (fun _ ->
-            List.iter (fun (button_j:#Dom.node t) -> 
+            List.iter (fun (button_j:#Dom.node t) ->
                     if (button_i <> button_j) then begin
                         let nocontent = element_to_button @@
-                                        unopt @@ 
-                                        Html.CoerceTo.element @@ 
-                                        button_j##.nextSibling 
+                                        unopt @@
+                                        Html.CoerceTo.element @@
+                                        button_j##.nextSibling
                         in
                         nocontent##.style##.display := js "none"
                     end
-                ) 
+                )
                 form_buttons;
 
             _false
-        )   
+        )
     )
     form_buttons*)
-(** Sets handlers to forms and buttons from search page. Submit event handler of a form redirect to the 
-    page with corresponding to search state results. Click event of a button 'update filters' shows filled 
+(** Sets handlers to forms and buttons from search page. Submit event handler of a form redirect to the
+    page with corresponding to search state results. Click event of a button 'update filters' shows filled
     form within result page that allows to update search request. *)
 
 let initialise_state () =
-  let args = Url.Current.arguments in 
+  let args = Url.Current.arguments in
   if args != []
   then search_state := state_of_args args
 (** Initialises state by looking up current URL arguments (query string) *)
 
 let uninitialized_page () =
-  let forms = get_element_by_id "forms" in 
+  let forms = get_element_by_id "forms" in
   forms##.style##.display := js "";
   Lwt.return_unit
 (** Displays unitialized version of the page. *)
@@ -611,16 +611,16 @@ let pagination_info state total_number =
     | SearchElement st -> SearchElement {st with page}
   in
   (* total number of pages *)
-  let pages_number = 
+  let pages_number =
     if total_number <= 0
     then raise @@ web_app_error "pagination_info: total number couldn't be negativ "
     else (total_number - 1) / 50 + 1
   (* current page *)
-  and page = get_search_page state in   
+  and page = get_search_page state in
   (* first and last page that will appear in page navigation bar *)
   let first,last =
-    if pages_number > 9 
-    && 4 < page 
+    if pages_number > 9
+    && 4 < page
     && page  < pages_number - 3
     then page - 4, page + 4
     else if not (4 < page)
@@ -629,28 +629,28 @@ let pagination_info state total_number =
     then max 1 (pages_number - 8), pages_number
     else max 1 (pages_number - 8), min 9 pages_number
   (* all pages that will appear inside page navigation bar and index of current page *)
-  and pages = ref [] 
+  and pages = ref []
   and active_ind = ref 0 in
   for num = first to last do
     (* first and last id of an entry/element that appears on the page *)
     let first_id = (num - 1) * 50 + 1
-    and last_id = if num = pages_number then total_number else num * 50 
+    and last_id = if num = pages_number then total_number else num * 50
     and st = set_search_page state num in
     (* construct link to the page *)
     let href = "search.html?" ^ state_to_args st in
     let page_info = {num; interval=(first_id, last_id); href} in
     pages := page_info :: !pages;
-    if num < page 
+    if num < page
     then incr active_ind
   done;
-  let pages = List.rev !pages 
+  let pages = List.rev !pages
   and active_ind = !active_ind in
   {active_ind; pages; total_number}
-(** [pagination_info state total_number] constructs [pagination_info] according to the current state [state] 
-    and total number of entries/element that will be listed throughout all the pages. 
+(** [pagination_info state total_number] constructs [pagination_info] according to the current state [state]
+    and total number of entries/element that will be listed throughout all the pages.
     Raises [Web_app_error] if current state is uninitialized. *)
 
-let insert_content info current current_number = 
+let insert_content info current current_number =
     (* insert pagination nav *)
     let insert_pagination () =
         let number = int_of_string current_number in
@@ -661,7 +661,7 @@ let insert_content info current current_number =
         let update_button = get_element_by_id "update-filters"
         and entries_nav = get_element_by_id "entries-nav"
         and result_div = get_element_by_id "result-div"
-        and result_nav = get_element_by_id @@ current ^ "-results" 
+        and result_nav = get_element_by_id @@ current ^ "-results"
         and results = get_element_by_id "results-list" in
         update_button##.style##.display := js "";
         entries_nav##.style##.display := js "";
@@ -680,9 +680,9 @@ let insert_content info current current_number =
         let update_button = get_element_by_id "update-filters" in
         update_button##.style##.display := js "";
         (* print error message *)
-        begin 
+        begin
             match err with
-            | Invalid_regex -> 
+            | Invalid_regex ->
                 Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
             | Unknown ->
                 Insertion.write_warning ("Server error occured, please try again later.")
@@ -690,11 +690,11 @@ let insert_content info current current_number =
         Lwt.return_unit
     in
     match info with
-    | Entry entry_info -> 
+    | Entry entry_info ->
         Requests.send_generic_request
             ~request:(Requests.getEntries entry_info)
             ~callback:(fun entries ->
-                if not @@ empty_entries entries 
+                if not @@ empty_entries entries
                 then begin
                     display_content ();
                     (* insert entries in search page *)
@@ -726,7 +726,7 @@ let insert_content info current current_number =
                 )
             ~error:display_error
             ()
-(** Inserts content of the search page (search results and pagination nav bar). 
+(** Inserts content of the search page (search results and pagination nav bar).
     Empty results and server side errors generate specific to them message on the page. *)
 
 let search_page () =
@@ -750,23 +750,23 @@ let search_page () =
         | SearchElement state -> List.map element_type_to_string @@ ElementSet.elements state.elements
     (* construct and set the link to the navigation item *)
     and link_to_elt state link =
-        let st = 
+        let st =
             match state with
             | Uninitialized -> raise @@ web_app_error "link_to_elt: search state is unitialised"
             | SearchEntry state -> SearchEntry {state with page = 1 }
             | SearchElement state -> SearchElement {state with page = 1 }
-        in 
+        in
             let href = "search.html?" ^ state_to_args st in
             link##setAttribute (js "href") (js href)
     in
-    let current = get_current !search_state in 
+    let current = get_current !search_state in
     let elts = get_elts_from_state !search_state
     and info = state_to_info !search_state
     (* number of current entries/elements *)
     and current_number = ref "" in
     let%lwt () =
         (* for every entry/element type *)
-        Lwt_list.iter_p (fun elt ->  
+        Lwt_list.iter_p (fun elt ->
                 let nav_bar = get_element_by_id @@ elt ^ "-results" in
                 (* set the link to the navigation item that leads to search page for corresponding entry/element *)
                 let st = set_current !search_state elt in
@@ -785,12 +785,10 @@ let search_page () =
                     )
                     ()
             )
-          ()
-      )
       elts
   in
   (* insert page content *)
-  insert_content info current !current_number  
+  insert_content info current !current_number
 (** Constructs and displays entirely search page. *)
 
 let onload () =

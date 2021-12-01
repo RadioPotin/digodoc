@@ -43,7 +43,7 @@ let print state =
           Printf.printf "       lib_mdls:\n";
           StringMap.iter (fun _ mdl ->
               Printf.printf "          %s (%s)\n" mdl.mdl_name
-                (String.concat ", "(StringSet.to_list mdl.mdl_exts));
+                (String.concat ", " (StringMap.to_list_of_keys mdl.mdl_path));
             ) lib.lib_mdls;
 
           if StringMap.is_empty lib.lib_metas then
@@ -57,7 +57,7 @@ let print state =
 
       StringMap.iter (fun _ mdl ->
           Printf.printf "    opam_mdl: %s (%s)\n" mdl.mdl_name
-            (String.concat ", "(StringSet.to_list mdl.mdl_exts));
+            (String.concat ", "(StringMap.to_list_of_keys mdl.mdl_path));
           Printf.printf "       module %s is part of %d libs:\n" mdl.mdl_name
             (StringMap.cardinal mdl.mdl_libs);
           StringMap.iter (fun _ lib ->

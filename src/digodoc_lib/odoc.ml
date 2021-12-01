@@ -14,6 +14,7 @@ open EzCompat
 open EzFile.OP
 open Type
 open Digodoc_common
+
 (* Note:
    In our first version, we were computing dependencies at the module level,
   but that's incompatible with `odoc`, because `odoc` follows "false"
@@ -136,8 +137,7 @@ let call_odoc ~continue_on_error state mdl ~pkgs ext =
       "odoc" ; "compile" ;
       "--pkg" ; pkg ;
       "-o" ; odoc_target ;
-      state.opam_switch_prefix // mdl.mdl_dir.dir_name //
-      mdl.mdl_basename ^ ext ]
+      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path ]
       @ includes
     in
     try
@@ -170,8 +170,7 @@ let call_odoc_compile ~continue_on_error state mdl ~pkgs ext =
       "odoc" ; "compile" ;
       "--pkg" ; pkg ;
       "-o" ; odoc_target ;
-      state.opam_switch_prefix // mdl.mdl_dir.dir_name //
-      mdl.mdl_basename ^ ext ]
+      state.opam_switch_prefix // StringMap.find ext mdl.mdl_path ]
       @ includes
     in
     try
@@ -929,7 +928,7 @@ let generate_module_entries state =
 
   List.iter (fun ( _ , mdl ) ->
       let pkg = pkg_of_mdl mdl in
-      if StringSet.mem "cmi" mdl.mdl_exts then begin 
+      if StringMap.mem "cmi" mdl.mdl_path then begin 
         Index.SAVE.save_module_entry
           ( Globals.digodoc_html_dir // pkg // "ENTRY.MODULE." ^ mdl.mdl_name )
           mdl;
@@ -1112,22 +1111,22 @@ let generate ~state ~continue_on_error  =
         let pkg = pkg_of_mdl mdl in
         let pkgs = Hashtbl.find deps_of_pkg pkg in
         let pkgs = StringSet.to_list !pkgs in
-        if StringSet.mem "cmti" mdl.mdl_exts then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmti"
+        if StringMap.mem "cmti" mdl.mdl_path then
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmti"
         else
-        if StringSet.mem "cmt" mdl.mdl_exts then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmt"
+        if StringMap.mem "cmt" mdl.mdl_path then
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmt"
         else
-        if StringSet.mem "cmi" mdl.mdl_exts then
-          call_odoc_compile ~continue_on_error state mdl ~pkgs ".cmi"
+        if StringMap.mem "cmi" mdl.mdl_path then
+          call_odoc_compile ~continue_on_error state mdl ~pkgs "cmi"
       );
 
     iter_modules_with_cmi state (fun _state mdl ->
         let pkg = pkg_of_mdl mdl in
         let pkgs = Hashtbl.find deps_of_pkg pkg in
         let pkgs = StringSet.to_list !pkgs in
-        if not (StringSet.disjoint mdl.mdl_exts
-                  (StringSet.of_list ["cmti";"cmt";"cmi"])) then
+        let set = StringSet.of_list (StringMap.to_list_of_keys mdl.mdl_path) in
+        if not (StringSet.disjoint set (StringSet.of_list ["cmti";"cmt";"cmi"])) then
           call_odoc_html ~continue_on_error mdl ~pkgs
       )
   end;
