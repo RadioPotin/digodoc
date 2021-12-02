@@ -30,7 +30,7 @@ jobs:
           opam install -y dune odoc json-data-encoding json-data-encoding ezjsonm uuidm geoip js_of_ocaml-lwt calendar tls lwt_log  cohttp-lwt-jsoo ppxlib
       - run: opam pin add . -y --no-action
 
-      - run: opam pin https://github.com/OCamlPro/digodoc-search-api.git
+      - run: opam pin add digodoc-search-api https://github.com/OCamlPro/digodoc-search-api.git
 
       - run: opam depext -y digodoc digodoc_lib meta_file ez_html htmlize
         if: steps.cache-opam.outputs.cache-hit != 'true'
