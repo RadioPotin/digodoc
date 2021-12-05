@@ -95,9 +95,9 @@
  (depends
    (ocaml (>= 4.10.0))
    (digodoc-search-api ( >= ~dev ))
-   (js_of_ocaml ( >= 3.0 ))
+   (js_of_ocaml ( >= 3.11.0 ))
    (ppx_deriving_jsoo ( >= 0.1 ))
-   (js_of_ocaml-ppx ( >= 3.0 ))
+   (js_of_ocaml-ppx ( >= 3.11.0 ))
    ppx_inline_test
    ppx_expect
    odoc

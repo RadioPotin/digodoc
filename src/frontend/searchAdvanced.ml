@@ -362,7 +362,7 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
                element_state.in_opams <- StringSet.add name_version element_state.in_opams;
                let sp1 = Html.createSpan document in
                set_attr sp1 "class" (js ("tag"));
-               sp1##.innerText := js name_version;
+               sp1##.innerHTML := js name_version;
                let sp2 = Html.createSpan document in
                set_attr sp2 "class" (js ("remove"));
                let _ = Dom.addEventListener sp2 Html.Event.click (Dom.handler (fun _ ->
@@ -378,7 +378,7 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
          pack_li##.style##.display := js "block";
          let a_li = Html.createA document in
          set_attr a_li "href" (js ("#"));
-         a_li##.innerText := js  name_version;
+         a_li##.innerHTML := js  name_version;
          Dom.appendChild pack_li a_li;
          Dom.appendChild packsUl pack_li;
        end;
@@ -420,7 +420,6 @@ let set_handlers () =
   let entry_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "entry-form" in
   let element_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "element-form" in
   let update_button = unopt @@ Html.CoerceTo.button @@ get_element_by_id "update-filters" in
-
   (*Currently working on some elements *)
   let pack_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showpacksearch" in
   let mod_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showmodsearch" in
@@ -430,7 +429,6 @@ let set_handlers () =
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-
   (*Hide / Show package input in element-form to specify packages in which search will be performed*)
   pack_checkbox##.onchange := Html.handler (fun _ ->
       let pack_to_hide = get_element_by_id "nsbp" in 
@@ -439,7 +437,6 @@ let set_handlers () =
       else pack_to_hide##.style##.display := js "none";
       _false
     );
-
   (*Hide / Show module input in element-form to specify modules in which search will be performed*)
   mod_checkbox##.onchange := Html.handler (fun _ ->
       let mod_to_hide = get_element_by_id "nsbm" in 
@@ -448,21 +445,18 @@ let set_handlers () =
       else mod_to_hide##.style##.display := js "none";
       _false
     );
-
   (*Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
   focus_packages_input##.onclick := Html.handler (fun _ ->
       let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in 
       focus_to_packinput##focus;
       _false
     );
-
   (*Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
   focus_mods_input##.onclick := Html.handler (fun _ ->
       let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in 
       focus_to_modinput##focus;
       _false
     );
-
   (*Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
   slider_show_hide##.onchange := Html.handler (fun _ ->
       let tr_tohide = get_element_by_id "tohide" in 
@@ -478,7 +472,6 @@ let set_handlers () =
       end;
       _false
     );
-
   (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
   toggle_entry_form##.onclick := Html.handler (fun _ ->
       let hide_this = get_element_by_id "element-search-content" in 
@@ -487,7 +480,6 @@ let set_handlers () =
       show_this##.style##.display := js "block";
       _false
     );
-
   (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
   toggle_element_form##.onclick := Html.handler (fun _ ->
       let show_this = get_element_by_id "element-search-content" in 
@@ -509,7 +501,7 @@ let set_handlers () =
             if (cur_input_value = js "" && (to_bool @@ (unopt @@ pack_tag_handling##.parentNode)##hasChildNodes)) (*&& StringSet.is_empty element_state.in_opams*)
             then begin
               let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
-              let rm_value = to_string rm_pack_name_version##.innerText in
+              let rm_value = to_string rm_pack_name_version##.innerHTML in
               let element_state = get_element_state() in
               element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
               let parent = unopt @@ rm_pack_name_version##.parentNode in
@@ -765,25 +757,23 @@ let search_page () =
     (* number of current entries/elements *)
     and current_number = ref "" in
     let%lwt () =
-        (* for every entry/element type *)
-        Lwt_list.iter_p (fun elt ->  
-                let nav_bar = get_element_by_id @@ elt ^ "-results" in
-                (* set the link to the navigation item that leads to search page for corresponding entry/element *)
-                let st = set_current !search_state elt in
-                link_to_elt st nav_bar;
-                Requests.send_generic_request
-                    ~request:(Requests.getNumber (state_to_info st))
-                    ~callback:(fun number ->
-                        (* display entries/elements number associated to the navigation item *)
-                        if elt = current then current_number:=number;
-                        let span = Html.createSpan document in
-                        nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
-                        span##.innerHTML := js ("("^number^")");
-                        Dom.appendChild nav_bar span;
-                        nav_bar##.style##.display := js "";
-                        Lwt.return_unit
-                    )
-                    ()
+    (* for every entry/element type *)
+    Lwt_list.iter_p (fun elt ->  
+        let nav_bar = get_element_by_id @@ elt ^ "-results" in
+        (* set the link to the navigation item that leads to search page for corresponding entry/element *)
+        let st = set_current !search_state elt in
+        link_to_elt st nav_bar;
+        Requests.send_generic_request
+          ~request:(Requests.getNumber (state_to_info st))
+          ~callback:(fun number ->
+              (* display entries/elements number associated to the navigation item *)
+              if elt = current then current_number:=number;
+              let span = Html.createSpan document in
+              nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
+              span##.innerHTML := js ("("^number^")");
+              Dom.appendChild nav_bar span;
+              nav_bar##.style##.display := js "";
+              Lwt.return_unit
             )
           ()
       )

@@ -20,6 +20,8 @@ let htmlize_sources_dir = digodoc_dir // "sources"
 
 let db_update_index = ref false
 
+let sources_update_index = ref false
+
 type frontentd_type = JS | JS_API | JS_OCAML
 
 let frontend = ref JS 
