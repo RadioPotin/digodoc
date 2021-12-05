@@ -24,10 +24,10 @@
 
 open EzCompat
 open EzFile.OP
-open Type 
+open Type
 open Ezcmd.V2
 open Digodoc_common.Globals
- 
+
 let cache_file = "_digodoc/digodoc.state"
 
 type action =
@@ -78,7 +78,7 @@ let main () =
       | "js-api" -> JS_API
       | "js-ocaml" -> JS_OCAML
       | _ -> JS
-    in frontend := ft  
+    in frontend := ft
   in
   let arg_set_action a =
     EZCMD.TYPES.Arg.Unit (fun () -> set_action a)
@@ -130,7 +130,7 @@ let main () =
 
       "--switch-prefix", Arg.String (fun s -> switch := Some s),
       "use SWITCH instead of the current opam switch (ignored if with --cached)";
-      
+
       "--sources", Arg.String (fun s -> set_action (HtmlizeSources s)),
       "DIR Htmlize sources in DIR";
 
@@ -147,7 +147,7 @@ let main () =
   let cached = !cached in
   let switch = !switch in
   let continue_on_error = !continue_on_error in
-  
+
   let state =
     if cached then
       let ic = open_in_bin cache_file  in
@@ -175,7 +175,7 @@ let main () =
     | GenerateIndex ->
         Index.generate ()
     | OpenDoc ->
-        let index = digodoc_html_dir // "index.html" in
+        let index = digodoc_dir // "about.html" in
         if Sys.file_exists index then
           Process.call [| "xdg-open" ; index |]
         else begin
@@ -190,15 +190,15 @@ let main () =
           | exception Not_found -> failwith "module not found"
           | [ m ] ->
               let opam_switch_prefix = Lazy.force opam_switch_prefix in
-              if StringSet.mem "mli" m.mdl_exts then
+              if StringMap.mem "mli" m.mdl_path then
                 Unix.execvp "less" [| "less";
                                       opam_switch_prefix //
-                                      ( Module.file m "mli") |]
+                                      ( Module.file m ~ext:"mli") |]
               else
-              if StringSet.mem "ml" m.mdl_exts then
+              if StringMap.mem "ml" m.mdl_path then
                 Unix.execvp "less" [| "less";
                                       opam_switch_prefix //
-                                      ( Module.file m "ml") |]
+                                      ( Module.file m ~ext:"ml") |]
           | list ->
               Printf.printf "Found %d occurrences of %S:\n%!"
                 ( List.length list) mdl;

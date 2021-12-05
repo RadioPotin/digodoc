@@ -49,20 +49,20 @@ jobs:
           git config --global user.email github-actions-bot@users.noreply.github.com
 
       - run: opam pin add . -y --no-action
-      
-      - run: opam depext -y geoip 
+
+      - run: opam depext -y geoip
         if : matrix.os != 'macos-latest'
 
       - run: brew install geoip
         if : matrix.os == 'macos-latest'
 
       - run: opam pin https://github.com/OCamlPro/digodoc-search-api.git
-        
+
       - run: opam depext -y digodoc digodoc_lib meta_file ez_html htmlize frontend digodoc_common
         if: steps.cache-opam.outputs.cache-hit != 'true'
 
-      - run : opam install json-data-encoding json-data-encoding ezjsonm uuidm geoip js_of_ocaml-lwt calendar tls lwt_log  cohttp-lwt-jsoo ppxlib  
- 
+      - run : opam install json-data-encoding json-data-encoding ezjsonm uuidm geoip js_of_ocaml-lwt calendar tls lwt_log  cohttp-lwt-jsoo ppxlib
+
       - run: opam install -y ./*.opam --deps-only --with-test
         if: steps.cache-opam.outputs.cache-hit != 'true'
 
