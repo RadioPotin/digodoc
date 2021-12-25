@@ -485,6 +485,14 @@ let generate () =
         (fun _ -> Lwt_io.eprintf "Done...\n%!") 
     in Lwt_main.run promis
   end;
+  if !Globals.sources_update_index then begin
+    Printf.eprintf "Indexating sources...\n%!";
+    let promis =
+      Lwt.bind 
+        (Cohttp_lwt_unix.Client.get (Uri.of_string "http://localhost:49002/sources"))
+        (fun _ -> Lwt_io.eprintf "Done...\n%!") 
+    in Lwt_main.run promis
+  end;
   let state = read_all_entries () in
 
   let stdlib_version = Option.value ~default:"4.10.0" @@ List.find_map (function

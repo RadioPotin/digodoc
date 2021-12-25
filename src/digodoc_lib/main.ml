@@ -104,6 +104,8 @@ let main () =
       "--db-update", Arg.Set db_update_index,
       "update database of index";
 
+      "--sources-index", Arg.Set sources_update_index,
+      "indexate source files";
 
       "--html", arg_set_action GenerateHtml,
       "build html documentation";

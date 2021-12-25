@@ -41,10 +41,10 @@ depends: [
   "ocaml" {>= "4.10.0"}
   "dune" {>= "2.6.0"}
   "digodoc-search-api" {>= "~dev"}
-  "js_of_ocaml" {>= "3.0"}
+  "js_of_ocaml" {>= "3.11.0"}
   "ez_api" {>= "0.1.0"}
   "ppx_deriving_jsoo" {>= "0.1"}
-  "js_of_ocaml-ppx" {>= "3.0"}
+  "js_of_ocaml-ppx" {>= "3.11.0"}
   "lwt_ppx" {>= "2.0.2"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
