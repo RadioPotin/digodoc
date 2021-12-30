@@ -934,6 +934,9 @@ let generate_module_entries state =
           mdl;
         Index.SAVE.save_module_vals
           ( Globals.digodoc_html_dir // pkg // "VALS.MODULE." ^ mdl.mdl_name )
+          mdl;
+        Index.SAVE.save_module_types
+          ( Globals.digodoc_html_dir // pkg // "TYPES.MODULE." ^ mdl.mdl_name )
           mdl 
       end
     ) state.ocaml_mdls ;
