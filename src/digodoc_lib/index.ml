@@ -116,11 +116,12 @@ module SAVE = struct
 
   let save_module_types file mdl =
     let oc = open_out file in
-    Printf.fprintf oc "%s\n" mdl.mdl_name;
-    Printf.fprintf oc "%s\n" mdl.mdl_opam.opam_name;
-    Printf.fprintf oc "%s\n" (String.trim mdl.mdl_opam.opam_version);
+    let ofmt = Format.formatter_of_out_channel oc in
+    Format.fprintf ofmt "%s\n" mdl.mdl_name;
+    Format.fprintf ofmt "%s\n" mdl.mdl_opam.opam_name;
+    Format.fprintf ofmt "%s\n" (String.trim mdl.mdl_opam.opam_version);
     List.iter (fun  (ident,type_kind,type_decl) ->
-      Printf.fprintf oc "%s\n%s\n%s\n" ident type_kind type_decl
+      Format.fprintf ofmt "%s\n%s\n%s\n" ident type_kind type_decl
     ) (Cmt.getTypes @@ Option.get mdl.mdl_cmi_info);
     close_out oc
 
