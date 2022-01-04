@@ -76,7 +76,7 @@ let getVals {cmi_sign; _} =
         cmi_sign
 
 let standardise_output s =
-    String.map (function | '{' -> '\x00' | '}' -> '\x00' |'\n' -> ' ' | '\r' -> ' ' | '\t' -> ' ' | '\x0C' -> ' ' | n -> n) s
+    String.map (function | '{' | '}' -> '\x00' |'\n' -> ' ' | '\r' -> ' ' | '\t' -> ' ' | '\x0C' -> ' ' | n -> n) s
 
 let rec out_type fmt =
     let open Outcometree in
@@ -89,6 +89,10 @@ let rec out_type fmt =
                                                         Format.fprintf fmt "%s:%a" name out_type out_ty
                                                     )
                                             ) list_of_fields
+        | Otyp_manifest (_out_ty1, out_ty2) -> Format.fprintf fmt "%a" out_type out_ty2
+        (* Here, out_ty1 is the type to which current declaration is aliased to.
+         I'm unsure on how to handle it's printing in `TYPE.MODULE.x` file
+         *)
         | t -> !Oprint.out_type fmt t
 
 let rec pp_type fmt (acc, tree) =
@@ -98,10 +102,10 @@ let rec pp_type fmt (acc, tree) =
            https://docs.ocaml.pro/docs/LIBRARY.ocamlcommon@ocaml-base-compiler.4.10.0/Outcometree/index.html#type-out_sig_item
      *)
     match tree with
-    | [] -> Format.fprintf fmt "%a"(Format.pp_print_list
+    | [] -> Format.fprintf fmt "%a" (Format.pp_print_list
                                             ~pp_sep:(fun fmt () -> Format.fprintf fmt "")
                                             (fun fmt ty -> Format.fprintf fmt "%s" ty)
-                                   ) (List.rev acc)
+                                    ) (List.rev acc)
     | Osig_type (out_type_decl, _out_rec_status) :: r ->
             let ty =
                 Format.asprintf "%a" out_type out_type_decl.otype_type
@@ -109,21 +113,16 @@ let rec pp_type fmt (acc, tree) =
             pp_type fmt (standardise_output ty :: acc, r)
     | _ -> failwith "should not occur"
 
-    (* This function is a placeholder while pp_type is underconstruction*)
-let fmt_type_decl f ~pp_sep l =
-    Format.asprintf "%a" (Format.pp_print_list ~pp_sep (fun fmt el -> Format.fprintf fmt "%a" f el)) l
-    |> standardise_output
-
 let pp_constructors fmt const_decl_l =
     let constructors =
         Format.asprintf "%a"
             (Format.pp_print_list
                     ~pp_sep:(fun fmt ()-> Format.fprintf fmt "|")
                     (fun fmt constr ->
-                        Format.fprintf fmt "%s%s%a"
+                        Format.fprintf fmt "|%s%s%a"
                                             (infix (Ident.name constr.cd_id))
                                             (match constr.cd_args with
-                                            |Cstr_tuple [] | Cstr_record [] -> ""
+                                            | Cstr_tuple [] | Cstr_record [] -> ""
                                             | _l -> "-")
                                             Printtyp.constructor_arguments constr.cd_args
                     )
@@ -144,6 +143,8 @@ let getTypes {cmi_sign; _} =
                     begin
                         match type_decl.type_kind with
                         | Type_abstract -> Some (ident, "TYPE_ABSTRACT", Format.asprintf "%a" pp_type ([], tree) )
+                        (* Since a TYPE_ABSTRACT can be any of several differently formatted types, maybe one could ALSO print the nature of the latter before printing content of type
+                         Since would allow easier parsing of, say, a CLASS relatively to any other type ?*)
                         | Type_record (_label_declaration_list, _record_representation) ->
                                 Some (ident, "TYPE_RECORD", Format.asprintf "%a" pp_type ([], tree) )
                         (* Note that we could also call function
@@ -153,12 +154,19 @@ let getTypes {cmi_sign; _} =
                            *)
                         | Type_variant constructor_declaration_list ->
                                 Some (ident, "TYPE_VARIANT", Format.asprintf "%a" pp_constructors constructor_declaration_list )
-                        (* Note: Same as above but for call to
-                        [fmt_type_decl Printtyp.constructor ~pp_sep:(fun fmt () -> Format.fprintf fmt "|") constructor_declaration_list]
-                    and TYPE_VARIANT listings
-                         *)
                         | Type_open -> Some (ident, "TYPE_OPEN", Format.asprintf "%a" pp_type ([], tree) )
+            end
+            | _ -> None
+        ) cmi_sign
 
-                    end
+let getClasses {cmi_sign; _} =
+    List.filter_map
+        (function
+            (* WIP: TODO: 1- Make UNILINE, be thorough with print of class contents, use tree *)
+            | Sig_class_type (id, class_type_declaration, _rec_status, _visibility) ->
+                    let ident = infix (Ident.name id) in
+                    let _tree = Printtyp.tree_of_cltype_declaration in
+                    let s = Format.asprintf "%a" (Printtyp.cltype_declaration id) class_type_declaration in
+                    Some (ident, "CLASS_TYPE_DECLARATION", s)
             | _ -> None
         ) cmi_sign
