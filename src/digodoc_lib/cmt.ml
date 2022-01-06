@@ -119,7 +119,7 @@ let pp_constructors fmt const_decl_l =
             (Format.pp_print_list
                     ~pp_sep:(fun fmt ()-> Format.fprintf fmt "|")
                     (fun fmt constr ->
-                        Format.fprintf fmt "|%s%s%a"
+                        Format.fprintf fmt "%s%s%a"
                                             (infix (Ident.name constr.cd_id))
                                             (match constr.cd_args with
                                             | Cstr_tuple [] | Cstr_record [] -> ""
@@ -144,7 +144,7 @@ let getTypes {cmi_sign; _} =
                         match type_decl.type_kind with
                         | Type_abstract -> Some (ident, "TYPE_ABSTRACT", Format.asprintf "%a" pp_type ([], tree) )
                         (* Since a TYPE_ABSTRACT can be any of several differently formatted types, maybe one could ALSO print the nature of the latter before printing content of type
-                         Since would allow easier parsing of, say, a CLASS relatively to any other type ?*)
+                         Since would allow easier parsing ?*)
                         | Type_record (_label_declaration_list, _record_representation) ->
                                 Some (ident, "TYPE_RECORD", Format.asprintf "%a" pp_type ([], tree) )
                         (* Note that we could also call function
@@ -159,14 +159,65 @@ let getTypes {cmi_sign; _} =
             | _ -> None
         ) cmi_sign
 
+let pp_class_sig_item fmt sig_item =
+    let open Outcometree in
+    match sig_item with
+    | Ocsg_constraint ( out_ty1, out_ty2 ) ->
+            Format.fprintf fmt "constraint %a = %a" out_type out_ty1 out_type out_ty2
+    | Ocsg_method ( name, _mut, _vir, out_ty ) ->
+            Format.fprintf fmt "method %s : %a" name out_type out_ty
+    | Ocsg_value ( name, _mut, _vir, out_ty ) ->
+            Format.fprintf fmt "val %s : %a" name out_type out_ty
+
+let rec pp_class_contents fmt class_decl =
+    let open Outcometree in
+
+    match class_decl with
+    | Octy_constr ( out_id, out_type_list ) ->
+            Format.fprintf fmt "%a%s%a"
+                !Oprint.out_ident out_id
+                (match out_type_list with
+                | [] -> ""
+                | _l -> " = ")
+                (Format.pp_print_list
+                    ~pp_sep:(fun fmt () -> Format.fprintf fmt "|@.")
+                    (fun fmt out_ty ->
+                        Format.fprintf fmt "%a" out_type out_ty)
+                ) out_type_list
+
+    | Octy_arrow ( name, out_ty, out_class_type ) ->
+            Format.fprintf fmt "%s:%a -> %a" name out_type out_ty pp_class_contents out_class_type
+
+    | Octy_signature ( out_type_op, out_class_sig_item_list) ->
+            let out_ty =
+                match out_type_op with
+                | None -> ""
+                | Some out_ty -> Format.asprintf "%a" out_type out_ty
+            in
+            Format.fprintf fmt "%s%a" out_ty
+                (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ";@.")
+                (fun fmt sig_item ->
+                    Format.fprintf fmt "%a" pp_class_sig_item sig_item)
+                ) out_class_sig_item_list
+
+let pp_class fmt tree =
+    let open Outcometree in
+    (*
+        For documentation on the type used for representing type declarations see:
+           https://docs.ocaml.pro/docs/LIBRARY.ocamlcommon@ocaml-base-compiler.4.10.0/Outcometree/index.html#type-out_sig_item
+     *)
+    match tree with
+    | Osig_class_type (_b1, _s1, _l, out_class_ty, _out_rec_status) ->
+            Format.fprintf fmt "object@.%a@.end" pp_class_contents out_class_ty
+    | _ -> failwith "should not occur"
+
 let getClasses {cmi_sign; _} =
     List.filter_map
         (function
-            (* WIP: TODO: 1- Make UNILINE, be thorough with print of class contents, use tree *)
-            | Sig_class_type (id, class_type_declaration, _rec_status, _visibility) ->
+            | Sig_class_type (id, class_type_declaration, rec_status, _visibility) ->
                     let ident = infix (Ident.name id) in
-                    let _tree = Printtyp.tree_of_cltype_declaration in
-                    let s = Format.asprintf "%a" (Printtyp.cltype_declaration id) class_type_declaration in
-                    Some (ident, "CLASS_TYPE_DECLARATION", s)
+                    let tree = (Printtyp.tree_of_cltype_declaration id) class_type_declaration rec_status
+                    in
+                    Some (ident,  Format.asprintf "%a" pp_class tree)
             | _ -> None
         ) cmi_sign

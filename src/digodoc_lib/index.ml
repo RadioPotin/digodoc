@@ -125,6 +125,16 @@ module SAVE = struct
     ) (Cmt.getTypes @@ Option.get mdl.mdl_cmi_info);
     close_out oc
 
+  let save_class_decl file mdl =
+    let oc = open_out file in
+    let ofmt = Format.formatter_of_out_channel oc in
+    Format.fprintf ofmt "%s\n" mdl.mdl_name;
+    Format.fprintf ofmt "%s\n" mdl.mdl_opam.opam_name;
+    Format.fprintf ofmt "%s\n" (String.trim mdl.mdl_opam.opam_version);
+    List.iter (fun  (ident, class_decl) ->
+      Format.fprintf ofmt "%s\n%s\n" ident class_decl
+    ) (Cmt.getClasses @@ Option.get mdl.mdl_cmi_info);
+    close_out oc
 end
 
 open TYPES
