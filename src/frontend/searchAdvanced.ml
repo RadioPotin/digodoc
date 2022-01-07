@@ -211,7 +211,7 @@ let element_state_to_element_info {pattern; current_element; regex; page; in_opa
         mode = if regex then Regex else Text;
         conditions =
             List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-            @ List.map (fun mdl -> In_mdl mdl)  (StringSet.elements in_mdls)
+            @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
     }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
