@@ -676,7 +676,7 @@ let insert_content info current current_number =
             match err with
             | Invalid_regex ->
                 Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
-            | Unknown ->
+            | _ ->
                 Insertion.write_warning ("Server error occured, please try again later.")
         end;
         Lwt.return_unit

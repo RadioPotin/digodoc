@@ -102,6 +102,7 @@ let default_error_handler err =
     begin 
         match err with
         | Invalid_regex -> warn "Search-api : Invalid regex"
+        | No_sources_config -> warn "Search-api : No config for sources"
         | Unknown -> warn "Search-api : Unknown error"
     end;
     Lwt.return_unit
