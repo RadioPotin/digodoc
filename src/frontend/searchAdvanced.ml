@@ -435,38 +435,32 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
        if i < 10
        then begin
          let pack_li = Html.createLi document in
-         let name = to_string elt##.name in 
-         pack_li##.onclick := Html.handler (fun _ ->
-             if (StringSet.mem name!cur_tags)
-             then Html.window##alert (js ("Error : package " ^ name ^ " already chosen,\nCheck for a different version"))
-             else 
-               begin
-                 cur_tags := StringSet.add name !cur_tags;
-                 let sp1 = Html.createSpan document in
-                 let sp2 = Html.createSpan document in
-                 sp1##.classList##add (js "tag"); 
-                 sp1##.innerText := js name;
-                 sp2##.classList##add (js "remove");
-                 sp2##.onclick := Html.handler (fun _ ->
-                     cur_tags := StringSet.remove name !cur_tags;
-                     Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
-                     _false
-                   );
-                 let tag_container_li = Html.createLi document in
-                 Dom.appendChild sp1 sp2;
-                 Dom.appendChild tag_container_li sp1;
-                 Dom.appendChild tag_container tag_container_li;
-               end;
+         let name_version = (to_string @@ elt##.name) ^ " " ^ (to_string @@ elt##.version) in
+         let _ = Dom.addEventListener pack_li Html.Event.click (Dom.handler (fun _ ->
+             if (StringSet.mem name_version element_state.in_opams)
+             then warn ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version")
+             else begin
+               element_state.in_opams <- StringSet.add name_version element_state.in_opams;
+               let sp1 = Html.createSpan document in
+               set_attr sp1 "class" (js ("tag"));
+               sp1##.innerHTML := js name_version;
+               let sp2 = Html.createSpan document in
+               set_attr sp2 "class" (js ("remove"));
+               let _ = Dom.addEventListener sp2 Html.Event.click (Dom.handler (fun _ ->
+                   element_state.in_opams <- StringSet.remove name_version element_state.in_opams;
+                   Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+                   _false) ) _false in
+               Dom.appendChild sp1 sp2;
+               Dom.insertBefore parent sp1 (Opt.return input);
+             end;
              input##.value := js "";
              packsUl##.style##.display := js "none";
              Headfoot.footerHandler();
              _false
            );
          let a_li = Html.createA document in
-         Insertion.set_attr a_li "href" (js ("#"));
-         Insertion.set_attr a_li "style" (js "color:green");
-         a_li##.innerText := js name;
-         pack_li##.style##.display := js "block";
+         set_attr a_li "href" (js ("#"));
+         a_li##.innerHTML := js  name_version;
          Dom.appendChild pack_li a_li;
          Dom.appendChild packsUl pack_li;
          Headfoot.footerHandler();
@@ -656,6 +650,10 @@ let set_handlers () =
   let entry_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "entry-form" in
   let element_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "element-form" in
   let update_button = unopt @@ Html.CoerceTo.button @@ get_element_by_id "update-filters" in
+<<<<<<< HEAD
+=======
+  (*Currently working on some elements *)
+>>>>>>> f269077 (regroup class/type listings in TYPE.MODULE.x, replace separator for constructors listings)
   let pack_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showpacksearch" in
   let mod_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showmodsearch" in
   let focus_packages_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
@@ -665,18 +663,7 @@ let set_handlers () =
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
   (* let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in *)
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-  let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
-  let toogle_form formname = 
-    let hidename = 
-      match formname with
-      | "element-search-content" -> "entry-search-content"
-      | _ -> "element-search-content"
-    in
-    let show_this = get_element_by_id formname in
-    let hide_this = get_element_by_id hidename in
-    hide_this##.style##.display := js "none";
-    show_this##.style##.display := js "block";
-  in
+  (*Hide / Show package input in element-form to specify packages in which search will be performed*)
   pack_checkbox##.onchange := Html.handler (fun _ ->
       let pack_to_hide = get_element_by_id "nsbp" in
       if pack_checkbox##.checked = _true
@@ -684,7 +671,7 @@ let set_handlers () =
       else pack_to_hide##.style##.display := js "none";
       _false
     );
-  (* Hide/Show package input in element-form to specify packages in which search will be performed*)
+  (*Hide / Show module input in element-form to specify modules in which search will be performed*)
   mod_checkbox##.onchange := Html.handler (fun _ ->
       let mod_to_hide = get_element_by_id "nsbm" in
       if mod_checkbox##.checked = _true
@@ -692,19 +679,19 @@ let set_handlers () =
       else mod_to_hide##.style##.display := js "none";
       _false
     );
-  (* Hide/Show module input in element-form to specify modules in which search will be performed*)
+  (*Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
   focus_packages_input##.onclick := Html.handler (fun _ ->
       let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
       focus_to_packinput##focus;
       _false
     );
-  (* Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
+  (*Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
   focus_mods_input##.onclick := Html.handler (fun _ ->
       let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
       focus_to_modinput##focus;
       _false
     );
-  (* Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
+  (*Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
   slider_show_hide##.onchange := Html.handler (fun _ ->
       let tr_tohide = get_element_by_id "tohide" in
       let tr_tohide2 = get_element_by_id "tohide2" in
@@ -719,12 +706,12 @@ let set_handlers () =
       end;
       _false
     );
-  (* Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
+  (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
   toggle_entry_form##.onclick := Html.handler (fun _ ->
       toogle_form "entry-search-content";
       _false
     );
-  (* Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
+  (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
   toggle_element_form##.onclick := Html.handler (fun _ ->
       toogle_form "element-search-content";
       _false
@@ -739,10 +726,13 @@ let set_handlers () =
         | Some "Backspace" ->
             if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then begin
-              packsUl##.style##.display := js "none";
-              let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
-              Dom.removeChild tag_container rm_pack_name_version;
-              Headfoot.footerHandler();
+              let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
+              let rm_value = to_string rm_pack_name_version##.innerHTML in
+              let element_state = get_element_state() in
+              element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
+              let parent = unopt @@ rm_pack_name_version##.parentNode in
+              Dom.removeChild parent rm_pack_name_version;
+              (* logs @@ "Done"; *)
             end;
         | Some "Escape" -> 
             packsUl##.style##.display := js "none";

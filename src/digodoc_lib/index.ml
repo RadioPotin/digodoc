@@ -509,9 +509,15 @@ let generate () =
   if !Globals.sources_update_index then begin
     Printf.eprintf "Indexating sources...\n%!";
     let promis =
+<<<<<<< HEAD
       Lwt.bind
         (Cohttp_lwt_unix.Client.get (Uri.of_string "http://localhost:49002/sources"))
         (fun _ -> Lwt_io.eprintf "Done...\n%!")
+=======
+      Lwt.bind 
+        (Cohttp_lwt_unix.Client.get (Uri.of_string "http://localhost:49002/sources"))
+        (fun _ -> Lwt_io.eprintf "Done...\n%!") 
+>>>>>>> f269077 (regroup class/type listings in TYPE.MODULE.x, replace separator for constructors listings)
     in Lwt_main.run promis
   end;
   let state = read_all_entries () in
