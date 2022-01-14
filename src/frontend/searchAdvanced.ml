@@ -462,7 +462,6 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
                  sp1##.classList##add (js "tag"); 
                  sp1##.innerText := js name_version;
                  sp2##.classList##add (js "remove");
-                 logs "------> an li element has been clicked <-----";
                  sp2##.onclick := Html.handler (fun _ ->
                      cur_tags := StringSet.remove name_version !cur_tags;
                      Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
@@ -568,7 +567,7 @@ let set_handlers () =
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
-  let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in
+  (* let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in *)
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
   let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
 
@@ -595,7 +594,7 @@ let set_handlers () =
       focus_to_packinput##focus;
       _false
     );
-  (*Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
+  (**Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
 
   focus_mods_input##.onclick := Html.handler (fun _ ->
       let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
@@ -638,7 +637,7 @@ let set_handlers () =
     );
   (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
 
-  toggle_fulltext_form##.onclick := Html.handler (fun _ ->
+  (* toggle_fulltext_form##.onclick := Html.handler (fun _ ->
       let show_this = get_element_by_id "fulltext-content" in
       let hide_entry_search = get_element_by_id "entry-search-content" in
       let hide_elem_search = get_element_by_id "element-search-content" in
@@ -646,7 +645,7 @@ let set_handlers () =
       hide_elem_search##.style##.display := js "none";
       hide_entry_search##.style##.display := js "none";
       _false
-    );
+    ); *)
   (**Show fulltext-form's div when button having id="col_fulltext" is clicked and hide the two other forms *)
 
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->

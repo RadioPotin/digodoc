@@ -31,7 +31,7 @@ open Digodoc_common
 
 let digodoc_odoc_dir = Globals.digodoc_dir // "odoc"
 
-let sources_dir = "sources"
+let sources_dir = Globals.digodoc_dir // "sources_files"
 
 let fullname opam = opam.opam_name ^ "." ^ opam.opam_version
 
@@ -1143,10 +1143,8 @@ let generate ~state ~continue_on_error  =
           Htmlize.Main.htmlize Globals.htmlize_sources_dir [opam_sources]
         else
           Htmlize.Main.htmlize_dir Globals.htmlize_sources_dir opam_sources;
-        EzFile.remove_dir ~all:true opam_sources
       end
     ) state.opam_packages;
-    EzFile.remove_dir ~all:true sources_dir
   end;
 
   generate_opam_pages ~continue_on_error state;

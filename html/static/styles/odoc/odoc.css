@@ -166,7 +166,7 @@ body {
   margin       : 0 auto;
   /* padding   : calc(1.5 * var(--size-line)); */
   /*using pad-left and right instead of padding*/
-  padding-left : calc(7.8 * var(--size-line));
+  padding-left : calc(2 * var(--size-line));
   padding-right: calc(1.5 * var(--size-line));
   padding-top  : calc(0.5 * var(--size-line));
 }
@@ -183,7 +183,7 @@ body {
   top: calc(0.5 * var(--size-line))
     /*0px*/
   ;
-  left       : -20px;
+  left       : -3%;
   text-align : left;
   width      : 15%;
   margin-left: 5%
@@ -1666,6 +1666,8 @@ input[type="checkbox"]:checked~input {
   margin-top: 10px;
   width     : 100px;
   height    : 40px;
+  border-radius: 10px;
+  border-style: hidden;
 }
 
 /******************************************************************************************/
@@ -1693,7 +1695,7 @@ input[type="checkbox"]:checked~input {
   border       : 0px;
   width        : auto;
   height       : 35px;
-  outline      : thick outset #659CD6;
+  outline      : thin outset #659CD6;
 }
 
 #fulltext-search-pattern {
@@ -1786,4 +1788,11 @@ input[type="checkbox"]:checked~input {
 .input_wrapper input[type="checkbox"]:checked~.is_unchecked {
   -webkit-transform: translateX(-190%) translateY(-30%) scale(0);
   transform        : translateX(-190%) translateY(-30%) scale(0);
+}
+
+/* Some media queries to handle elements when resizing window */
+
+@media only screen and (max-width: 1700px) {
+  .toc {top: calc(10 * var(--size-line));} /*Put table of content at the level of letter selection*/
+  .content {padding-left : calc(7.5 * var(--size-line));}
 }
