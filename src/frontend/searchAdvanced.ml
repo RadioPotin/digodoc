@@ -203,16 +203,16 @@ let entry_state_to_entry_info {pattern; current_entry; page; _} =
 (** Converts [entry_search_state] to [Data_types.entry_info] *)
 
 let element_state_to_element_info {pattern; current_element; regex; page; in_opams; in_mdls; _} =
-  let open Data_types in
-  {
-    element = current_element;
-    pattern = pattern;
-    last_id = (page - 1) * 50;
-    mode = if regex then Regex else Text;
-    conditions = 
-      List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-      @ List.map (fun mdl -> In_mdl mdl)  (StringSet.elements in_mdls)
-  }
+    let open Data_types in
+    {
+        element = current_element;
+        pattern = pattern;
+        last_id = (page - 1) * 50;
+        mode = if regex then Regex else Text;
+        conditions =
+            List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
+            @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
+    }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
 let state_to_info state =
@@ -489,6 +489,7 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
     modules
 (** preview modules propositions from which to choose *)
 
+(* let preview_Sources pattern in () *)
 
 let previewpacks pattern =
   let entry_info = {
@@ -868,7 +869,7 @@ let insert_content info current current_number =
             match err with
             | Invalid_regex ->
                 Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
-            | Unknown ->
+            | _ ->
                 Insertion.write_warning ("Server error occured, please try again later.")
         end;
         Lwt.return_unit
