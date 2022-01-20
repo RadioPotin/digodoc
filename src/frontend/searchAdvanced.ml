@@ -203,16 +203,16 @@ let entry_state_to_entry_info {pattern; current_entry; page; _} =
 (** Converts [entry_search_state] to [Data_types.entry_info] *)
 
 let element_state_to_element_info {pattern; current_element; regex; page; in_opams; in_mdls; _} =
-    let open Data_types in
-    {
-        element = current_element;
-        pattern = pattern;
-        last_id = (page - 1) * 50;
-        mode = if regex then Regex else Text;
-        conditions =
-            List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-            @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
-    }
+  let open Data_types in
+  {
+    element = current_element;
+    pattern = pattern;
+    last_id = (page - 1) * 50;
+    mode = if regex then Regex else Text;
+    conditions =
+      List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
+      @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
+  }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
 let state_to_info state =
@@ -489,7 +489,41 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
     modules
 (** preview modules propositions from which to choose *)
 
-(* let preview_Sources pattern in () *)
+(* let insert_Sources_fulltext : sources_search_result_jsoo t -> unit = 
+  fun (sources : sources_search_result_jsoo t) ->
+  sources *)
+(** Insert Sources results for fulltext search *)
+
+(* let preview_Sources pattern files =
+  let sources_search_info = {
+    pattern;
+    files;
+    is_regex = true;
+    is_case_sensitive = true;
+    last_match_id = 10; 
+  } in
+  Lwt.async @@
+  Requests.send_generic_request
+    ~request:(Requests.getSources_fulltext sources_search_info)
+    ~callback:(fun source_search_result ->
+        if not @@ (source_search_result.occs = [])
+        then
+          begin
+            insert_Sources_fulltext (Objects.sources_search_result_to_jsoo source_search_result);
+          end;  
+        Lwt.return_unit
+      )
+    ~error:(fun err ->
+        begin
+          match err with
+          | Unknown ->
+              logs "Something went wrong in preview_Sources"
+          | _ ->
+              warn "Work on preview_Sources";
+        end;
+        Lwt.return_unit
+      ) *)
+(** Request to get sources for fulltext search (improve comments as ASAP) *)
 
 let previewpacks pattern =
   let entry_info = {
@@ -638,17 +672,6 @@ let set_handlers () =
     );
   (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
 
-  (* toggle_fulltext_form##.onclick := Html.handler (fun _ ->
-      let show_this = get_element_by_id "fulltext-content" in
-      let hide_entry_search = get_element_by_id "entry-search-content" in
-      let hide_elem_search = get_element_by_id "element-search-content" in
-      show_this##.style##.display := js "block";
-      hide_elem_search##.style##.display := js "none";
-      hide_entry_search##.style##.display := js "none";
-      _false
-    ); *)
-  (**Show fulltext-form's div when button having id="col_fulltext" is clicked and hide the two other forms *)
-
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
       let packsUl = get_element_by_id "packsUl" in
@@ -744,27 +767,6 @@ let set_handlers () =
       update_form ();
       _false
     )
-
-(*toggle_pack ();
-  toggle_mod ()
-  List.iter (fun button_i ->
-        button_i##.onclick := Html.handler (fun _ ->
-            List.iter (fun (button_j:#Dom.node t) ->
-                    if (button_i <> button_j) then begin
-                        let nocontent = element_to_button @@
-                                        unopt @@
-                                        Html.CoerceTo.element @@
-                                        button_j##.nextSibling
-                        in
-                        nocontent##.style##.display := js "none"
-                    end
-                )
-                form_buttons;
-
-            _false
-        )
-    )
-    form_buttons*)
 (** Sets handlers to forms and buttons from search page. Submit event handler of a form redirect to the
     page with corresponding to search state results. Click event of a button 'update filters' shows filled
     form within result page that allows to update search request. *)
@@ -836,140 +838,140 @@ let pagination_info state total_number =
     Raises [Web_app_error] if current state is uninitialized. *)
 
 let insert_content info current current_number =
-    (* insert pagination nav *)
-    let insert_pagination () =
-        let number = int_of_string current_number in
-        let pages_info = pagination_info !search_state number in
-        Insertion.insert_pagination pages_info;
+  (* insert pagination nav *)
+  let insert_pagination () =
+    let number = int_of_string current_number in
+    let pages_info = pagination_info !search_state number in
+    Insertion.insert_pagination pages_info;
     (* display results, entries bar, update button and set active nav *)
-    and display_content () =
-        let update_button = get_element_by_id "update-filters"
-        and entries_nav = get_element_by_id "entries-nav"
-        and result_div = get_element_by_id "result-div"
-        and result_nav = get_element_by_id @@ current ^ "-results"
-        and results = get_element_by_id "results-list" in
-        update_button##.style##.display := js "";
-        entries_nav##.style##.display := js "";
-        result_div##.style##.display := js "";
-        results##.innerHTML := js "";
-        result_nav##.className := js "active-nav";
+  and display_content () =
+    let update_button = get_element_by_id "update-filters"
+    and entries_nav = get_element_by_id "entries-nav"
+    and result_div = get_element_by_id "result-div"
+    and result_nav = get_element_by_id @@ current ^ "-results"
+    and results = get_element_by_id "results-list" in
+    update_button##.style##.display := js "";
+    entries_nav##.style##.display := js "";
+    result_div##.style##.display := js "";
+    results##.innerHTML := js "";
+    result_nav##.className := js "active-nav";
     (* insert message about empty search results *)
-    and display_empty_message () =
-        let update_button = get_element_by_id "update-filters"
-        and entries_nav = get_element_by_id "entries-nav" in
-        update_button##.style##.display := js "";
-        entries_nav##.style##.display := js "";
-        Insertion.write_message ("No " ^ current ^ " found.");
+  and display_empty_message () =
+    let update_button = get_element_by_id "update-filters"
+    and entries_nav = get_element_by_id "entries-nav" in
+    update_button##.style##.display := js "";
+    entries_nav##.style##.display := js "";
+    Insertion.write_message ("No " ^ current ^ " found.");
     (* insert error message *)
-    and display_error err =
-        let update_button = get_element_by_id "update-filters" in
-        update_button##.style##.display := js "";
-        (* print error message *)
-        begin
-            match err with
-            | Invalid_regex ->
-                Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
-            | _ ->
-                Insertion.write_warning ("Server error occured, please try again later.")
-        end;
-        Lwt.return_unit
-    in
-    match info with
-    | Entry entry_info ->
-        Requests.send_generic_request
-            ~request:(Requests.getEntries entry_info)
-            ~callback:(fun entries ->
-                if not @@ empty_entries entries
-                then begin
-                    display_content ();
-                    (* insert entries in search page *)
-                    Insertion.insert_entries_search entries;
-                    insert_pagination ();
-                end
-                else begin
-                    display_empty_message ()
-                end;
-                Lwt.return_unit
-                )
-            ~error:display_error
-            ()
-    | Element element_info ->
-        Requests.send_generic_request
-            ~request:(Requests.getElements element_info)
-            ~callback:(fun elements ->
-                if not @@ empty_elements elements
-                then begin
-                    display_content ();
-                    (* insert elements in search page *)
-                    Insertion.insert_elements_search elements;
-                    insert_pagination ()
-                end
-                else begin
-                    display_empty_message ()
-                end;
-                Lwt.return_unit
-                )
-            ~error:display_error
-            ()
+  and display_error err =
+    let update_button = get_element_by_id "update-filters" in
+    update_button##.style##.display := js "";
+    (* print error message *)
+    begin
+      match err with
+      | Invalid_regex ->
+          Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
+      | _ ->
+          Insertion.write_warning ("Server error occured, please try again later.")
+    end;
+    Lwt.return_unit
+  in
+  match info with
+  | Entry entry_info ->
+      Requests.send_generic_request
+        ~request:(Requests.getEntries entry_info)
+        ~callback:(fun entries ->
+            if not @@ empty_entries entries
+            then begin
+              display_content ();
+              (* insert entries in search page *)
+              Insertion.insert_entries_search entries;
+              insert_pagination ();
+            end
+            else begin
+              display_empty_message ()
+            end;
+            Lwt.return_unit
+          )
+        ~error:display_error
+        ()
+  | Element element_info ->
+      Requests.send_generic_request
+        ~request:(Requests.getElements element_info)
+        ~callback:(fun elements ->
+            if not @@ empty_elements elements
+            then begin
+              display_content ();
+              (* insert elements in search page *)
+              Insertion.insert_elements_search elements;
+              insert_pagination ()
+            end
+            else begin
+              display_empty_message ()
+            end;
+            Lwt.return_unit
+          )
+        ~error:display_error
+        ()
 (** Inserts content of the search page (search results and pagination nav bar).
     Empty results and server side errors generate specific to them message on the page. *)
 
 let search_page () =
-    (* get current entry/element as string from state *)
-    let get_current state =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "get_elt_from_state: search state is unitialised"
-        | SearchEntry state -> entry_type_to_string state.current_entry
-        | SearchElement state -> element_type_to_string state.current_element
-    (* get current entry/element in the state *)
-    and set_current state current =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "set_current: search state is unitialised"
-        | SearchEntry state -> SearchEntry {state with current_entry = entry_type_of_string current}
-        | SearchElement state -> SearchElement {state with current_element = element_type_of_string current}
-    (* get entries/elements as list of strings from state *)
-    and get_elts_from_state state =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "get_elts_from_state: search state is unitialised"
-        | SearchEntry state -> List.map entry_type_to_string @@ EntrySet.elements state.entries
-        | SearchElement state -> List.map element_type_to_string @@ ElementSet.elements state.elements
-    (* construct and set the link to the navigation item *)
-    and link_to_elt state link =
-        let st =
-            match state with
-            | Uninitialized -> raise @@ web_app_error "link_to_elt: search state is unitialised"
-            | SearchEntry state -> SearchEntry {state with page = 1 }
-            | SearchElement state -> SearchElement {state with page = 1 }
-        in
-            let href = "search.html?" ^ state_to_args st in
-            link##setAttribute (js "href") (js href)
+  (* get current entry/element as string from state *)
+  let get_current state =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "get_elt_from_state: search state is unitialised"
+    | SearchEntry state -> entry_type_to_string state.current_entry
+    | SearchElement state -> element_type_to_string state.current_element
+  (* get current entry/element in the state *)
+  and set_current state current =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "set_current: search state is unitialised"
+    | SearchEntry state -> SearchEntry {state with current_entry = entry_type_of_string current}
+    | SearchElement state -> SearchElement {state with current_element = element_type_of_string current}
+  (* get entries/elements as list of strings from state *)
+  and get_elts_from_state state =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "get_elts_from_state: search state is unitialised"
+    | SearchEntry state -> List.map entry_type_to_string @@ EntrySet.elements state.entries
+    | SearchElement state -> List.map element_type_to_string @@ ElementSet.elements state.elements
+  (* construct and set the link to the navigation item *)
+  and link_to_elt state link =
+    let st =
+      match state with
+      | Uninitialized -> raise @@ web_app_error "link_to_elt: search state is unitialised"
+      | SearchEntry state -> SearchEntry {state with page = 1 }
+      | SearchElement state -> SearchElement {state with page = 1 }
     in
-    let current = get_current !search_state in
-    let elts = get_elts_from_state !search_state
-    and info = state_to_info !search_state
-    (* number of current entries/elements *)
-    and current_number = ref "" in
-    let%lwt () =
-        (* for every entry/element type *)
-        Lwt_list.iter_p (fun elt ->
-                let nav_bar = get_element_by_id @@ elt ^ "-results" in
-                (* set the link to the navigation item that leads to search page for corresponding entry/element *)
-                let st = set_current !search_state elt in
-                link_to_elt st nav_bar;
-                Requests.send_generic_request
-                    ~request:(Requests.getNumber (state_to_info st))
-                    ~callback:(fun number ->
-                        (* display entries/elements number associated to the navigation item *)
-                        if elt = current then current_number:=number;
-                        let span = Html.createSpan document in
-                        nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
-                        span##.innerHTML := js ("("^number^")");
-                        Dom.appendChild nav_bar span;
-                        nav_bar##.style##.display := js "";
-                        Lwt.return_unit
-                    )
-                    ()
+    let href = "search.html?" ^ state_to_args st in
+    link##setAttribute (js "href") (js href)
+  in
+  let current = get_current !search_state in
+  let elts = get_elts_from_state !search_state
+  and info = state_to_info !search_state
+  (* number of current entries/elements *)
+  and current_number = ref "" in
+  let%lwt () =
+    (* for every entry/element type *)
+    Lwt_list.iter_p (fun elt ->
+        let nav_bar = get_element_by_id @@ elt ^ "-results" in
+        (* set the link to the navigation item that leads to search page for corresponding entry/element *)
+        let st = set_current !search_state elt in
+        link_to_elt st nav_bar;
+        Requests.send_generic_request
+          ~request:(Requests.getNumber (state_to_info st))
+          ~callback:(fun number ->
+              (* display entries/elements number associated to the navigation item *)
+              if elt = current then current_number:=number;
+              let span = Html.createSpan document in
+              nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
+              span##.innerHTML := js ("("^number^")");
+              Dom.appendChild nav_bar span;
+              nav_bar##.style##.display := js "";
+              Lwt.return_unit
             )
+          ()
+      )
       elts
   in
   (* insert page content *)

@@ -47,6 +47,9 @@ let generate_page ~filename ~title ~is_index f =
         if is_index 
         then EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
         else EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+    (* trying to add fulltext search page *)
+    | "fulltext_search" ->
+        EZ_SUBST.string (file_content "fulltext_search.html") ~ctxt:() ~brace
     | _ ->
         Printf.kprintf failwith "Unknown var %S" var
   in
@@ -220,6 +223,9 @@ let add_header_footer () =
                 then {| | <a href="#header">To the top</a>|} 
                 else ""
             | "search" -> EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+            (* trying to add fulltext search page *)
+            | "fulltext_search" ->
+                EZ_SUBST.string (file_content "fulltext_search.html") ~ctxt:() ~brace
             | _ -> 
                 Printf.kprintf failwith "Unknown var %S" var
           in

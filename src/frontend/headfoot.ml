@@ -31,6 +31,7 @@ let activate_bar () =
     | "metas.html" -> activate "metas-item"
     | "modules.html" -> activate "modules-item"
     | "sources.html" -> activate "sources-item"
+    | "fulltext_search.html" -> activate "fulltext_search-item" (* Check for *-item in html files *)
     | _ -> 
         raise @@ 
         web_app_error (Printf.sprintf {|activate_bar : file "%s" couldn't activate the bar|} filename) 

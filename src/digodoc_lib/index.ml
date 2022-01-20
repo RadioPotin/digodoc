@@ -595,5 +595,14 @@ let generate () =
        ignore title;
        Printf.bprintf bb "%s" (Utils.file_content "search_page.html"));
 
-  Printf.eprintf "Index generation done.\n%!";
+  Html.generate_page
+    ~is_index:false
+    ~filename:"fulltext_search.html"
+    ~title:"Fulltext"
+    (fun bb ~title ->
+       header bb ~title;
+       trailer bb;
+    );
+
+    Printf.eprintf "Index generation done.\n%!";
   ()
