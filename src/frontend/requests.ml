@@ -153,6 +153,12 @@ let getEntries entry_info () =
     as argument of type [Data_types.entry_info]. Server returns 50 first entries that respect constraints 
     mentioned in [entry_info]. *)
 
+let getSources_fulltext sources_search_info () =
+    get1 ~host:(get_api_host ()) Services.search_sources sources_search_info >>= function
+        | Error err -> handle_error err
+        | Ok sources -> handle_response sources
+(** Attempt to query server to get sources (fulltext search) *)
+
 let getElements element_info () = 
     get1 ~host:(get_api_host ()) Services.elements element_info >>= function
         | Error err -> handle_error err

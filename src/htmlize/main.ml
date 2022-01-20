@@ -198,6 +198,8 @@ let htmlize_file destdir srcdir path file =
       then {| | <a href="#header">To the top</a>|}
       else ""
     | "search" -> EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+    | "fulltext_search" ->
+        EZ_SUBST.string (file_content "fulltext_search.html") ~ctxt:() ~brace
     | _ ->
       Printf.kprintf failwith "Unknown var %S" var
   in
@@ -335,6 +337,8 @@ let rec htmlize_dir destdir srcdir path basename =
       then {| | <a href="#header">To the top</a>|}
       else ""
     | "search" -> EZ_SUBST.string (file_content "search.html") ~ctxt:() ~brace
+    | "fulltext_search" ->
+        EZ_SUBST.string (file_content "fulltext_search.html") ~ctxt:() ~brace
     | _ ->
       Printf.kprintf failwith "Unknown var %S" var
   in

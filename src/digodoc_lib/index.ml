@@ -69,9 +69,9 @@ module SAVE = struct
     Printf.fprintf oc "%s\n" opam.opam_name;
     Printf.fprintf oc "%s\n" (String.trim opam.opam_version);
     Printf.fprintf oc "%s\n" (match opam.opam_synopsis with
-      | None -> "" | Some s ->
-        String.trim (String.concat " " (EzString.split s '\n'))
-    );
+        | None -> "" | Some s ->
+            String.trim (String.concat " " (EzString.split s '\n'))
+      );
     close_out oc
 
   let save_meta_entry file meta =
@@ -98,10 +98,10 @@ module SAVE = struct
     Printf.fprintf oc "%s\n" (String.trim mdl.mdl_opam.opam_version);
     Printf.fprintf oc "%s\n" mdl.mdl_basename;
     StringMap.iter (fun _ lib ->
-      Printf.fprintf oc "%s@%s.%s\n"
-        lib.lib_name lib.lib_opam.opam_name
-        (String.trim lib.lib_opam.opam_version)
-    ) mdl.mdl_libs;
+        Printf.fprintf oc "%s@%s.%s\n"
+          lib.lib_name lib.lib_opam.opam_name
+          (String.trim lib.lib_opam.opam_version)
+      ) mdl.mdl_libs;
     close_out oc
 
   let save_module_vals file mdl =
@@ -110,10 +110,10 @@ module SAVE = struct
     Printf.fprintf oc "%s\n" mdl.mdl_opam.opam_name;
     Printf.fprintf oc "%s\n" (String.trim mdl.mdl_opam.opam_version);
     List.iter (fun  (ident,vall) ->
-      Printf.fprintf oc "%s\n%s\n" ident vall
-    ) (Cmt.getVals @@ Option.get mdl.mdl_cmi_info);
+        Printf.fprintf oc "%s\n%s\n" ident vall
+      ) (Cmt.getVals @@ Option.get mdl.mdl_cmi_info);
     close_out oc
-  
+
 end
 
 open TYPES
@@ -152,22 +152,22 @@ let pkg_of_mdl mdl =
   match mdl.mdl_libs with
   | lib :: _rem -> pkg_of_lib lib
   | [] ->
-    let pack, alias = module_cut mdl.mdl_basename in
-    if alias = "" then
-      Printf.sprintf "MODULE.%s@%s.%s"
-        mdl.mdl_basename mdl.mdl_opam_name version
-    else
-      let pkg =
-        Printf.sprintf "MODULE.%s__@%s.%s" pack mdl.mdl_opam_name version in
-      if Sys.file_exists (Globals.digodoc_html_dir // pkg) then
-        pkg
+      let pack, alias = module_cut mdl.mdl_basename in
+      if alias = "" then
+        Printf.sprintf "MODULE.%s@%s.%s"
+          mdl.mdl_basename mdl.mdl_opam_name version
       else
         let pkg =
           Printf.sprintf "MODULE.%s__@%s.%s" pack mdl.mdl_opam_name version in
         if Sys.file_exists (Globals.digodoc_html_dir // pkg) then
           pkg
         else
-          Printf.sprintf "MODULE.%s@%s.%s" pack mdl.mdl_opam_name version
+          let pkg =
+            Printf.sprintf "MODULE.%s__@%s.%s" pack mdl.mdl_opam_name version in
+          if Sys.file_exists (Globals.digodoc_html_dir // pkg) then
+            pkg
+          else
+            Printf.sprintf "MODULE.%s@%s.%s" pack mdl.mdl_opam_name version
 
 let library_of_string s =
   let lib_name, s = EzString.cut_at s '@' in
@@ -178,11 +178,11 @@ let read_entry file =
   match EzFile.read_lines_to_list file with
   |
     "opam" ::
-      opam_name ::
-      opam_version ::
-      opam_synopsis ->
-    let opam_synopsis = String.concat " " opam_synopsis in
-    Opam { opam_name ; opam_version ; opam_synopsis }
+    opam_name ::
+    opam_version ::
+    opam_synopsis ->
+      let opam_synopsis = String.concat " " opam_synopsis in
+      Opam { opam_name ; opam_version ; opam_synopsis }
   | [
     "meta" ;
     meta_name ;
@@ -196,34 +196,34 @@ let read_entry file =
     lib_opam_version ;
   ] -> Library { lib_name ; lib_opam_name ; lib_opam_version }
   | "module" ::
-      mdl_name ::
-      mdl_opam_name ::
-      mdl_opam_version ::
-      mdl_basename ::
-      mdl_libs ->
-    let mdl_libs = List.map library_of_string mdl_libs in
-    Module { mdl_name ; mdl_opam_name ; mdl_opam_version ;
-      mdl_basename ; mdl_libs }
+    mdl_name ::
+    mdl_opam_name ::
+    mdl_opam_version ::
+    mdl_basename ::
+    mdl_libs ->
+      let mdl_libs = List.map library_of_string mdl_libs in
+      Module { mdl_name ; mdl_opam_name ; mdl_opam_version ;
+               mdl_basename ; mdl_libs }
   | _lines ->
-    Printf.eprintf "Unrecognized format for entry file %S\n%!" file;
-    raise Not_found
+      Printf.eprintf "Unrecognized format for entry file %S\n%!" file;
+      raise Not_found
 
 
 let print_index bb index entity_name =
   let map = ref StringMap.empty in
   let n = ref 0 in
   List.iter (fun (entry, line) ->
-    incr n;
-    let i = String.make 1 ( Char.lowercase entry.[0] ) in
-    match StringMap.find i !map with
-    | exception Not_found ->
-      let r = ref [ entry, line ] in
-      map := StringMap.add i r !map
-    | r -> r := ( entry, line ) :: !r
-  ) index;
+      incr n;
+      let i = String.make 1 ( Char.lowercase entry.[0] ) in
+      match StringMap.find i !map with
+      | exception Not_found ->
+          let r = ref [ entry, line ] in
+          map := StringMap.add i r !map
+      | r -> r := ( entry, line ) :: !r
+    ) index;
 
   Printf.bprintf bb {|
-    <h4 id="item-number">%d %s</h4>
+    <!--<h4 id="item-number">%d %s</h4>-->
     <div id="by-name" class="by-name">
       <nav>
 |} !n entity_name;
@@ -237,7 +237,7 @@ let print_index bb index entity_name =
       </nav>
 |};
   StringMap.iter (fun i r ->
-    Printf.bprintf bb {|
+      Printf.bprintf bb {|
      <div id="packages-set-%s" class="packages-set">
       <h3 id="name-%s">
         <a href="#name-%s" aria-hidden="true" class="anchor">
@@ -250,11 +250,11 @@ let print_index bb index entity_name =
             Printf.bprintf bb "%s\n" line;
           ) ( List.sort compare !r ) 
       end;
-    Printf.bprintf bb {|
+      Printf.bprintf bb {|
       </ol>
      </div>
 |};
-  ) !map;
+    ) !map;
 
   Printf.bprintf bb {|
     </div>
@@ -327,10 +327,10 @@ let generate_module_index state bb =
   let add_module pack alias mdl =
     let pkg = pkg_of_mdl mdl in
     let opam_pkg = pkg_of_opam {
-      opam_name = mdl.mdl_opam_name ;
-      opam_version = mdl.mdl_opam_version ;
-      opam_synopsis = "" ;
-    }
+        opam_name = mdl.mdl_opam_name ;
+        opam_version = mdl.mdl_opam_version ;
+        opam_synopsis = "" ;
+      }
     in
 
     let search_id = Printf.sprintf "%s:%s" pkg mdl.mdl_name in
@@ -361,26 +361,26 @@ let generate_module_index state bb =
         mdl.mdl_opam_name
         mdl.mdl_opam_version
         (match mdl.mdl_libs with
-          | [] -> ""
-          | libs ->
-            Printf.sprintf " in libs %s"
-              ( String.concat ", "
-                  (List.map (fun lib ->
-                      Printf.sprintf
-                        {|<a href="docs/%s/index.html" class="digodoc-lib">%s</a>|}
-                        (pkg_of_lib lib) lib.lib_name
-                    ) libs ))
+         | [] -> ""
+         | libs ->
+             Printf.sprintf " in libs %s"
+               ( String.concat ", "
+                   (List.map (fun lib ->
+                        Printf.sprintf
+                          {|<a href="docs/%s/index.html" class="digodoc-lib">%s</a>|}
+                          (pkg_of_lib lib) lib.lib_name
+                      ) libs ))
         )
     in
     index := ( mdl.mdl_name, line ) :: !index;
   in
 
   List.iter (function
-    | Module mdl ->
-      let pack, alias = module_cut mdl.mdl_name in
-      add_module pack alias mdl
-    | _ -> ()
-  ) state ;
+      | Module mdl ->
+          let pack, alias = module_cut mdl.mdl_name in
+          add_module pack alias mdl
+      | _ -> ()
+    ) state ;
 
   print_index bb !index "modules";
   ()
@@ -455,22 +455,22 @@ let read_all_entries () =
   let entries = ref [] in
   let dir = Globals.digodoc_html_dir in
   Array.iter (fun pkg ->
-    let dir = dir // pkg in
-    Array.iter (fun file ->
+      let dir = dir // pkg in
+      Array.iter (fun file ->
 
-      if EzString.starts_with file ~prefix:"ENTRY." then
-        let entry = read_entry ( dir // file ) in
-        begin  
-          match entry with
-          | Opam {opam_name; opam_version; _ } ->
-            let src = Source {src_opam_name=opam_name;src_opam_version=opam_version} in
-            entries := src :: !entries
-          | _ -> ()
-        end;
-        entries := entry :: !entries
+          if EzString.starts_with file ~prefix:"ENTRY." then
+            let entry = read_entry ( dir // file ) in
+            begin  
+              match entry with
+              | Opam {opam_name; opam_version; _ } ->
+                  let src = Source {src_opam_name=opam_name;src_opam_version=opam_version} in
+                  entries := src :: !entries
+              | _ -> ()
+            end;
+            entries := entry :: !entries
 
-    ) ( try Sys.readdir dir with _ -> [||] )
-  ) ( Sys.readdir dir ) ;
+        ) ( try Sys.readdir dir with _ -> [||] )
+    ) ( Sys.readdir dir ) ;
 
   Printf.eprintf "%d entries read\n%!" ( List.length !entries ) ;
   !entries
@@ -496,9 +496,9 @@ let generate () =
   let state = read_all_entries () in
 
   let stdlib_version = Option.value ~default:"4.10.0" @@ List.find_map (function
-    | Library {lib_opam_name = "ocaml-base-compiler" ; lib_opam_version; _} ->
-      Some lib_opam_version
-    | _ -> None) state in
+      | Library {lib_opam_name = "ocaml-base-compiler" ; lib_opam_version; _} ->
+          Some lib_opam_version
+      | _ -> None) state in
   let header bb ~title =
     Printf.bprintf bb
       {|
@@ -511,6 +511,16 @@ let generate () =
   </nav>
   </header>
   <h2>Index</h2>
+<div class="container">
+<div class="contained-left">
+<h4 id="item-number" class=""></h4>
+</div>
+<div class="contained-right">
+<input id="localsearch" placeholder="Search in ..." autocomplete="off">
+</div>
+</div>  
+<br>
+<br>
 |} title stdlib_version;
   in
 
@@ -523,17 +533,17 @@ let generate () =
     ~filename:"about.html"
     ~title:"About"
     (fun bb ~title ->
-      ignore title;
-      Printf.bprintf bb "%s" (Utils.file_content "about.html"));
+       ignore title;
+       Printf.bprintf bb "%s" (Utils.file_content "about.html"));
 
   Html.generate_page
     ~is_index:true
     ~filename:"packages.html"
     ~title:"Packages Index"
     (fun bb ~title ->
-        header bb ~title;
-        generate_opam_index state bb;
-        trailer bb;
+       header bb ~title;
+       generate_opam_index state bb;
+       trailer bb;
     );
 
   Html.generate_page
@@ -541,9 +551,9 @@ let generate () =
     ~filename:"libraries.html"
     ~title:"Libraries Index"
     (fun bb ~title  ->
-        header bb ~title;
-        generate_library_index state bb;
-        trailer bb;
+       header bb ~title;
+       generate_library_index state bb;
+       trailer bb;
     );
 
   Html.generate_page
@@ -551,9 +561,9 @@ let generate () =
     ~filename:"metas.html"
     ~title:"Meta Index"
     (fun bb ~title ->
-        header bb ~title;
-        generate_meta_index state bb;
-        trailer bb;
+       header bb ~title;
+       generate_meta_index state bb;
+       trailer bb;
     );
 
   Html.generate_page
@@ -561,9 +571,9 @@ let generate () =
     ~filename:"modules.html"
     ~title:"Modules Index"
     (fun bb ~title ->
-        header bb ~title;
-        generate_module_index state bb;
-        trailer bb;
+       header bb ~title;
+       generate_module_index state bb;
+       trailer bb;
     );
   if !Globals.sources then begin
     Html.generate_page
@@ -571,9 +581,9 @@ let generate () =
       ~filename:"sources.html"
       ~title:"Sources Index"
       (fun bb ~title ->
-          header bb ~title;
-          generate_source_index state bb;
-          trailer bb;
+         header bb ~title;
+         generate_source_index state bb;
+         trailer bb;
       )
   end;
 
@@ -582,8 +592,17 @@ let generate () =
     ~filename:"search.html"
     ~title:"Search"
     (fun bb ~title ->
-      ignore title;
-      Printf.bprintf bb "%s" (Utils.file_content "search_page.html"));
+       ignore title;
+       Printf.bprintf bb "%s" (Utils.file_content "search_page.html"));
 
-  Printf.eprintf "Index generation done.\n%!";
+  Html.generate_page
+    ~is_index:false
+    ~filename:"fulltext_search.html"
+    ~title:"Fulltext"
+    (fun bb ~title ->
+       header bb ~title;
+       trailer bb;
+    );
+
+    Printf.eprintf "Index generation done.\n%!";
   ()

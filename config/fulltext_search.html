@@ -1,0 +1,73 @@
+<!-- Fulltext Search -->
+
+<button type="button" id="col_funcs" class="collapsible-div">Fulltext Search</button>
+
+<div id="element-search-content" class="form-div">
+  <form class="search-form" id="element-form">
+    <table>
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <label for="fpattern_element">Search pattern:</label>
+            <input type="text" class="fpattern" id="fpattern_element" name="fpattern_element" value=""><br>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="switch">
+              <input type="checkbox" id="fregex" checked>
+              <span class="slider round"></span>
+            </label>
+            <label>Pattern or <a style="color: green;">RegEx</a></label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="fvals" name="fvals" value="Values">
+            <label for="fvals">Values</label>
+          </td>
+          <td>
+            <input type="checkbox" id="fclasses" name="fclasses" value="Classes">
+            <label for="fclass">Classes</label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type="checkbox" id="ftypes" name="ftypes" value="Types">
+            <label for="ftypes">Types</label><br>
+          </td>
+        </tr>
+        <tr id="tohide">
+          <td colspan="2">
+            <input type="checkbox" id="showpacksearch" value="Package">
+            <label for="showpacksearch">in Packages&nbsp;</label>
+            <div id="nsbp" class="newSearchbyPack">
+              <ul id="pack_tag_container"></ul>
+              <input type="text" id="ftextpackages" name="packinput" value="" placeholder="Search in ..." size="1">
+              <ul id="packsUl" class="packsUl"></ul>
+              <br>
+            </div>
+          </td>
+        </tr>
+        <tr id="tohide2">
+          <td colspan="2">
+            <input type="checkbox" id="showmodsearch" value="Module">
+            <label for="showmodsearch">in Modules&nbsp;</label>
+            <div id="nsbm" class="newSearchbyModule">
+              <ul id="mod_tag_container"></ul>
+              <input type="text" id="ftextmodules" name="modinput" value="" placeholder="Search in ..." size="1">
+              <ul id="modsUl" class="modsUl"></ul>
+              <br>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center;" colspan="2">
+            <input type="submit" class="submitstyle" value="Search">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+</div>

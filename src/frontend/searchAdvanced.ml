@@ -193,26 +193,26 @@ let get_element_state () =
     Raises [Web_app_error] if current state isn't an element state *)
 
 let entry_state_to_entry_info {pattern; current_entry; page; _} =
-    let open Data_types in
-    {
-        entry = current_entry;
-        pattern = pattern;
-        last_id = (page - 1) * 50;
-        starts_with = "^."
-    }
+  let open Data_types in
+  {
+    entry = current_entry;
+    pattern = pattern;
+    last_id = (page - 1) * 50;
+    starts_with = "^."
+  }
 (** Converts [entry_search_state] to [Data_types.entry_info] *)
 
 let element_state_to_element_info {pattern; current_element; regex; page; in_opams; in_mdls; _} =
-    let open Data_types in
-    {
-        element = current_element;
-        pattern = pattern;
-        last_id = (page - 1) * 50;
-        mode = if regex then Regex else Text;
-        conditions =
-            List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-            @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
-    }
+  let open Data_types in
+  {
+    element = current_element;
+    pattern = pattern;
+    last_id = (page - 1) * 50;
+    mode = if regex then Regex else Text;
+    conditions =
+      List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
+      @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
+  }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
 let state_to_info state =
@@ -270,6 +270,23 @@ let update_entry_state () =
     corresponding to them entry to the set of entries in the current state. Function returns [true]
     if at least 1 checkbox is checked (search is made through at least 1 entry type) else returns [false]. *)
 
+let getTags id =
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id id in
+  let cur_sset = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then begin
+    let tags = tag_container##.childNodes in
+    for i = 0 to tags##.length - 1
+    do
+      let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (tags##item i) in
+      cur_sset := StringSet.add (to_string tag_i##.innerText) !cur_sset;
+    done
+  end;
+  logs "printing what I got ";
+  StringSet.iter (fun e -> logs e) !cur_sset;
+  !cur_sset
+(** Retrieves the chosen modules / packages in which search will be done *)
+
 let update_element_state () =
   (* Look up either checkbox is checked or not. If checked, add corresponding element to the state *)
   let handle_checkbox id state =
@@ -299,9 +316,12 @@ let update_element_state () =
   (* Handle checkboxes *)
   handle_checkbox "fvals" element_state;
   element_state.regex <- to_bool (get_input "fregex")##.checked;
-  (* TODO : get opams and mdls names from tags *)
   element_state.in_opams <- StringSet.empty;
-  element_state.in_mdls <- StringSet.empty;
+  element_state.in_mdls <- StringSet.empty; 
+  (* TODO : get opams and mdls names from tags *)
+  element_state.in_opams <- getTags "pack_tag_container" ;
+  element_state.in_mdls <- getTags "mod_tag_container" ;
+
   match element_state.elements with
   | set when ElementSet.is_empty set -> false
   | set ->
@@ -334,59 +354,177 @@ let update_form () =
 (* TODO: update tags lists with content from state.in_opams and state.in_mdls *)
 (** Looks for state in order to update corresponding form *)
 
-
-(**Intermediate functions *)
-
-let set_attr elt attr value =
-  elt##setAttribute (js attr) value
-
-let append_inner elt str =
-  elt##.innerHTML := concat elt##.innerHTML str
-
-let insert_packsUl_li : packages_jsoo t -> unit  =
+let insert_packsUl_li : packages_jsoo t -> unit  = 
   fun (packages : packages_jsoo t) ->
   let packsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "packsUl" in
-  let parent = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
   let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-  let element_state = get_element_state() in
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
+  (* Start by removing all children from packsUl and replace them with result of new request 
+     packsUl##.innerHTML = "";*)
+  packsUl##.innerHTML := js "";
+
+  let cur_tags = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then
+    begin
+      let chosen_tags = tag_container##.childNodes in
+      for i = 0 to chosen_tags##.length - 1
+      do
+        let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
+        cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+      done
+    end;
   foreach
     (fun i elt ->
        if i < 10
        then begin
          let pack_li = Html.createLi document in
-         let name_version = (to_string @@ elt##.name) ^ " " ^ (to_string @@ elt##.version) in
-         let _ = Dom.addEventListener pack_li Html.Event.click (Dom.handler (fun _ ->
-             if (StringSet.mem name_version element_state.in_opams)
-             then warn ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version")
-             else begin
-               element_state.in_opams <- StringSet.add name_version element_state.in_opams;
-               let sp1 = Html.createSpan document in
-               set_attr sp1 "class" (js ("tag"));
-               sp1##.innerHTML := js name_version;
-               let sp2 = Html.createSpan document in
-               set_attr sp2 "class" (js ("remove"));
-               let _ = Dom.addEventListener sp2 Html.Event.click (Dom.handler (fun _ ->
-                   element_state.in_opams <- StringSet.remove name_version element_state.in_opams;
-                   Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
-                   _false) ) _false in
-               Dom.appendChild sp1 sp2;
-               Dom.insertBefore parent sp1 (Opt.return input);
-             end;
+         let name_version = to_string (concat (concat elt##.name (js " ")) elt##.version) in
+         pack_li##.onclick := Html.handler (fun _ ->
+             if (StringSet.mem name_version !cur_tags)
+             then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
+             else 
+               begin
+                 cur_tags := StringSet.add name_version !cur_tags;
+                 let sp1 = Html.createSpan document in
+                 let sp2 = Html.createSpan document in
+                 sp1##.classList##add (js "tag"); 
+                 sp1##.innerText := js name_version;
+                 sp2##.classList##add (js "remove");
+                 sp2##.onclick := Html.handler (fun _ ->
+                     cur_tags := StringSet.remove name_version !cur_tags;
+                     Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+                     _false
+                   );
+                 let tag_container_li = Html.createLi document in
+                 Dom.appendChild sp1 sp2;
+                 Dom.appendChild tag_container_li sp1;
+                 Dom.appendChild tag_container tag_container_li;
+               end;
              input##.value := js "";
              packsUl##.style##.display := js "none";
-             _false) ) _false in (**bool might be needed *)
-         pack_li##.style##.display := js "block";
+             Headfoot.footerHandler();
+             _false
+           );
          let a_li = Html.createA document in
-         set_attr a_li "href" (js ("#"));
-         a_li##.innerHTML := js  name_version;
+         Insertion.set_attr a_li "href" (js ("#"));
+         a_li##.innerText := js  name_version;
+         pack_li##.style##.display := js "block";
          Dom.appendChild pack_li a_li;
          Dom.appendChild packsUl pack_li;
+         Headfoot.footerHandler();
        end;
     )
     packages
+(** preview packages propositions from which to choose *)
 
+let insert_modsUl_li : modules_jsoo t -> unit  = 
+  fun (modules : modules_jsoo t) ->
+  let modsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "modsUl" in
+  let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+  (* Start by removing all children from packsUl and replace them with result of new request 
+     modsUl##.innerHTML = ""; *)
+  let clean_lis = modsUl##.childNodes in
+  for i = 0 to clean_lis##.length - 1
+  do
+    let li_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (clean_lis##item i) in 
+    Dom.removeChild modsUl li_i;
+  done;
 
-(*Request to get packages *)
+  let cur_tags = ref StringSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then
+    begin
+      let chosen_tags = tag_container##.childNodes in
+      for i = 0 to chosen_tags##.length - 1
+      do
+        let tag_li = unopt @@ Html.CoerceTo.element @@ unopt @@ (chosen_tags##item i) in
+        cur_tags := StringSet.add (to_string (tag_li##.innerText)) !cur_tags;
+      done
+    end;
+  (* logs "printing selected tags  ----> ";
+     StringSet.iter (fun e -> logs e) !cur_tags; *)
+  foreach
+    (fun i elt ->
+       if i < 10
+       then begin
+         let pack_li = Html.createLi document in
+         let name_version = to_string (concat (concat elt##.name (js " ")) elt##.opam) in
+         pack_li##.onclick := Html.handler (fun _ ->
+             if (StringSet.mem name_version !cur_tags)
+             then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
+             else 
+               begin
+                 cur_tags := StringSet.add name_version !cur_tags;
+                 let sp1 = Html.createSpan document in
+                 let sp2 = Html.createSpan document in
+                 sp1##.classList##add (js "tag"); 
+                 sp1##.innerText := js name_version;
+                 sp2##.classList##add (js "remove");
+                 sp2##.onclick := Html.handler (fun _ ->
+                     cur_tags := StringSet.remove name_version !cur_tags;
+                     Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+                     _false
+                   );
+                 let tag_container_li = Html.createLi document in
+                 Dom.appendChild sp1 sp2;
+                 Dom.appendChild tag_container_li sp1;
+                 Dom.appendChild tag_container tag_container_li;
+               end;
+             input##.value := js "";
+             modsUl##.style##.display := js "none";
+             Headfoot.footerHandler();
+             _false
+           );
+         let a_li = Html.createA document in
+         Insertion.set_attr a_li "href" (js ("#"));
+         a_li##.innerText := js  name_version;
+         pack_li##.style##.display := js "block";
+         Dom.appendChild pack_li a_li;
+         Dom.appendChild modsUl pack_li;
+         Headfoot.footerHandler();
+       end;
+    )
+    modules
+(** preview modules propositions from which to choose *)
+
+(* let insert_Sources_fulltext : sources_search_result_jsoo t -> unit = 
+  fun (sources : sources_search_result_jsoo t) ->
+  sources *)
+(** Insert Sources results for fulltext search *)
+
+(* let preview_Sources pattern files =
+  let sources_search_info = {
+    pattern;
+    files;
+    is_regex = true;
+    is_case_sensitive = true;
+    last_match_id = 10; 
+  } in
+  Lwt.async @@
+  Requests.send_generic_request
+    ~request:(Requests.getSources_fulltext sources_search_info)
+    ~callback:(fun source_search_result ->
+        if not @@ (source_search_result.occs = [])
+        then
+          begin
+            insert_Sources_fulltext (Objects.sources_search_result_to_jsoo source_search_result);
+          end;  
+        Lwt.return_unit
+      )
+    ~error:(fun err ->
+        begin
+          match err with
+          | Unknown ->
+              logs "Something went wrong in preview_Sources"
+          | _ ->
+              warn "Work on preview_Sources";
+        end;
+        Lwt.return_unit
+      ) *)
+(** Request to get sources for fulltext search (improve comments as ASAP) *)
+
 let previewpacks pattern =
   let entry_info = {
     entry = PACK;
@@ -398,29 +536,65 @@ let previewpacks pattern =
   Requests.send_generic_request
     ~request:(Requests.getEntries entry_info)
     ~callback:(fun pack_entries ->
-        begin
-          match pack_entries with
-          | Opam packages -> insert_packsUl_li (Objects.packages_to_jsoo packages)
-          | _ -> raise @@ web_app_error "Received is not a package"
-        end;
+        if not @@ Utils.empty_entries pack_entries
+        then
+          begin
+            match pack_entries with
+            | Opam packages ->
+                insert_packsUl_li (Objects.packages_to_jsoo packages);
+            | _ -> raise @@ web_app_error "Received object is not a package"
+          end;
         Lwt.return_unit
       )
     ~error:(fun err ->
-        logs "Error in previewpacks, request and/or callback failed";
         begin
           match err with
-          | Unknown -> logs "Something went wrong, Fix it now !";
-          | _ -> warn "Work on this"
+          | Unknown ->
+              logs "Something went wrong in previewpacks !";
+          | _ ->
+              warn "Work on this";
         end;
-        Lwt.return_unit;
+        Lwt.return_unit
       )
+(** Request to get packages *)
 
+let previewmods pattern =
+  let entry_mod_info = {
+    entry = MOD;
+    last_id = 0;
+    starts_with = "^.";
+    pattern;
+  } in
+  Lwt.async @@
+  Requests.send_generic_request
+    ~request:(Requests.getEntries entry_mod_info)
+    ~callback:(fun mod_entries ->
+        if not @@ Utils.empty_entries mod_entries
+        then
+          begin
+            match mod_entries with
+            | Mdl modules ->
+                insert_modsUl_li (Objects.modules_to_jsoo modules);
+            | _ -> raise @@ web_app_error "Received object is not a module"
+          end;
+        Lwt.return_unit
+      )
+    ~error:(fun err ->
+        begin
+          match err with
+          | Unknown ->
+              logs "Something went wrong in previewmods !";
+          | _ ->
+              warn "Work on this";
+        end;
+        Lwt.return_unit
+      )
+(** Request to get modules *)
 
 let set_handlers () =
   let entry_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "entry-form" in
   let element_form = unopt @@ Html.CoerceTo.form @@ get_element_by_id "element-form" in
   let update_button = unopt @@ Html.CoerceTo.button @@ get_element_by_id "update-filters" in
-  (*Currently working on some elements *)
   let pack_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showpacksearch" in
   let mod_checkbox = unopt @@ Html.CoerceTo.input @@ get_element_by_id "showmodsearch" in
   let focus_packages_input = unopt @@ Html.CoerceTo.div @@ get_element_by_id "nsbp" in
@@ -428,8 +602,10 @@ let set_handlers () =
   let slider_show_hide = unopt @@ Html.CoerceTo.input @@ get_element_by_id "fregex" in
   let toggle_entry_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_entry" in
   let toggle_element_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_funcs" in
+  (* let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in *)
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
-  (*Hide / Show package input in element-form to specify packages in which search will be performed*)
+  let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
+
   pack_checkbox##.onchange := Html.handler (fun _ ->
       let pack_to_hide = get_element_by_id "nsbp" in
       if pack_checkbox##.checked = _true
@@ -437,7 +613,8 @@ let set_handlers () =
       else pack_to_hide##.style##.display := js "none";
       _false
     );
-  (*Hide / Show module input in element-form to specify modules in which search will be performed*)
+  (**Hide/Show package input in element-form to specify packages in which search will be performed*)
+
   mod_checkbox##.onchange := Html.handler (fun _ ->
       let mod_to_hide = get_element_by_id "nsbm" in
       if mod_checkbox##.checked = _true
@@ -445,19 +622,22 @@ let set_handlers () =
       else mod_to_hide##.style##.display := js "none";
       _false
     );
-  (*Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
+  (**Hide/Show module input in element-form to specify modules in which search will be performed*)
+
   focus_packages_input##.onclick := Html.handler (fun _ ->
       let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
       focus_to_packinput##focus;
       _false
     );
-  (*Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
+  (**Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
+
   focus_mods_input##.onclick := Html.handler (fun _ ->
       let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
       focus_to_modinput##focus;
       _false
     );
-  (*Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
+  (**Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
+
   slider_show_hide##.onchange := Html.handler (fun _ ->
       let tr_tohide = get_element_by_id "tohide" in
       let tr_tohide2 = get_element_by_id "tohide2" in
@@ -472,7 +652,8 @@ let set_handlers () =
       end;
       _false
     );
-  (*Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
+  (**Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
+
   toggle_entry_form##.onclick := Html.handler (fun _ ->
       let hide_this = get_element_by_id "element-search-content" in
       let show_this = get_element_by_id "entry-search-content" in
@@ -480,7 +661,8 @@ let set_handlers () =
       show_this##.style##.display := js "block";
       _false
     );
-  (*Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
+  (**Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
+
   toggle_element_form##.onclick := Html.handler (fun _ ->
       let show_this = get_element_by_id "element-search-content" in
       let hide_this = get_element_by_id "entry-search-content" in
@@ -488,38 +670,72 @@ let set_handlers () =
       show_this##.style##.display := js "block";
       _false
     );
+  (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
 
-  (*WORK ON THIS *)
-
-  (*Remove and delete selected tag when pressing backspace in input having id=ftextpackages *)
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
+      let packsUl = get_element_by_id "packsUl" in
+      let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
       begin
         match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
-        | Some "Backspace" -> (*Done*)
-            (* logs @@ "cur_value --->" ^ (to_string @@ cur_input_value); *)
-            if (cur_input_value = js "" && (to_bool @@ (unopt @@ pack_tag_handling##.parentNode)##hasChildNodes)) (*&& StringSet.is_empty element_state.in_opams*)
+
+        | Some "Backspace" ->
+            if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then begin
-              let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ pack_tag_handling##.previousSibling in
-              let rm_value = to_string rm_pack_name_version##.innerHTML in
-              let element_state = get_element_state() in
-              element_state.in_opams <- StringSet.remove rm_value element_state.in_opams;
-              let parent = unopt @@ rm_pack_name_version##.parentNode in
-              Dom.removeChild parent rm_pack_name_version;
-              (* logs @@ "Done"; *)
+              packsUl##.style##.display := js "none";
+              let rm_pack_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
+              Dom.removeChild tag_container rm_pack_name_version;
+              Headfoot.footerHandler();
             end;
-        | _ -> (**Keep doing stuff here ... previewpacks ... *)
-            logs @@ ("currently typing : " ^ (to_string @@ cur_input_value) ^ "\nto be used for request");
-            let packsUl = get_element_by_id "packsUl" in
-            if cur_input_value = js ""
-            then packsUl##.style##.display := js "block"
+
+        | Some "Escape" -> 
+            packsUl##.style##.display := js "none";
+            Headfoot.footerHandler();
+
+        | _ ->
+            if (not (cur_input_value = js ""))
+            then begin
+              packsUl##.style##.display := js "block";
+              previewpacks @@ (to_string cur_input_value);
+            end
             else packsUl##.style##.display := js "none";
-            previewpacks @@ to_string cur_input_value;
-            (*Calling function to deal with tags and display li s with package name and version to choose from *)
-            (* previewpacks (to_string @@ cur_input_value); *)
       end;
       _false
     );
+  (**Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
+
+  mod_tag_handling##.onkeyup := Html.handler (fun kbevent ->
+      let cur_input_value = mod_tag_handling##.value##trim in
+      let modsUl = get_element_by_id "modsUl" in
+      let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+      begin
+        match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
+
+        | Some "Backspace" ->
+            if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
+            then begin
+              if to_bool tag_container##hasChildNodes
+              then
+                let rm_mod_name_version = unopt @@ Html.CoerceTo.element @@ unopt @@ tag_container##.lastChild in
+                Dom.removeChild tag_container rm_mod_name_version;
+                Headfoot.footerHandler();
+            end;
+
+        | Some "Escape" -> 
+            modsUl##.style##.display := js "none";
+            Headfoot.footerHandler();
+
+        | _ ->
+            if (not (cur_input_value = js ""))
+            then begin
+              modsUl##.style##.display := js "block";
+              previewmods @@ to_string cur_input_value;
+            end
+            else modsUl##.style##.display := js "none";
+      end;
+      _false
+    );
+  (**Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
 
   (* Handler called when onsubmit event was generated by entry form *)
   entry_form##.onsubmit := Html.handler (fun _ ->
@@ -551,27 +767,6 @@ let set_handlers () =
       update_form ();
       _false
     )
-
-(*toggle_pack ();
-  toggle_mod ()
-  List.iter (fun button_i ->
-        button_i##.onclick := Html.handler (fun _ ->
-            List.iter (fun (button_j:#Dom.node t) ->
-                    if (button_i <> button_j) then begin
-                        let nocontent = element_to_button @@
-                                        unopt @@
-                                        Html.CoerceTo.element @@
-                                        button_j##.nextSibling
-                        in
-                        nocontent##.style##.display := js "none"
-                    end
-                )
-                form_buttons;
-
-            _false
-        )
-    )
-    form_buttons*)
 (** Sets handlers to forms and buttons from search page. Submit event handler of a form redirect to the
     page with corresponding to search state results. Click event of a button 'update filters' shows filled
     form within result page that allows to update search request. *)
@@ -643,140 +838,140 @@ let pagination_info state total_number =
     Raises [Web_app_error] if current state is uninitialized. *)
 
 let insert_content info current current_number =
-    (* insert pagination nav *)
-    let insert_pagination () =
-        let number = int_of_string current_number in
-        let pages_info = pagination_info !search_state number in
-        Insertion.insert_pagination pages_info;
+  (* insert pagination nav *)
+  let insert_pagination () =
+    let number = int_of_string current_number in
+    let pages_info = pagination_info !search_state number in
+    Insertion.insert_pagination pages_info;
     (* display results, entries bar, update button and set active nav *)
-    and display_content () =
-        let update_button = get_element_by_id "update-filters"
-        and entries_nav = get_element_by_id "entries-nav"
-        and result_div = get_element_by_id "result-div"
-        and result_nav = get_element_by_id @@ current ^ "-results"
-        and results = get_element_by_id "results-list" in
-        update_button##.style##.display := js "";
-        entries_nav##.style##.display := js "";
-        result_div##.style##.display := js "";
-        results##.innerHTML := js "";
-        result_nav##.className := js "active-nav";
+  and display_content () =
+    let update_button = get_element_by_id "update-filters"
+    and entries_nav = get_element_by_id "entries-nav"
+    and result_div = get_element_by_id "result-div"
+    and result_nav = get_element_by_id @@ current ^ "-results"
+    and results = get_element_by_id "results-list" in
+    update_button##.style##.display := js "";
+    entries_nav##.style##.display := js "";
+    result_div##.style##.display := js "";
+    results##.innerHTML := js "";
+    result_nav##.className := js "active-nav";
     (* insert message about empty search results *)
-    and display_empty_message () =
-        let update_button = get_element_by_id "update-filters"
-        and entries_nav = get_element_by_id "entries-nav" in
-        update_button##.style##.display := js "";
-        entries_nav##.style##.display := js "";
-        Insertion.write_message ("No " ^ current ^ " found.");
+  and display_empty_message () =
+    let update_button = get_element_by_id "update-filters"
+    and entries_nav = get_element_by_id "entries-nav" in
+    update_button##.style##.display := js "";
+    entries_nav##.style##.display := js "";
+    Insertion.write_message ("No " ^ current ^ " found.");
     (* insert error message *)
-    and display_error err =
-        let update_button = get_element_by_id "update-filters" in
-        update_button##.style##.display := js "";
-        (* print error message *)
-        begin
-            match err with
-            | Invalid_regex ->
-                Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
-            | _ ->
-                Insertion.write_warning ("Server error occured, please try again later.")
-        end;
-        Lwt.return_unit
-    in
-    match info with
-    | Entry entry_info ->
-        Requests.send_generic_request
-            ~request:(Requests.getEntries entry_info)
-            ~callback:(fun entries ->
-                if not @@ empty_entries entries
-                then begin
-                    display_content ();
-                    (* insert entries in search page *)
-                    Insertion.insert_entries_search entries;
-                    insert_pagination ();
-                end
-                else begin
-                    display_empty_message ()
-                end;
-                Lwt.return_unit
-                )
-            ~error:display_error
-            ()
-    | Element element_info ->
-        Requests.send_generic_request
-            ~request:(Requests.getElements element_info)
-            ~callback:(fun elements ->
-                if not @@ empty_elements elements
-                then begin
-                    display_content ();
-                    (* insert elements in search page *)
-                    Insertion.insert_elements_search elements;
-                    insert_pagination ()
-                end
-                else begin
-                    display_empty_message ()
-                end;
-                Lwt.return_unit
-                )
-            ~error:display_error
-            ()
+  and display_error err =
+    let update_button = get_element_by_id "update-filters" in
+    update_button##.style##.display := js "";
+    (* print error message *)
+    begin
+      match err with
+      | Invalid_regex ->
+          Insertion.write_warning ("Invalid regex '" ^ pattern_from_info info ^ "'")
+      | _ ->
+          Insertion.write_warning ("Server error occured, please try again later.")
+    end;
+    Lwt.return_unit
+  in
+  match info with
+  | Entry entry_info ->
+      Requests.send_generic_request
+        ~request:(Requests.getEntries entry_info)
+        ~callback:(fun entries ->
+            if not @@ empty_entries entries
+            then begin
+              display_content ();
+              (* insert entries in search page *)
+              Insertion.insert_entries_search entries;
+              insert_pagination ();
+            end
+            else begin
+              display_empty_message ()
+            end;
+            Lwt.return_unit
+          )
+        ~error:display_error
+        ()
+  | Element element_info ->
+      Requests.send_generic_request
+        ~request:(Requests.getElements element_info)
+        ~callback:(fun elements ->
+            if not @@ empty_elements elements
+            then begin
+              display_content ();
+              (* insert elements in search page *)
+              Insertion.insert_elements_search elements;
+              insert_pagination ()
+            end
+            else begin
+              display_empty_message ()
+            end;
+            Lwt.return_unit
+          )
+        ~error:display_error
+        ()
 (** Inserts content of the search page (search results and pagination nav bar).
     Empty results and server side errors generate specific to them message on the page. *)
 
 let search_page () =
-    (* get current entry/element as string from state *)
-    let get_current state =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "get_elt_from_state: search state is unitialised"
-        | SearchEntry state -> entry_type_to_string state.current_entry
-        | SearchElement state -> element_type_to_string state.current_element
-    (* get current entry/element in the state *)
-    and set_current state current =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "set_current: search state is unitialised"
-        | SearchEntry state -> SearchEntry {state with current_entry = entry_type_of_string current}
-        | SearchElement state -> SearchElement {state with current_element = element_type_of_string current}
-    (* get entries/elements as list of strings from state *)
-    and get_elts_from_state state =
-        match state with
-        | Uninitialized -> raise @@ web_app_error "get_elts_from_state: search state is unitialised"
-        | SearchEntry state -> List.map entry_type_to_string @@ EntrySet.elements state.entries
-        | SearchElement state -> List.map element_type_to_string @@ ElementSet.elements state.elements
-    (* construct and set the link to the navigation item *)
-    and link_to_elt state link =
-        let st =
-            match state with
-            | Uninitialized -> raise @@ web_app_error "link_to_elt: search state is unitialised"
-            | SearchEntry state -> SearchEntry {state with page = 1 }
-            | SearchElement state -> SearchElement {state with page = 1 }
-        in
-            let href = "search.html?" ^ state_to_args st in
-            link##setAttribute (js "href") (js href)
+  (* get current entry/element as string from state *)
+  let get_current state =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "get_elt_from_state: search state is unitialised"
+    | SearchEntry state -> entry_type_to_string state.current_entry
+    | SearchElement state -> element_type_to_string state.current_element
+  (* get current entry/element in the state *)
+  and set_current state current =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "set_current: search state is unitialised"
+    | SearchEntry state -> SearchEntry {state with current_entry = entry_type_of_string current}
+    | SearchElement state -> SearchElement {state with current_element = element_type_of_string current}
+  (* get entries/elements as list of strings from state *)
+  and get_elts_from_state state =
+    match state with
+    | Uninitialized -> raise @@ web_app_error "get_elts_from_state: search state is unitialised"
+    | SearchEntry state -> List.map entry_type_to_string @@ EntrySet.elements state.entries
+    | SearchElement state -> List.map element_type_to_string @@ ElementSet.elements state.elements
+  (* construct and set the link to the navigation item *)
+  and link_to_elt state link =
+    let st =
+      match state with
+      | Uninitialized -> raise @@ web_app_error "link_to_elt: search state is unitialised"
+      | SearchEntry state -> SearchEntry {state with page = 1 }
+      | SearchElement state -> SearchElement {state with page = 1 }
     in
-    let current = get_current !search_state in
-    let elts = get_elts_from_state !search_state
-    and info = state_to_info !search_state
-    (* number of current entries/elements *)
-    and current_number = ref "" in
-    let%lwt () =
-        (* for every entry/element type *)
-        Lwt_list.iter_p (fun elt ->
-                let nav_bar = get_element_by_id @@ elt ^ "-results" in
-                (* set the link to the navigation item that leads to search page for corresponding entry/element *)
-                let st = set_current !search_state elt in
-                link_to_elt st nav_bar;
-                Requests.send_generic_request
-                    ~request:(Requests.getNumber (state_to_info st))
-                    ~callback:(fun number ->
-                        (* display entries/elements number associated to the navigation item *)
-                        if elt = current then current_number:=number;
-                        let span = Html.createSpan document in
-                        nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
-                        span##.innerHTML := js ("("^number^")");
-                        Dom.appendChild nav_bar span;
-                        nav_bar##.style##.display := js "";
-                        Lwt.return_unit
-                    )
-                    ()
+    let href = "search.html?" ^ state_to_args st in
+    link##setAttribute (js "href") (js href)
+  in
+  let current = get_current !search_state in
+  let elts = get_elts_from_state !search_state
+  and info = state_to_info !search_state
+  (* number of current entries/elements *)
+  and current_number = ref "" in
+  let%lwt () =
+    (* for every entry/element type *)
+    Lwt_list.iter_p (fun elt ->
+        let nav_bar = get_element_by_id @@ elt ^ "-results" in
+        (* set the link to the navigation item that leads to search page for corresponding entry/element *)
+        let st = set_current !search_state elt in
+        link_to_elt st nav_bar;
+        Requests.send_generic_request
+          ~request:(Requests.getNumber (state_to_info st))
+          ~callback:(fun number ->
+              (* display entries/elements number associated to the navigation item *)
+              if elt = current then current_number:=number;
+              let span = Html.createSpan document in
+              nav_bar##.innerHTML := concat nav_bar##.innerHTML (js " ");
+              span##.innerHTML := js ("("^number^")");
+              Dom.appendChild nav_bar span;
+              nav_bar##.style##.display := js "";
+              Lwt.return_unit
             )
+          ()
+      )
       elts
   in
   (* insert page content *)
