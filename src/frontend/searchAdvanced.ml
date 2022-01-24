@@ -640,7 +640,17 @@ let set_handlers () =
   (* let toggle_fulltext_form = unopt @@ Html.CoerceTo.button @@ get_element_by_id "col_fulltext" in *)
   let pack_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
   let mod_tag_handling = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
-
+  let toogle_form formname = 
+    let hidename = 
+      match formname with
+      | "element-search-content" -> "entry-search-content"
+      | _ -> "element-search-content"
+    in
+    let show_this = get_element_by_id formname in
+    let hide_this = get_element_by_id hidename in
+    hide_this##.style##.display := js "none";
+    show_this##.style##.display := js "block";
+  in
   pack_checkbox##.onchange := Html.handler (fun _ ->
       let pack_to_hide = get_element_by_id "nsbp" in
       if pack_checkbox##.checked = _true
@@ -648,8 +658,7 @@ let set_handlers () =
       else pack_to_hide##.style##.display := js "none";
       _false
     );
-  (**Hide/Show package input in element-form to specify packages in which search will be performed*)
-
+  (* Hide/Show package input in element-form to specify packages in which search will be performed*)
   mod_checkbox##.onchange := Html.handler (fun _ ->
       let mod_to_hide = get_element_by_id "nsbm" in
       if mod_checkbox##.checked = _true
@@ -657,22 +666,19 @@ let set_handlers () =
       else mod_to_hide##.style##.display := js "none";
       _false
     );
-  (**Hide/Show module input in element-form to specify modules in which search will be performed*)
-
+  (* Hide/Show module input in element-form to specify modules in which search will be performed*)
   focus_packages_input##.onclick := Html.handler (fun _ ->
       let focus_to_packinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextpackages" in
       focus_to_packinput##focus;
       _false
     );
-  (**Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
-
+  (* Set focus on input text id="ftextpackages" when div of class newSearchbyPack and id=nsbp is clicked in element-form*)
   focus_mods_input##.onclick := Html.handler (fun _ ->
       let focus_to_modinput = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
       focus_to_modinput##focus;
       _false
     );
-  (**Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
-
+  (* Set focus on input text id="ftextmodules" when div of class newSearchbyModule and id=nsbm is clicked in element-form*)
   slider_show_hide##.onchange := Html.handler (fun _ ->
       let tr_tohide = get_element_by_id "tohide" in
       let tr_tohide2 = get_element_by_id "tohide2" in
@@ -687,33 +693,23 @@ let set_handlers () =
       end;
       _false
     );
-  (**Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
-
+  (* Show / Hide package and module checkbox in element-form when slider is checked / unchecked *)
   toggle_entry_form##.onclick := Html.handler (fun _ ->
-      let hide_this = get_element_by_id "element-search-content" in
-      let show_this = get_element_by_id "entry-search-content" in
-      hide_this##.style##.display := js "none";
-      show_this##.style##.display := js "block";
+      toogle_form "entry-search-content";
       _false
     );
-  (**Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
-
+  (* Show entry-form's div when button having id="col_entry" is clicked and hide element-form's div *)
   toggle_element_form##.onclick := Html.handler (fun _ ->
-      let show_this = get_element_by_id "element-search-content" in
-      let hide_this = get_element_by_id "entry-search-content" in
-      hide_this##.style##.display := js "none";
-      show_this##.style##.display := js "block";
+      toogle_form "element-search-content";
       _false
     );
-  (**Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
-
+  (* Show element-form's div when button having id="col_funcs" is clicked and hide entry-form's div *)
   pack_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = pack_tag_handling##.value##trim in
       let packsUl = get_element_by_id "packsUl" in
       let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
       begin
         match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
-
         | Some "Backspace" ->
             if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then begin
@@ -722,11 +718,9 @@ let set_handlers () =
               Dom.removeChild tag_container rm_pack_name_version;
               Headfoot.footerHandler();
             end;
-
         | Some "Escape" -> 
             packsUl##.style##.display := js "none";
             Headfoot.footerHandler();
-
         | _ ->
             if (not (cur_input_value = js ""))
             then begin
@@ -737,15 +731,13 @@ let set_handlers () =
       end;
       _false
     );
-  (**Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
-
+  (* Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
   mod_tag_handling##.onkeyup := Html.handler (fun kbevent ->
       let cur_input_value = mod_tag_handling##.value##trim in
       let modsUl = get_element_by_id "modsUl" in
       let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
       begin
         match Option.map to_string @@ Optdef.to_option @@ kbevent##.key with
-
         | Some "Backspace" ->
             if (cur_input_value = js "" && (to_bool tag_container##hasChildNodes))
             then begin
@@ -755,11 +747,9 @@ let set_handlers () =
                 Dom.removeChild tag_container rm_mod_name_version;
                 Headfoot.footerHandler();
             end;
-
         | Some "Escape" -> 
             modsUl##.style##.display := js "none";
             Headfoot.footerHandler();
-
         | _ ->
             if (not (cur_input_value = js ""))
             then begin
@@ -770,8 +760,7 @@ let set_handlers () =
       end;
       _false
     );
-  (**Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
-
+  (* Remove and delete selected tag when pressing backspace in input having id=ftextpackages <---- Update THIS *)
   (* Handler called when onsubmit event was generated by entry form *)
   entry_form##.onsubmit := Html.handler (fun _ ->
       (* if state was updated (at least 1 entry checkbox is checked) then redirect to the corresponding search page *)
@@ -798,6 +787,12 @@ let set_handlers () =
       (* display forms and hide update button *)
       update_button##.style##.display := js "none";
       form_div##.style##.display := js "";
+      begin
+        match !search_state with
+        | SearchEntry _ -> toogle_form "entry-search-content"
+        | SearchElement _ -> toogle_form "element-search-content"
+        | _ -> raise @@ web_app_error "set_handlers: couldn't toogle to the form from unitialized page"
+      end;
       (* fills form from state *)
       update_form ();
       _false
