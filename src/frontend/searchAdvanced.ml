@@ -56,6 +56,15 @@ module ElementSet = Set.Make(OrderedElement)
 module StringSet = Set.Make(String)
 (** Set of strings. *)
 
+module StringCoupleSet = Set.Make(struct 
+  type t = string * string
+  let compare (x1,x2) (y1,y2) = 
+    match String.compare x1 y1 with
+    | 0 -> String.compare x2 y2
+    | x -> x 
+end)
+(** Set of strings. *)
+
 type entry_search_state = {
   mutable pattern : string;
   mutable entries : EntrySet.t;
@@ -71,7 +80,7 @@ type element_search_state = {
   mutable page : int;
   mutable regex : bool;
   mutable in_opams : StringSet.t;
-  mutable in_mdls : StringSet.t
+  mutable in_mdls : StringCoupleSet.t
 }
 (** State for element search *)
 
@@ -126,7 +135,7 @@ let state_of_args args =
         page = 1;
         regex = true;
         in_opams = StringSet.empty;
-        in_mdls = StringSet.empty
+        in_mdls = StringCoupleSet.empty
       }
       in
       (* construct the element state *)
@@ -138,8 +147,14 @@ let state_of_args args =
           | "current" -> state.current_element <- element_type_of_string elt
           | "mode" -> (match elt with "text" -> state.regex <- false | _ -> state.regex <- true)
           | "page" -> state.page <- int_of_string elt
-          | "opam" -> state.in_opams <- StringSet.add (decode_query_val elt) state.in_opams
-          | "mdl" -> state.in_mdls <- StringSet.add (decode_query_val elt) state.in_mdls
+          | "opam" -> state.in_opams <- StringSet.add (decode_query_val elt) state.in_opams; logs ("OPAM = " ^ elt)
+          | "mdl" ->
+            let elt = decode_query_val elt in
+            begin
+              match String.split_on_char '+' elt with
+              | [mdl;opam] -> state.in_mdls <- StringCoupleSet.add (mdl,opam) state.in_mdls
+              | _ -> raise @@ web_app_error (Printf.sprintf "state_of_args: mdl  value %s has wrong format" elt)
+            end
           | _ -> raise @@ web_app_error (Printf.sprintf "state_of_args: key %s is not recognised" key)
         )
         args;
@@ -171,11 +186,11 @@ let state_to_args state =
         page
         (if regex then "regex" else "text")
         (String.concat "&"
-         @@ List.map (fun elt -> ("opam=" ^ elt))
+         @@ List.map (fun elt -> ("opam=" ^ encode_query_val elt))
          @@ StringSet.elements in_opams)
         (String.concat "&"
-         @@ List.map (fun elt -> ("mdl=" ^ elt))
-         @@ StringSet.elements in_mdls)
+         @@ List.map (fun (mdl,opam) -> ("mdl=" ^ encode_query_val (mdl ^ "+" ^ opam)))
+         @@ StringCoupleSet.elements in_mdls)
 (** [state_to_args state] constructs query string from search state [state] *)
 
 let get_entry_state () =
@@ -211,7 +226,7 @@ let element_state_to_element_info {pattern; current_element; regex; page; in_opa
     mode = if regex then Regex else Text;
     conditions =
       List.map (fun opam -> In_opam opam) (StringSet.elements in_opams)
-      @ List.map (fun mdl -> In_mdl (mdl, "")) (StringSet.elements in_mdls)
+      @ List.map (fun (mdl,opam) -> In_mdl (mdl, opam)) (StringCoupleSet.elements in_mdls)
   }
 (** Converts [element_search_state] to [Data_types.element_info] *)
 
@@ -270,8 +285,8 @@ let update_entry_state () =
     corresponding to them entry to the set of entries in the current state. Function returns [true]
     if at least 1 checkbox is checked (search is made through at least 1 entry type) else returns [false]. *)
 
-let getTags id =
-  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id id in
+let getPackTags () =
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in
   let cur_sset = ref StringSet.empty in
   if to_bool tag_container##hasChildNodes
   then begin
@@ -282,10 +297,27 @@ let getTags id =
       cur_sset := StringSet.add (to_string tag_i##.innerText) !cur_sset;
     done
   end;
-  logs "printing what I got ";
-  StringSet.iter (fun e -> logs e) !cur_sset;
   !cur_sset
-(** Retrieves the chosen modules / packages in which search will be done *)
+(** Retrieves the chosen packages in which search will be done *)
+
+
+let getMdlTags () =
+  let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+  let cur_sset = ref StringCoupleSet.empty in
+  if to_bool tag_container##hasChildNodes
+  then begin
+    let tags = tag_container##.childNodes in
+    for i = 0 to tags##.length - 1
+    do
+      let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (tags##item i) in
+      let str_i = to_string tag_i##.innerText in
+      match String.split_on_char ':' str_i with
+      | [mdl_i;opam_i] -> cur_sset := StringCoupleSet.add (mdl_i, opam_i) !cur_sset
+      | _ -> ()
+    done
+  end;
+  !cur_sset
+(** Retrieves the chosen modules in which search will be done *)
 
 let update_element_state () =
   (* Look up either checkbox is checked or not. If checked, add corresponding element to the state *)
@@ -308,7 +340,7 @@ let update_element_state () =
     page = 1;
     regex = true;
     in_opams = StringSet.empty;
-    in_mdls = StringSet.empty
+    in_mdls = StringCoupleSet.empty
   } in
   let pattern_input = get_input "fpattern_element" in
   let value = to_string pattern_input##.value##trim in
@@ -316,11 +348,8 @@ let update_element_state () =
   (* Handle checkboxes *)
   handle_checkbox "fvals" element_state;
   element_state.regex <- to_bool (get_input "fregex")##.checked;
-  element_state.in_opams <- StringSet.empty;
-  element_state.in_mdls <- StringSet.empty; 
-  (* TODO : get opams and mdls names from tags *)
-  element_state.in_opams <- getTags "pack_tag_container" ;
-  element_state.in_mdls <- getTags "mod_tag_container" ;
+  element_state.in_opams <- getPackTags () ;
+  element_state.in_mdls <- getMdlTags () ;
 
   match element_state.elements with
   | set when ElementSet.is_empty set -> false
@@ -379,20 +408,20 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
        if i < 10
        then begin
          let pack_li = Html.createLi document in
-         let name_version = to_string (concat (concat elt##.name (js " ")) elt##.version) in
+         let name = to_string elt##.name in 
          pack_li##.onclick := Html.handler (fun _ ->
-             if (StringSet.mem name_version !cur_tags)
-             then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
+             if (StringSet.mem name!cur_tags)
+             then Html.window##alert (js ("Error : package " ^ name ^ " already chosen,\nCheck for a different version"))
              else 
                begin
-                 cur_tags := StringSet.add name_version !cur_tags;
+                 cur_tags := StringSet.add name !cur_tags;
                  let sp1 = Html.createSpan document in
                  let sp2 = Html.createSpan document in
                  sp1##.classList##add (js "tag"); 
-                 sp1##.innerText := js name_version;
+                 sp1##.innerText := js name;
                  sp2##.classList##add (js "remove");
                  sp2##.onclick := Html.handler (fun _ ->
-                     cur_tags := StringSet.remove name_version !cur_tags;
+                     cur_tags := StringSet.remove name !cur_tags;
                      Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
                      _false
                    );
@@ -408,7 +437,8 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
            );
          let a_li = Html.createA document in
          Insertion.set_attr a_li "href" (js ("#"));
-         a_li##.innerText := js  name_version;
+         Insertion.set_attr a_li "style" (js "color:green");
+         a_li##.innerText := js name;
          pack_li##.style##.display := js "block";
          Dom.appendChild pack_li a_li;
          Dom.appendChild packsUl pack_li;
@@ -423,14 +453,8 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
   let modsUl = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "modsUl" in
   let input = unopt @@ Html.CoerceTo.input @@ get_element_by_id "ftextmodules" in
   let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
-  (* Start by removing all children from packsUl and replace them with result of new request 
-     modsUl##.innerHTML = ""; *)
-  let clean_lis = modsUl##.childNodes in
-  for i = 0 to clean_lis##.length - 1
-  do
-    let li_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (clean_lis##item i) in 
-    Dom.removeChild modsUl li_i;
-  done;
+  (* Start by removing all children from packsUl and replace them with result of new request*) 
+  modsUl##.innerHTML := js "";
 
   let cur_tags = ref StringSet.empty in
   if to_bool tag_container##hasChildNodes
@@ -450,20 +474,23 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
        if i < 10
        then begin
          let pack_li = Html.createLi document in
-         let name_version = to_string (concat (concat elt##.name (js " ")) elt##.opam) in
+         let pack_name = match String.index_opt (to_string elt##.opam) '.' with
+         | Some i -> String.sub (to_string elt##.opam) 0 i
+         | None -> to_string elt##.opam in
+         let name = to_string (concat elt##.name (js @@ ":" ^ pack_name)) in
          pack_li##.onclick := Html.handler (fun _ ->
-             if (StringSet.mem name_version !cur_tags)
-             then Html.window##alert (js ("Error : package " ^ name_version ^ " already chosen,\nCheck for a different version"))
+             if (StringSet.mem name !cur_tags)
+             then Html.window##alert (js ("Error : package " ^ name ^ " already chosen,\nCheck for a different version"))
              else 
                begin
-                 cur_tags := StringSet.add name_version !cur_tags;
+                 cur_tags := StringSet.add name !cur_tags;
                  let sp1 = Html.createSpan document in
                  let sp2 = Html.createSpan document in
                  sp1##.classList##add (js "tag"); 
-                 sp1##.innerText := js name_version;
+                 sp1##.innerText := js name;
                  sp2##.classList##add (js "remove");
                  sp2##.onclick := Html.handler (fun _ ->
-                     cur_tags := StringSet.remove name_version !cur_tags;
+                     cur_tags := StringSet.remove name !cur_tags;
                      Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
                      _false
                    );
@@ -479,7 +506,15 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
            );
          let a_li = Html.createA document in
          Insertion.set_attr a_li "href" (js ("#"));
-         a_li##.innerText := js  name_version;
+         let in_w = Html.createSpan document in
+         Insertion.set_attr in_w "style" (js "color:black");
+         in_w##.innerHTML := js " in ";
+         let pkg = Html.createSpan document in 
+         Insertion.set_attr pkg "style" (js "color:green");
+         pkg##.innerHTML := js pack_name;
+         a_li##.innerHTML := elt##.name;
+         Dom.appendChild a_li in_w;
+         Dom.appendChild a_li pkg;
          pack_li##.style##.display := js "block";
          Dom.appendChild pack_li a_li;
          Dom.appendChild modsUl pack_li;
