@@ -294,7 +294,9 @@ let getPackTags () =
     for i = 0 to tags##.length - 1
     do
       let tag_i = unopt @@ Html.CoerceTo.element @@ unopt @@ (tags##item i) in
-      cur_sset := StringSet.add (to_string tag_i##.innerText) !cur_sset;
+      if (to_string tag_i##.innerText) = "" 
+      then Dom.removeChild tag_container tag_i
+      else cur_sset := StringSet.add (to_string tag_i##.innerText) !cur_sset;
     done
   end;
   !cur_sset
@@ -365,7 +367,22 @@ let update_element_state () =
 let update_form () =
   let check_input id =
     (get_input id)##.checked := bool true
-  in
+  in 
+  let add_tag tag_container name = 
+    let sp1 = Html.createSpan document in
+    let sp2 = Html.createSpan document in
+    sp1##.classList##add (js "tag"); 
+    sp1##.innerText := js name;
+    sp2##.classList##add (js "remove");
+    sp2##.onclick := Html.handler (fun _ ->
+      Dom.removeChild (unopt @@ sp1##.parentNode) sp1;
+      _false
+    );
+    let tag_container_li = Html.createLi document in
+    Dom.appendChild sp1 sp2;
+    Dom.appendChild tag_container_li sp1;
+    Dom.appendChild tag_container tag_container_li;
+  in 
   match !search_state with
   | Uninitialized ->
       raise @@ web_app_error "update_form: search is unitialised"
@@ -379,8 +396,21 @@ let update_form () =
       (get_input "fpattern_element")##.value := js state.pattern;
       ElementSet.iter (fun element ->  check_input @@ "f" ^ element_type_to_string element)
         state.elements;
-      if state.regex then check_input "fregex"
-(* TODO: update tags lists with content from state.in_opams and state.in_mdls *)
+      if state.regex then check_input "fregex";
+      if not @@ StringSet.is_empty state.in_opams then begin
+        StringSet.iter (fun p -> logs @@ "I FOUNAD PACK " ^ p) state.in_opams;
+        check_input "showpacksearch";
+        (get_element_by_id "nsbp")##.style##.display := js "block";
+        let tag_packs = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in 
+        StringSet.iter (fun opam -> add_tag tag_packs opam) state.in_opams
+      end;  
+      if not @@ StringCoupleSet.is_empty state.in_mdls then begin
+        StringCoupleSet.iter (fun (mdl,_) -> logs @@ "I FOUNAD MOD " ^ mdl) state.in_mdls;
+        check_input "showmodsearch";
+        (get_element_by_id "nsbm")##.style##.display := js "block";
+        let tag_mdls = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
+        StringCoupleSet.iter (fun (mdl,opam) -> add_tag tag_mdls (mdl ^ ":" ^ opam)) state.in_mdls
+      end
 (** Looks for state in order to update corresponding form *)
 
 let insert_packsUl_li : packages_jsoo t -> unit  = 
@@ -391,7 +421,6 @@ let insert_packsUl_li : packages_jsoo t -> unit  =
   (* Start by removing all children from packsUl and replace them with result of new request 
      packsUl##.innerHTML = "";*)
   packsUl##.innerHTML := js "";
-
   let cur_tags = ref StringSet.empty in
   if to_bool tag_container##hasChildNodes
   then
@@ -455,7 +484,6 @@ let insert_modsUl_li : modules_jsoo t -> unit  =
   let tag_container = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in
   (* Start by removing all children from packsUl and replace them with result of new request*) 
   modsUl##.innerHTML := js "";
-
   let cur_tags = ref StringSet.empty in
   if to_bool tag_container##hasChildNodes
   then
