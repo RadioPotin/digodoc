@@ -33,9 +33,13 @@ let redirection_handler () =
         open_url href
     else
         (* Else redirect to search page with predefined filters *)
-        let display_query = "&current=packages&page=0" in
+        let display_query = "&current=packages&page=1" in
         let entries_query = "&entry=packages&entry=libraries&entry=modules" in
-        let url = js ("search.html?pattern=" ^ encode_query_val entry_state.pattern ^ entries_query ^ display_query) in 
+        let url = concat path_to_root @@ 
+            js ("search.html?search=entry&pattern=" 
+                ^ encode_query_val entry_state.pattern 
+                ^ entries_query 
+                ^ display_query) in 
         open_url url
 (** Redirection handler that redirects either to the documentation page (if only one result displayed) either
     to the search page that lists all the results. *)
