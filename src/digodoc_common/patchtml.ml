@@ -10,7 +10,6 @@ let edit_html ?header ?footer ~head_childs html =
     Option.iter (fun e ->
       f ( parse e $$ id ) ) o
   in
-  ignore header;
   opt_inserter
     (fun e -> rev e |> iter (fun e -> prepend_child body e))
     header
@@ -80,6 +79,25 @@ let change_link_to_upper_directory html upper =
   set_attribute "href" new_href link;
   to_string html
 
+let append_local_search html = 
+  let get_first_elt node =
+    Option.get @@ first @@ elements @@ children node
+  in
+  let html = parse html in
+  let body = html $ "body" in
+  let div = Option.get @@
+    element @@
+    Option.get @@
+    nth 2 @@
+    elements @@
+    children body
+  in
+  let nav = get_first_elt div |> get_first_elt in 
+  iter (fun input -> append_child nav input) @@
+    (parse {|<input id="localsearch" placeholder="Search in ..." autocomplete="off" style="float:right">|} 
+     $$ "#localsearch");
+  to_string html
+  
 open Omd
 (* Keeps us from processing url links *)
 let is_url url =
