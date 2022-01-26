@@ -223,3 +223,24 @@ let path_to_root : js_string t =
     path;
   js !root
 (** Path to the root directory from current file *)
+
+let opam_name_from_page : string option = 
+  let open String in
+  if Array.length path > 2 && is_doc_page then begin
+    let dir = path.(1) in
+    let i, len = index dir '.', length dir in 
+    let pref, rest = sub dir 0 i, sub dir (i + 1) (len - i - 1) in
+    match pref with
+    | "OPAM" | "PAGES" -> Some (sub rest 0 (index rest '.'))
+    | "META" | "LIBRARY" | "MODULE" ->
+      let i, len = index rest '@', length rest in
+      Some (sub dir (i + 1) (len - i - 1))
+    | _ -> None
+  end
+  else if Array.length path > 2 && is_source_page then begin
+    let dir = path.(1) in
+    let i = index dir '.' in 
+    Some (sub dir 0 i)
+  end
+  else None
+(** Name of opam package for current documentation/source page *)

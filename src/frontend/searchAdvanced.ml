@@ -147,7 +147,7 @@ let state_of_args args =
           | "current" -> state.current_element <- element_type_of_string elt
           | "mode" -> (match elt with "text" -> state.regex <- false | _ -> state.regex <- true)
           | "page" -> state.page <- int_of_string elt
-          | "opam" -> state.in_opams <- StringSet.add (decode_query_val elt) state.in_opams; logs ("OPAM = " ^ elt)
+          | "opam" -> state.in_opams <- StringSet.add (decode_query_val elt) state.in_opams
           | "mdl" ->
             let elt = decode_query_val elt in
             begin
@@ -398,14 +398,12 @@ let update_form () =
         state.elements;
       if state.regex then check_input "fregex";
       if not @@ StringSet.is_empty state.in_opams then begin
-        StringSet.iter (fun p -> logs @@ "I FOUNAD PACK " ^ p) state.in_opams;
         check_input "showpacksearch";
         (get_element_by_id "nsbp")##.style##.display := js "block";
         let tag_packs = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "pack_tag_container" in 
         StringSet.iter (fun opam -> add_tag tag_packs opam) state.in_opams
       end;  
       if not @@ StringCoupleSet.is_empty state.in_mdls then begin
-        StringCoupleSet.iter (fun (mdl,_) -> logs @@ "I FOUNAD MOD " ^ mdl) state.in_mdls;
         check_input "showmodsearch";
         (get_element_by_id "nsbm")##.style##.display := js "block";
         let tag_mdls = unopt @@ Html.CoerceTo.ul @@ get_element_by_id "mod_tag_container" in

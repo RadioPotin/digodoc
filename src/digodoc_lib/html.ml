@@ -243,14 +243,20 @@ let add_header_footer () =
         end
       ) html_dir
 
-let adjust_upper_link () =
+let adjust_nav () =
   let update_doc path ?(filename="index.html") upper = 
     let file = path // filename in
     let html = EzFile.read_file file in
     let html' = Patchtml.change_link_to_upper_directory html upper in 
     EzFile.remove file;
     EzFile.write_file file html'
-  in  
+  and add_search_input path = 
+    let file = path // "index.html" in
+    let html = EzFile.read_file file in
+    let html' = Patchtml.append_local_search html in
+    EzFile.remove file;
+    EzFile.write_file file html'
+  in
     let html_dir = digodoc_html_dir in 
     Array.iter (fun file ->
         let path = html_dir // file in
@@ -259,17 +265,22 @@ let adjust_upper_link () =
         | "MODULE" -> begin
           Array.iter (fun modul ->
               let path = path // modul in 
-              if EzFile.is_directory path then update_doc path "modules.html"
+              if EzFile.is_directory path then begin
+                update_doc path "modules.html";
+              end
             ) 
             (EzFile.read_dir path)
         end
-        | "LIBRARY" -> update_doc path "libraries.html"
+        | "LIBRARY" -> update_doc path "libraries.html";
         | "META" -> update_doc path "metas.html"
         | "PAGES" ->
           if EzFile.exists (path // "index.html")
           then update_doc path "packages.html"
           else update_doc path "packages.html" ~filename:(EzFile.readdir path).(0)
-        | _ -> update_doc path "packages.html"
+        | "OPAM" -> 
+          add_search_input path;
+          update_doc path "packages.html"
+        | _ -> ()
       )
       (EzFile.read_dir html_dir)
 
@@ -278,7 +289,7 @@ let adjust_upper_link () =
 let adjust_docs () = 
   Printf.eprintf "Docs adjusting...\n%!";
   let html_dir = digodoc_html_dir in
-  adjust_upper_link ();
+  adjust_nav ();
   EzFile.make_select EzFile.iter_dir ~deep:true ~glob:"index.html"
     ~f:(fun path ->
         let file = html_dir // path in
